@@ -73,7 +73,9 @@ export default function NewPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to create vision framework');
+        console.error('Vision Framework V2 generation error:', errorData);
+        const errorDetails = errorData.details ? `\n\nDetails:\n${JSON.stringify(errorData.details, null, 2)}` : '';
+        throw new Error(errorData.error + errorDetails || 'Failed to create vision framework');
       }
 
       // Update progress as we process the response
