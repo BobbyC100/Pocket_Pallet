@@ -174,7 +174,7 @@ Create a complete Vision Framework in JSON format with these sections:
 5. **metrics** (array of 3-12 objects): Extract what they should track. Each needs:
    - \`name\`: What to measure
    - \`target\`: The goal (can be a number or qualitative)
-   - \`cadence\`: How often to check (daily, weekly, monthly, quarterly, milestone)
+   - \`cadence\`: How often to check - MUST be exactly one of: "daily", "weekly", "monthly", "quarterly", or "milestone" (no other values allowed)
 
 6. **tensions** (array of 0-10 strings): **CRITICAL** - Identify contradictions or trade-offs in their responses. Each tension should be 10-30 words. Look for:
    - Conflicting priorities (e.g., "move fast" vs "never compromise on safety")
@@ -203,8 +203,10 @@ Return ONLY valid JSON matching this structure:
   ],
   "metrics": [
     {"name": "string", "target": "string", "cadence": "monthly"},
+    {"name": "string", "target": "string", "cadence": "quarterly"},
     ...
   ],
+  "IMPORTANT": "cadence MUST be one of: daily, weekly, monthly, quarterly, milestone",
   "tensions": ["string", "string", ...]
 }
 \`\`\`
