@@ -15,9 +15,13 @@ export function AppHeader() {
           <Link href="/new" className="rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
             New Brief
           </Link>
-          <Link href="/sos" className="rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-            Documents
-          </Link>
+          
+          <SignedIn>
+            <Link href="/sos" className="rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+              Documents
+            </Link>
+          </SignedIn>
+          
           <Link href="/showcase" className="rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
             Examples
           </Link>
