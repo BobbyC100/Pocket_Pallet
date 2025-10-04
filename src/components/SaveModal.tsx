@@ -16,8 +16,8 @@ export default function SaveModal({ isOpen, onClose, onSaveComplete }: SaveModal
   if (!isOpen) return null;
 
   const handleEmailSignIn = () => {
-    // Clerk will handle the magic link flow
-    router.push('/sign-in');
+    // Redirect to sign-in with a return URL back to /new
+    router.push('/sign-in?redirect_url=/new');
   };
 
   const handleGoogleSignIn = async () => {
@@ -26,8 +26,8 @@ export default function SaveModal({ isOpen, onClose, onSaveComplete }: SaveModal
     try {
       await signIn.authenticateWithRedirect({
         strategy: 'oauth_google',
-        redirectUrl: '/sos',
-        redirectUrlComplete: '/sos',
+        redirectUrl: '/new',
+        redirectUrlComplete: '/new',
       });
     } catch (error) {
       console.error('Google sign-in error:', error);
