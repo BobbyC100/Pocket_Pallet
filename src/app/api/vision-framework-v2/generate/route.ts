@@ -62,6 +62,14 @@ export async function POST(request: NextRequest) {
       metrics: frameworkData.metrics || [],
       tensions: frameworkData.tensions || []
     };
+    
+    console.log('📊 Complete framework structure:');
+    console.log('  - vision:', completeFramework.vision?.substring(0, 50) + '...');
+    console.log('  - strategy length:', completeFramework.strategy?.length);
+    console.log('  - operating_principles length:', completeFramework.operating_principles?.length);
+    console.log('  - near_term_bets length:', completeFramework.near_term_bets?.length);
+    console.log('  - metrics length:', completeFramework.metrics?.length);
+    console.log('  - tensions length:', completeFramework.tensions?.length);
 
     console.log('Complete framework structure:', {
       hasVision: !!completeFramework.vision,
