@@ -24,12 +24,23 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
     if (draftData) {
       try {
         const parsed = JSON.parse(draftData);
-        console.log('📦 Parsed data:', parsed);
-        console.log('🎯 Framework:', parsed.framework);
+        console.log('📦 Parsed data keys:', Object.keys(parsed));
+        console.log('🎯 Framework exists:', !!parsed.framework);
+        console.log('📄 Framework vision:', parsed.framework?.vision);
+        console.log('📊 Framework strategy length:', parsed.framework?.strategy?.length);
         
-        setFramework(parsed.framework || null);
-        setExecutiveOnePager(parsed.executiveOnePager || '');
-        setQaResults(parsed.metadata?.qaChecks || null);
+        if (parsed.framework) {
+          setFramework(parsed.framework);
+          console.log('✅ Framework set with', Object.keys(parsed.framework).length, 'keys');
+        }
+        if (parsed.executiveOnePager) {
+          setExecutiveOnePager(parsed.executiveOnePager);
+          console.log('✅ One-pager set, length:', parsed.executiveOnePager.length);
+        }
+        if (parsed.metadata?.qaChecks) {
+          setQaResults(parsed.metadata.qaChecks);
+          console.log('✅ QA results set');
+        }
         console.log('✅ Loaded Vision Framework V2 from session');
       } catch (error) {
         console.error('❌ Failed to parse draft data:', error);
@@ -444,10 +455,10 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
 
         {activeTab === 'onepager' && (
           <div className="bg-white rounded-lg shadow-sm p-8">
-            <div className="prose max-w-none">
-              <pre className="whitespace-pre-wrap font-sans text-gray-800">
+            <div className="prose prose-sm max-w-none">
+              <div className="whitespace-pre-wrap font-sans text-gray-800 leading-relaxed">
                 {executiveOnePager || 'Executive one-pager will appear here after generation.'}
-              </pre>
+              </div>
             </div>
           </div>
         )}
@@ -456,35 +467,51 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
           <div className="bg-white rounded-lg shadow-sm p-8">
             {qaResults ? (
               <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Overall Score: {qaResults.overallScore}/10</h3>
+                <div className="pb-4 border-b border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-900">Quality Assessment</h3>
+                  <p className="text-2xl font-bold text-blue-600 mt-2">{qaResults.overallScore}/10</p>
                 </div>
                 
-                {Object.entries(qaResults).filter(([key]) => 
-                  ['consistency', 'measurability', 'tensions', 'actionability', 'completeness'].includes(key)
-                ).map(([category, data]: [string, any]) => (
-                  <div key={category} className="border-l-4 border-gray-200 pl-4">
-                    <h4 className="font-bold text-gray-900 capitalize mb-2">
-                      {category} {data.pass ? '✅' : '⚠️'}
-                    </h4>
-                    {data.issues && data.issues.length > 0 && (
-                      <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                        {data.issues.map((issue: string, i: number) => (
-                          <li key={i}>{issue}</li>
-                        ))}
-                      </ul>
-                    )}
-                    {data.feedback && <p className="text-sm text-gray-700 mt-2">{data.feedback}</p>}
-                    {data.score && <p className="text-sm text-gray-600 mt-1">Score: {data.score}/10</p>}
-                  </div>
-                ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(qaResults).filter(([key]) => 
+                    ['consistency', 'measurability', 'tensions', 'actionability', 'completeness'].includes(key)
+                  ).map(([category, data]: [string, any]) => (
+                    <div key={category} className="p-4 border border-gray-200 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold text-gray-900 capitalize">{category}</h4>
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          data.pass ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {data.pass ? 'Pass' : 'Review'}
+                        </span>
+                      </div>
+                      {data.issues && data.issues.length > 0 && (
+                        <ul className="text-sm text-gray-600 space-y-1 mt-2">
+                          {data.issues.map((issue: string, i: number) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <span className="text-gray-400 mt-0.5">•</span>
+                              <span>{issue}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      {data.feedback && <p className="text-sm text-gray-600 mt-2">{data.feedback}</p>}
+                      {data.score && <p className="text-sm font-medium text-gray-700 mt-2">Score: {data.score}/10</p>}
+                    </div>
+                  ))}
+                </div>
 
                 {qaResults.recommendations && qaResults.recommendations.length > 0 && (
-                  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                    <h4 className="font-bold text-gray-900 mb-2">Recommendations</h4>
-                    <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                  <div className="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-3">Recommendations</h4>
+                    <ul className="space-y-2">
                       {qaResults.recommendations.map((rec: string, i: number) => (
-                        <li key={i}>{rec}</li>
+                        <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
+                          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold mt-0.5">
+                            {i + 1}
+                          </span>
+                          <span>{rec}</span>
+                        </li>
                       ))}
                     </ul>
                   </div>
