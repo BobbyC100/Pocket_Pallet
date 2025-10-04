@@ -313,7 +313,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                         type="text"
                         value={bet.bet}
                         onChange={(e) => updateBet(index, 'bet', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                         placeholder="What are you committing to?"
                       />
                     </div>
@@ -323,7 +323,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                         type="text"
                         value={bet.owner}
                         onChange={(e) => updateBet(index, 'owner', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                         placeholder="CEO, CTO, etc."
                       />
                     </div>
@@ -332,7 +332,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                       <select
                         value={bet.horizon}
                         onChange={(e) => updateBet(index, 'horizon', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                       >
                         <option value="Q1">Q1</option>
                         <option value="Q2">Q2</option>
@@ -350,7 +350,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                         type="text"
                         value={bet.measure}
                         onChange={(e) => updateBet(index, 'measure', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                         placeholder="How will you measure success?"
                       />
                     </div>
@@ -383,7 +383,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                         type="text"
                         value={metric.name}
                         onChange={(e) => updateMetric(index, 'name', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                         placeholder="What to measure"
                       />
                     </div>
@@ -393,7 +393,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                         type="text"
                         value={metric.target}
                         onChange={(e) => updateMetric(index, 'target', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                         placeholder="Goal"
                       />
                     </div>
@@ -402,7 +402,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                       <select
                         value={metric.cadence}
                         onChange={(e) => updateMetric(index, 'cadence', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                       >
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
