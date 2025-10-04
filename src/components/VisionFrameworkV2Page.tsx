@@ -6,16 +6,17 @@ import { VisionFrameworkV2, NearTermBet, Metric } from '@/lib/vision-framework-s
 interface VisionFrameworkV2PageProps {
   companyId?: string;
   embedded?: boolean; // Hide header when embedded in SOS
+  editOnly?: boolean; // Only show edit tab, hide others
 }
 
-export default function VisionFrameworkV2Page({ companyId = 'demo-company', embedded = false }: VisionFrameworkV2PageProps) {
+export default function VisionFrameworkV2Page({ companyId = 'demo-company', embedded = false, editOnly = false }: VisionFrameworkV2PageProps) {
   const [framework, setFramework] = useState<VisionFrameworkV2 | null>(null);
   const [executiveOnePager, setExecutiveOnePager] = useState<string>('');
   const [qaResults, setQaResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  // Default to QA tab when embedded (users want to see results first)
-  const [activeTab, setActiveTab] = useState<'edit' | 'onepager' | 'qa'>(embedded ? 'qa' : 'edit');
+  // Default to edit tab when editOnly, QA tab when embedded
+  const [activeTab, setActiveTab] = useState<'edit' | 'onepager' | 'qa'>(editOnly ? 'edit' : embedded ? 'qa' : 'edit');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Load framework from session storage on mount
@@ -209,29 +210,38 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex gap-2 border-b border-gray-200">
-          <button
-            onClick={() => setActiveTab('edit')}
-            className={`px-4 py-2 font-medium ${activeTab === 'edit' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-          >
-            Edit Framework
-          </button>
-          <button
-            onClick={() => setActiveTab('onepager')}
-            className={`px-4 py-2 font-medium ${activeTab === 'onepager' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-          >
-            Executive One-Pager
-          </button>
-          <button
-            onClick={() => setActiveTab('qa')}
+      {/* Tabs - hide when editOnly */}
+      {!editOnly && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex gap-2 border-b border-gray-200">
+            <button
+              onClick={() => setActiveTab('edit')}
+              className={`px-4 py-2 font-medium ${activeTab === 'edit' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              Framework
+            </button>
+            <button
+              onClick={() => setActiveTab('onepager')}
+              className={`px-4 py-2 font-medium ${activeTab === 'onepager' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              Executive One-Pager
+            </button>
+            <button
+              onClick={() => setActiveTab('qa')}
             className={`px-4 py-2 font-medium ${activeTab === 'qa' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
           >
             QA Results
           </button>
         </div>
-      </div>
+        </div>
+      )}
+
+      {/* Title when editOnly (no tabs) */}
+      {editOnly && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Vision Framework</h2>
+        </div>
+      )}
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

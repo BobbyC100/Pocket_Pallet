@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import VisionFrameworkV2Page from '@/components/VisionFrameworkV2Page';
 
-type DocType = 'vision-v2' | 'founder-brief' | 'vc-summary';
+type DocType = 'vision-v2' | 'executive-onepager' | 'founder-brief' | 'vc-summary' | 'qa-results';
 
 interface Document {
   id: DocType;
@@ -27,8 +27,16 @@ export default function SOSPage() {
   const [documents, setDocuments] = useState<Document[]>([
     {
       id: 'vision-v2',
-      title: 'Vision Framework V2',
+      title: 'Vision Framework',
       icon: '🎯',
+      status: 'complete',
+      lastUpdated: 'Today',
+      completionPercent: 100
+    },
+    {
+      id: 'executive-onepager',
+      title: 'Executive One-Pager',
+      icon: '📋',
       status: 'complete',
       lastUpdated: 'Today',
       completionPercent: 100
@@ -48,10 +56,19 @@ export default function SOSPage() {
       status: 'complete',
       lastUpdated: 'Today',
       completionPercent: 100
+    },
+    {
+      id: 'qa-results',
+      title: 'QA Results',
+      icon: '✅',
+      status: 'complete',
+      lastUpdated: 'Today',
+      completionPercent: 100
     }
   ]);
 
   const [briefContent, setBriefContent] = useState<{founderBrief?: string; vcSummary?: string} | null>(null);
+  const [visionV2Content, setVisionV2Content] = useState<{executiveOnePager?: string; qaResults?: any} | null>(null);
 
   // Check for data in session storage to update document statuses and load content
   useEffect(() => {
@@ -77,6 +94,23 @@ export default function SOSPage() {
       }
     } else {
       console.log('⚠️ No brief data in session storage');
+    }
+    
+    // Load Vision V2 content if available
+    if (visionV2Data) {
+      try {
+        const parsed = JSON.parse(visionV2Data);
+        console.log('🎯 Loaded Vision V2 data:', {
+          hasOnePager: !!parsed.executiveOnePager,
+          hasQA: !!parsed.metadata?.qaChecks
+        });
+        setVisionV2Content({
+          executiveOnePager: parsed.executiveOnePager,
+          qaResults: parsed.metadata?.qaChecks
+        });
+      } catch (error) {
+        console.error('Error parsing Vision V2 data:', error);
+      }
     }
     
     setDocuments(prev => prev.map(doc => {
@@ -182,7 +216,33 @@ export default function SOSPage() {
           {/* Content Area */}
           <div className="lg:col-span-3">
             {activeDoc === 'vision-v2' && (
-              <VisionFrameworkV2Page companyId="demo-company" embedded={true} />
+              <VisionFrameworkV2Page companyId="demo-company" embedded={true} editOnly={true} />
+            )}
+            
+            {activeDoc === 'executive-onepager' && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Executive One-Pager</h2>
+                {visionV2Content?.executiveOnePager ? (
+                  <div 
+                    className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700"
+                    dangerouslySetInnerHTML={{ 
+                      __html: visionV2Content.executiveOnePager
+                        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold mt-6 mb-3">$1</h2>')
+                        .replace(/^### (.+)$/gm, '<h3 class="text-xl font-semibold mt-4 mb-2">$1</h3>')
+                        .replace(/^- (.+)$/gm, '<li class="ml-4">$1</li>')
+                        .replace(/(<li.*<\/li>)/s, '<ul class="list-disc ml-6 space-y-1">$1</ul>')
+                        .replace(/\n\n/g, '<br/><br/>')
+                    }}
+                  />
+                ) : (
+                  <div className="prose prose-sm max-w-none">
+                    <p className="text-gray-600">
+                      Your executive one-pager will appear here. Generate a Vision Framework first.
+                    </p>
+                  </div>
+                )}
+              </div>
             )}
             
             {activeDoc === 'founder-brief' && (
@@ -221,6 +281,63 @@ export default function SOSPage() {
                         Create Brief
                       </a>{' '}
                       page.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {activeDoc === 'qa-results' && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">QA Results</h2>
+                {visionV2Content?.qaResults ? (
+                  <div className="space-y-6">
+                    {/* Overall Score */}
+                    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900">Overall Quality</h3>
+                        <span className="text-3xl font-bold text-green-600">
+                          {visionV2Content.qaResults.overallScore || 'N/A'}%
+                        </span>
+                      </div>
+                      {visionV2Content.qaResults.summary && (
+                        <p className="text-gray-700">{visionV2Content.qaResults.summary}</p>
+                      )}
+                    </div>
+
+                    {/* Issues Found */}
+                    {visionV2Content.qaResults.issues && visionV2Content.qaResults.issues.length > 0 && (
+                      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Issues Found</h3>
+                        <div className="space-y-3">
+                          {visionV2Content.qaResults.issues.map((issue: any, idx: number) => (
+                            <div key={idx} className="border-l-4 border-yellow-500 pl-4 py-2 bg-white rounded">
+                              <p className="text-sm font-medium text-yellow-700">{issue.severity || 'Warning'}</p>
+                              <p className="text-gray-700 mt-1">{issue.description || issue}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Recommendations */}
+                    {visionV2Content.qaResults.recommendations && visionV2Content.qaResults.recommendations.length > 0 && (
+                      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Recommendations</h3>
+                        <div className="space-y-3">
+                          {visionV2Content.qaResults.recommendations.map((rec: any, idx: number) => (
+                            <div key={idx} className="border-l-4 border-blue-500 pl-4 py-2 bg-white rounded">
+                              <p className="text-gray-700">{rec.text || rec}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="prose prose-sm max-w-none">
+                    <p className="text-gray-600">
+                      QA results will appear here. Generate a Vision Framework first.
                     </p>
                   </div>
                 )}
