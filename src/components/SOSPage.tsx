@@ -272,21 +272,35 @@ export default function SOSPage() {
             )}
             
             {activeDoc === 'executive-onepager' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Executive One-Pager</h2>
+              <div className="bg-white rounded-lg shadow-sm p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Executive One-Pager</h2>
+                  <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                    Gemini 2.5 Flash
+                  </span>
+                </div>
                 {visionV2Content?.executiveOnePager ? (
-                  <div 
-                    className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700"
-                    dangerouslySetInnerHTML={{ 
-                      __html: visionV2Content.executiveOnePager
-                       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                       .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold mt-6 mb-3">$1</h2>')
-                       .replace(/^### (.+)$/gm, '<h3 class="text-xl font-semibold mt-4 mb-2">$1</h3>')
-                       .replace(/^- (.+)$/gm, '<li class="ml-4">$1</li>')
-                       .replace(/(<li[\s\S]*?<\/li>)/g, '<ul class="list-disc ml-6 space-y-1">$1</ul>')
-                       .replace(/\n\n/g, '<br/><br/>')
-                    }}
-                  />
+                  <>
+                    <div className="prose prose-sm max-w-none">
+                      <div 
+                        className="whitespace-pre-wrap text-gray-700 leading-relaxed text-sm"
+                        dangerouslySetInnerHTML={{ 
+                          __html: visionV2Content.executiveOnePager
+                           .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                           .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold mt-6 mb-3">$1</h2>')
+                           .replace(/^### (.+)$/gm, '<h3 class="text-xl font-semibold mt-4 mb-2">$1</h3>')
+                           .replace(/^- (.+)$/gm, '<li class="ml-4">$1</li>')
+                           .replace(/(<li[\s\S]*?<\/li>)/g, '<ul class="list-disc ml-6 space-y-1">$1</ul>')
+                           .replace(/\n\n/g, '<br/><br/>')
+                        }}
+                      />
+                    </div>
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <p className="text-sm text-gray-500">
+                        <strong>Purpose:</strong> Quick reference for team / board / advisors
+                      </p>
+                    </div>
+                  </>
                 ) : (
                   <div className="prose prose-sm max-w-none">
                     <p className="text-gray-600">
@@ -298,12 +312,26 @@ export default function SOSPage() {
             )}
             
             {activeDoc === 'founder-brief' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Founder Brief</h2>
+              <div className="bg-white rounded-lg shadow-sm p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Founder Brief</h2>
+                  <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                    GPT-4 Generated
+                  </span>
+                </div>
                 {briefContent?.founderBrief ? (
-                  <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700">
-                    <ReactMarkdown>{briefContent.founderBrief}</ReactMarkdown>
-                  </div>
+                  <>
+                    <div className="prose prose-sm max-w-none">
+                      <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                        <ReactMarkdown>{briefContent.founderBrief}</ReactMarkdown>
+                      </div>
+                    </div>
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <p className="text-sm text-gray-500">
+                        <strong>Purpose:</strong> Internal narrative for founders, team, and advisors
+                      </p>
+                    </div>
+                  </>
                 ) : (
                   <div className="prose prose-sm max-w-none">
                     <p className="text-gray-600">
@@ -319,12 +347,26 @@ export default function SOSPage() {
             )}
             
             {activeDoc === 'vc-summary' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">VC Summary</h2>
+              <div className="bg-white rounded-lg shadow-sm p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">VC Summary</h2>
+                  <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                    GPT-4 Generated
+                  </span>
+                </div>
                 {briefContent?.vcSummary ? (
-                  <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700">
-                    <ReactMarkdown>{briefContent.vcSummary}</ReactMarkdown>
-                  </div>
+                  <>
+                    <div className="prose prose-sm max-w-none">
+                      <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                        <ReactMarkdown>{briefContent.vcSummary}</ReactMarkdown>
+                      </div>
+                    </div>
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <p className="text-sm text-gray-500">
+                        <strong>Purpose:</strong> Investor pitch deck companion / email intro
+                      </p>
+                    </div>
+                  </>
                 ) : (
                   <div className="prose prose-sm max-w-none">
                     <p className="text-gray-600">
@@ -340,8 +382,13 @@ export default function SOSPage() {
             )}
             
             {activeDoc === 'qa-results' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">QA Results</h2>
+              <div className="bg-white rounded-lg shadow-sm p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">QA Results</h2>
+                  <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">
+                    Gemini 2.5 Pro
+                  </span>
+                </div>
                 {visionV2Content?.qaResults ? (
                   <div className="space-y-6">
                     {/* Overall Score */}
