@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 interface GenerationStep {
   id: string;
   label: string;
@@ -18,12 +20,41 @@ export default function GenerationProgressModal({
   currentStep,
   steps 
 }: GenerationProgressModalProps) {
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  
+  useEffect(() => {
+    if (!isOpen) {
+      setStartTime(null);
+      setElapsedTime(0);
+      return;
+    }
+    
+    // Set start time when modal opens
+    const start = Date.now();
+    setStartTime(start);
+    
+    // Update elapsed time every second
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - start) / 1000);
+      setElapsedTime(elapsed);
+    }, 100); // Update every 100ms for smoother display
+    
+    // Cleanup function
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isOpen]);
+  
   if (!isOpen) return null;
   
   const currentStepIndex = steps.findIndex(s => s.id === currentStep);
   const completedSteps = steps.filter(s => s.status === 'complete').length;
   const totalSteps = steps.length;
   const overallProgress = Math.min(100, Math.round((completedSteps / totalSteps) * 100));
+  
+  const totalEstimatedTime = steps.reduce((acc, step) => acc + step.estimatedSeconds, 0);
+  const remainingTime = Math.max(0, totalEstimatedTime - elapsedTime);
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -52,6 +83,12 @@ export default function GenerationProgressModal({
               style={{ width: `${overallProgress}%` }}
             />
           </div>
+        </div>
+        
+        {/* Time Display */}
+        <div className="flex justify-between text-sm text-gray-600 mb-6">
+          <span>Elapsed: {elapsedTime}s</span>
+          <span>Est. remaining: ~{remainingTime}s</span>
         </div>
         
         {/* Step List */}
