@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createStructuredVcSummaryPrompt, validateVcSummary } from '@/lib/vc-summary-schema';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
     
     const gpt4Briefs = await generateGPT4Briefs(responses);
     const founderBriefMd = gpt4Briefs.founder;
+    const vcSummaryStructured = gpt4Briefs.vcStructured;
     const vcSummaryMd = gpt4Briefs.vc;
     
     console.log('✅ Briefs generated');
@@ -49,6 +51,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       founderBriefMd,
       vcSummaryMd,
+      vcSummaryStructured, // New structured format
       runwayMonths,
       responses // Pass through for framework generation
     });
@@ -104,8 +107,9 @@ The outline should serve as the foundation for both a founder-facing brief (narr
 async function generateGPT4Briefs(responses: any) {
   const founderPrompt = createFounderPrompt(responses);
   const vcPrompt = createVCPrompt(responses);
+  const vcStructuredPrompt = createStructuredVcSummaryPrompt(responses);
 
-  const [founderResult, vcResult] = await Promise.all([
+  const [founderResult, vcResult, vcStructuredResult] = await Promise.all([
     openai.chat.completions.create({
       model: "gpt-4-turbo-preview",
       messages: [{ role: "user", content: founderPrompt }],
@@ -117,12 +121,38 @@ async function generateGPT4Briefs(responses: any) {
       messages: [{ role: "user", content: vcPrompt }],
       temperature: 0.7,
       max_tokens: 1500,
+    }),
+    openai.chat.completions.create({
+      model: "gpt-4-turbo-preview",
+      messages: [{ role: "user", content: vcStructuredPrompt }],
+      temperature: 0.7,
+      max_tokens: 1500,
+      response_format: { type: "json_object" }
     })
   ]);
 
+  // Parse and validate structured VC Summary
+  let vcStructured = null;
+  try {
+    const vcText = vcStructuredResult.choices[0]?.message?.content || '{}';
+    const vcParsed = JSON.parse(vcText);
+    const validation = validateVcSummary(vcParsed);
+    
+    if (validation.success) {
+      vcStructured = validation.data;
+      console.log('✅ Structured VC Summary validated');
+    } else {
+      console.warn('⚠️  VC Summary validation failed:', validation.errors);
+      vcStructured = vcParsed; // Return anyway but log the issues
+    }
+  } catch (error) {
+    console.error('❌ Failed to parse structured VC Summary:', error);
+  }
+
   return {
     founder: founderResult.choices[0]?.message?.content || '',
-    vc: vcResult.choices[0]?.message?.content || ''
+    vc: vcResult.choices[0]?.message?.content || '',
+    vcStructured
   };
 }
 
