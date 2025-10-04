@@ -62,6 +62,12 @@ export default function SOSPage() {
     if (briefData) {
       try {
         const parsed = JSON.parse(briefData);
+        console.log('📄 Loaded brief data:', {
+          hasFounderBrief: !!parsed.founderBriefMd,
+          hasVcSummary: !!parsed.vcSummaryMd,
+          founderBriefLength: parsed.founderBriefMd?.length,
+          vcSummaryLength: parsed.vcSummaryMd?.length
+        });
         setBriefContent({
           founderBrief: parsed.founderBriefMd,
           vcSummary: parsed.vcSummaryMd
@@ -69,6 +75,8 @@ export default function SOSPage() {
       } catch (error) {
         console.error('Error parsing brief data:', error);
       }
+    } else {
+      console.log('⚠️ No brief data in session storage');
     }
     
     setDocuments(prev => prev.map(doc => {
