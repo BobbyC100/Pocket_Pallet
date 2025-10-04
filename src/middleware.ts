@@ -1,11 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-// Define public routes that don't require authentication
+// Define public routes (default allow)
 const isPublicRoute = createRouteMatcher([
   '/',
   '/new',
   '/brief/:id',
-  '/dashboard',
   '/example',
   '/showcase',
   '/sos',
@@ -16,10 +15,19 @@ const isPublicRoute = createRouteMatcher([
   '/api/vision-framework/generate',
 ]);
 
+// Define private routes that require authentication
+const isPrivateRoute = createRouteMatcher([
+  '/account(.*)',
+  '/settings(.*)',
+  '/dashboard',
+]);
+
 export default clerkMiddleware(async (auth, request) => {
-  // For now, make everything public during development
-  // We'll add protection after the save flow is complete
-  return;
+  // Protect private routes
+  if (isPrivateRoute(request)) {
+    await auth.protect();
+  }
+  // Public routes are accessible to everyone
 });
 
 export const config = {
