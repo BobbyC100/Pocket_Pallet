@@ -5,9 +5,10 @@ import { VisionFrameworkV2, NearTermBet, Metric } from '@/lib/vision-framework-s
 
 interface VisionFrameworkV2PageProps {
   companyId?: string;
+  embedded?: boolean; // Hide header when embedded in SOS
 }
 
-export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: VisionFrameworkV2PageProps) {
+export default function VisionFrameworkV2Page({ companyId = 'demo-company', embedded = false }: VisionFrameworkV2PageProps) {
   const [framework, setFramework] = useState<VisionFrameworkV2 | null>(null);
   const [executiveOnePager, setExecutiveOnePager] = useState<string>('');
   const [qaResults, setQaResults] = useState<any>(null);
@@ -170,31 +171,33 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <a href="/new" className="text-sm text-gray-500 hover:text-gray-700 mb-2 block">
-                ← Back to Brief
-              </a>
-              <h1 className="text-2xl font-bold text-gray-900">Vision Framework</h1>
-              <p className="text-sm text-gray-500 mt-1">Your strategic operating system</p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                {saving ? 'Saving...' : 'Save'}
-              </button>
+  const content = (
+    <>
+      {/* Header - only show when not embedded */}
+      {!embedded && (
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <a href="/new" className="text-sm text-gray-500 hover:text-gray-700 mb-2 block">
+                  ← Back to Brief
+                </a>
+                <h1 className="text-2xl font-bold text-gray-900">Vision Framework</h1>
+                <p className="text-sm text-gray-500 mt-1">Your strategic operating system</p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  {saving ? 'Saving...' : 'Save'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Message */}
       {message && (
@@ -538,6 +541,17 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
           </div>
         )}
       </div>
+    </>
+  );
+
+  // Return with or without outer container based on embedded prop
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {content}
     </div>
   );
 }
