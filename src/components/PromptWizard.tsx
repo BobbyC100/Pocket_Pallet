@@ -3,15 +3,28 @@
 import { useState, useEffect } from 'react'
 import { PROMPT_STEPS } from '@/lib/templates'
 import { PromptInput, BriefOutput } from '@/lib/types'
+import GenerationProgressModal from '@/components/GenerationProgressModal'
 
 interface PromptWizardProps {
   onGenerated: (result: BriefOutput & { responses?: PromptInput }) => void;
+}
+
+interface GenerationStep {
+  id: string;
+  label: string;
+  status: 'pending' | 'active' | 'complete';
+  estimatedSeconds: number;
 }
 
 export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [responses, setResponses] = useState<Partial<PromptInput>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [generationSteps, setGenerationSteps] = useState<GenerationStep[]>([
+    { id: 'framework', label: 'Generating Vision Framework', status: 'pending', estimatedSeconds: 2 },
+    { id: 'brief', label: 'Generating Founder Brief & VC Summary', status: 'pending', estimatedSeconds: 18 }
+  ])
+  const [activeGenerationStep, setActiveGenerationStep] = useState('')
 
   const loadTestData = () => {
     const testData = {
@@ -47,13 +60,28 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
     }
   }
 
+  const updateStepStatus = (stepId: string, status: 'pending' | 'active' | 'complete') => {
+    setGenerationSteps(prev => prev.map(step => 
+      step.id === stepId ? { ...step, status } : step
+    ));
+    if (status === 'active') {
+      setActiveGenerationStep(stepId);
+    }
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true)
     
-    console.log('🚀 Generating brief...');
+    // Reset steps
+    setGenerationSteps([
+      { id: 'framework', label: 'Generating Vision Framework', status: 'pending', estimatedSeconds: 2 },
+      { id: 'brief', label: 'Generating Founder Brief & VC Summary', status: 'pending', estimatedSeconds: 18 }
+    ]);
 
     try {
-      // First generate the vision framework
+      // Step 1: Generate vision framework
+      updateStepStatus('framework', 'active');
+      
       const spineResponse = await fetch('/api/vision-framework/generate', {
         method: 'POST',
         headers: {
@@ -73,8 +101,11 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
 
       // Parse framework result immediately after success check
       const frameworkResult = await spineResponse.json();
+      updateStepStatus('framework', 'complete');
 
-      // Then generate the traditional briefs
+      // Step 2: Generate the traditional briefs
+      updateStepStatus('brief', 'active');
+      
       const briefResponse = await fetch('/api/generate-brief', {
         method: 'POST',
         headers: {
@@ -90,6 +121,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       }
 
       const briefResult = await briefResponse.json()
+      updateStepStatus('brief', 'complete');
       
       console.log('✅ Complete');
       
@@ -104,7 +136,9 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
     } catch (error) {
       console.error('Error generating brief:', error)
       alert(`Error generating brief: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
       setIsSubmitting(false)
+      setActiveGenerationStep('');
     }
   }
 
@@ -112,7 +146,14 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   const progress = ((currentStep + 1) / PROMPT_STEPS.length) * 100
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <>
+      <GenerationProgressModal 
+        isOpen={isSubmitting}
+        currentStep={activeGenerationStep}
+        steps={generationSteps}
+      />
+      
+      <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Progress Bar */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-2">
@@ -191,6 +232,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         )}
       </div>
     </div>
+    </>
   )
 }
 
