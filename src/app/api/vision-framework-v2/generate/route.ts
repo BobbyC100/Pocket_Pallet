@@ -25,29 +25,47 @@ export async function POST(request: NextRequest) {
     const frameworkText = frameworkResult.response.text();
     
     console.log('✅ Framework structure generated');
+    console.log('Raw Gemini response (first 500 chars):', frameworkText.substring(0, 500));
 
     // Extract JSON from response (handle markdown code blocks)
     let frameworkData: Partial<VisionFrameworkV2>;
     try {
       const jsonMatch = frameworkText.match(/\`\`\`json\s*([\s\S]*?)\`\`\`/);
       if (jsonMatch) {
+        console.log('Found JSON in code block');
         frameworkData = JSON.parse(jsonMatch[1]);
       } else {
+        console.log('No code block found, parsing entire response');
         // Try parsing the whole response
         frameworkData = JSON.parse(frameworkText);
       }
+      console.log('Parsed framework data:', JSON.stringify(frameworkData, null, 2).substring(0, 500));
     } catch (parseError) {
       console.error('❌ Failed to parse Gemini response:', parseError);
       console.error('Raw response:', frameworkText);
       throw new Error('Failed to parse Vision Framework from Gemini response');
     }
 
-    // Add metadata
+    // Add metadata and ensure all required fields exist
     const completeFramework: VisionFrameworkV2 = {
       companyId,
       updatedAt: new Date().toISOString(),
-      ...frameworkData
-    } as VisionFrameworkV2;
+      vision: frameworkData.vision || '',
+      strategy: frameworkData.strategy || [],
+      operating_principles: frameworkData.operating_principles || [],
+      near_term_bets: frameworkData.near_term_bets || [],
+      metrics: frameworkData.metrics || [],
+      tensions: frameworkData.tensions || []
+    };
+
+    console.log('Complete framework structure:', {
+      hasVision: !!completeFramework.vision,
+      strategyCount: completeFramework.strategy.length,
+      principlesCount: completeFramework.operating_principles.length,
+      betsCount: completeFramework.near_term_bets.length,
+      metricsCount: completeFramework.metrics.length,
+      tensionsCount: completeFramework.tensions.length
+    });
 
     // Validate
     console.log('Step 2: Validating framework...');

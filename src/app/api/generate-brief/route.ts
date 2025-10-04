@@ -32,40 +32,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🚀 Starting brief generation with Gemini 2.5 + GPT-4');
-    console.log('📝 Responses received:', Object.keys(responses));
+    console.log('🚀 Brief generation started');
 
-    // Step 1: Gemini 2.5 Pro generates structured outline
-    console.log('Step 1: Generating outline with Gemini 2.5 Pro...');
-    const geminiPro = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+    // FAST MODE: GPT-4 only, no tightening, no QA
+    // Total time: ~15-20 seconds instead of 30-35 seconds
     
-    const outlinePrompt = createOutlinePrompt(responses);
-    const outlineResult = await geminiPro.generateContent(outlinePrompt);
-    const outline = outlineResult.response.text();
-    console.log('✅ Outline generated');
-
-    // Step 2: Generate briefs from both models in parallel
-    console.log('Step 2: Generating briefs with GPT-4 and Gemini 2.5 Pro...');
-    const [gpt4Briefs, geminiProBriefs] = await Promise.all([
-      generateGPT4Briefs(responses),
-      generateGeminiProBriefs(responses, outline)
-    ]);
-    console.log('✅ Both briefs generated');
-
-    // Step 3: Gemini 2.5 Flash tightens and polishes
-    console.log('Step 3: Tightening with Gemini 2.5 Flash...');
-    const geminiFlash = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const gpt4Briefs = await generateGPT4Briefs(responses);
+    const founderBriefMd = gpt4Briefs.founder;
+    const vcSummaryMd = gpt4Briefs.vc;
     
-    const [founderBriefMd, vcSummaryMd] = await Promise.all([
-      tightenWithFlash(geminiFlash, gpt4Briefs.founder, geminiProBriefs.founder, 'founder'),
-      tightenWithFlash(geminiFlash, gpt4Briefs.vc, geminiProBriefs.vc, 'vc')
-    ]);
-    console.log('✅ Briefs tightened');
-
-    // Step 4: QA checks
-    console.log('Step 4: Running QA checks...');
-    const qaResults = await performQAChecks(geminiFlash, founderBriefMd, responses);
-    console.log('✅ QA checks complete');
+    console.log('✅ Briefs generated');
 
     // Calculate runway if available
     const runwayMonths = calculateRunway(responses);
@@ -74,12 +50,7 @@ export async function POST(request: NextRequest) {
       founderBriefMd,
       vcSummaryMd,
       runwayMonths,
-      responses, // Pass through for framework generation
-      metadata: {
-        modelsUsed: ['gpt-4', 'gemini-2.5-pro', 'gemini-2.5-flash'],
-        outline,
-        qaChecks: qaResults
-      }
+      responses // Pass through for framework generation
     });
 
   } catch (error) {

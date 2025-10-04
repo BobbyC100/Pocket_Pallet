@@ -50,12 +50,10 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   const handleSubmit = async () => {
     setIsSubmitting(true)
     
-    console.log('Submitting wizard responses:', responses);
-    console.log('⏳ Starting brief generation (this may take 15-20 seconds)...');
+    console.log('🚀 Generating brief...');
 
     try {
       // First generate the vision framework
-      console.log('Step 1/2: Generating vision framework...');
       const spineResponse = await fetch('/api/vision-framework/generate', {
         method: 'POST',
         headers: {
@@ -77,8 +75,6 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       const frameworkResult = await spineResponse.json();
 
       // Then generate the traditional briefs
-      console.log('✓ Vision framework generated!');
-      console.log('Step 2/2: Generating AI briefs (this takes 10-15 seconds)...');
       const briefResponse = await fetch('/api/generate-brief', {
         method: 'POST',
         headers: {
@@ -95,8 +91,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
 
       const briefResult = await briefResponse.json()
       
-      console.log('✓ Briefs generated successfully!');
-      console.log('🎉 All done! Displaying results...');
+      console.log('✅ Complete');
       
       // Combine both results
       const combinedResult = {
