@@ -2,6 +2,14 @@
 import { useState } from "react";
 import PromptWizard from "@/components/PromptWizard";
 import ResultTabs from "@/components/ResultTabs";
+import GenerationProgressModal from "@/components/GenerationProgressModal";
+
+interface GenerationStep {
+  id: string;
+  label: string;
+  status: 'pending' | 'active' | 'complete';
+  estimatedSeconds: number;
+}
 
 export default function NewPage() {
   const [result, setResult] = useState<null | {
@@ -11,6 +19,22 @@ export default function NewPage() {
     responses?: any; // Store wizard responses for framework generation
   }>(null);
   const [isCreatingFramework, setIsCreatingFramework] = useState(false);
+  const [frameworkSteps, setFrameworkSteps] = useState<GenerationStep[]>([
+    { id: 'mapping', label: 'Mapping strategic questions to framework', status: 'pending', estimatedSeconds: 10 },
+    { id: 'tensions', label: 'Detecting contradictions and tensions', status: 'pending', estimatedSeconds: 8 },
+    { id: 'onepager', label: 'Generating executive one-pager', status: 'pending', estimatedSeconds: 6 },
+    { id: 'qa', label: 'Running quality checks', status: 'pending', estimatedSeconds: 6 }
+  ]);
+  const [activeFrameworkStep, setActiveFrameworkStep] = useState('');
+
+  const updateFrameworkStepStatus = (stepId: string, status: 'pending' | 'active' | 'complete') => {
+    setFrameworkSteps(prev => prev.map(step => 
+      step.id === stepId ? { ...step, status } : step
+    ));
+    if (status === 'active') {
+      setActiveFrameworkStep(stepId);
+    }
+  };
 
   const handleCreateVisionFramework = async (useV2: boolean = true) => {
     if (!result?.responses) {
@@ -19,11 +43,24 @@ export default function NewPage() {
     }
 
     setIsCreatingFramework(true);
+    
+    // Reset steps
+    setFrameworkSteps([
+      { id: 'mapping', label: 'Mapping strategic questions to framework', status: 'pending', estimatedSeconds: 10 },
+      { id: 'tensions', label: 'Detecting contradictions and tensions', status: 'pending', estimatedSeconds: 8 },
+      { id: 'onepager', label: 'Generating executive one-pager', status: 'pending', estimatedSeconds: 6 },
+      { id: 'qa', label: 'Running quality checks', status: 'pending', estimatedSeconds: 6 }
+    ]);
+    
     try {
       const apiEndpoint = useV2 ? '/api/vision-framework-v2/generate' : '/api/vision-framework/generate';
       const storageKey = useV2 ? 'visionFrameworkV2Draft' : 'visionFrameworkDraft';
       const targetPage = useV2 ? '/vision-framework-v2' : '/vision-framework';
 
+      // Simulate progress through steps (since the API is a single call)
+      updateFrameworkStepStatus('mapping', 'active');
+      await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UX
+      
       // Call the generation API with wizard responses
       const response = await fetch(apiEndpoint, {
         method: 'POST',
@@ -39,7 +76,22 @@ export default function NewPage() {
         throw new Error(errorData.error || 'Failed to create vision framework');
       }
 
+      // Update progress as we process the response
+      updateFrameworkStepStatus('mapping', 'complete');
+      updateFrameworkStepStatus('tensions', 'active');
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
       const frameworkData = await response.json();
+      
+      updateFrameworkStepStatus('tensions', 'complete');
+      updateFrameworkStepStatus('onepager', 'active');
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      updateFrameworkStepStatus('onepager', 'complete');
+      updateFrameworkStepStatus('qa', 'active');
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      updateFrameworkStepStatus('qa', 'complete');
       
       // Store in session storage for the vision framework page
       sessionStorage.setItem(storageKey, JSON.stringify({
@@ -58,13 +110,21 @@ export default function NewPage() {
       alert(`Failed to create vision framework: ${errorMessage}`);
     } finally {
       setIsCreatingFramework(false);
+      setActiveFrameworkStep('');
     }
   };
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
-      {!result ? (
-        <PromptWizard onGenerated={setResult} />
+    <>
+      <GenerationProgressModal 
+        isOpen={isCreatingFramework}
+        currentStep={activeFrameworkStep}
+        steps={frameworkSteps}
+      />
+      
+      <main className="mx-auto max-w-5xl px-6 py-12">
+        {!result ? (
+          <PromptWizard onGenerated={setResult} />
       ) : (
         <div className="space-y-6">
           <ResultTabs
@@ -102,6 +162,7 @@ export default function NewPage() {
           </div>
         </div>
       )}
-    </main>
+      </main>
+    </>
   );
 }
