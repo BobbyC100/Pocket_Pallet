@@ -69,8 +69,11 @@ export function validateVisionFrameworkV2(framework: any): { success: boolean; e
       
       const errors = result.error?.errors?.map(err => {
         const path = err.path.join('.') || 'root';
-        return `${path}: ${err.message}`;
+        const received = err.message.includes('Required') ? 'missing' : JSON.stringify((err as any).received);
+        return `${path}: ${err.message} (received: ${received})`;
       }) || ['Unknown validation error'];
+      
+      console.error('❌ Formatted errors:', errors);
       
       return {
         success: false,
