@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import VisionFrameworkV2Page from '@/components/VisionFrameworkV2Page';
+import { exportToPDF, exportToMarkdown } from '@/lib/pdf-export';
 
 type DocType = 'vision-v2' | 'executive-onepager' | 'founder-brief' | 'vc-summary' | 'qa-results';
 
@@ -24,6 +25,52 @@ export default function SOSPage() {
     }
     return 'vision-v2';
   });
+
+  // Export handlers
+  const handleExportCurrent = async () => {
+    // For now, just download the HTML content as a text file
+    // You can enhance this to use proper PDF export later
+    const currentDoc = documents.find(doc => doc.id === activeDoc);
+    if (!currentDoc) return;
+
+    const element = document.getElementById('document-content');
+    if (!element) return;
+
+    const content = element.innerText;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${currentDoc.title.toLowerCase().replace(/\s+/g, '-')}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportAll = async () => {
+    // Export all documents as separate files
+    for (const doc of documents) {
+      setActiveDoc(doc.id);
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for render
+      
+      const element = document.getElementById('document-content');
+      if (!element) continue;
+
+      const content = element.innerText;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${doc.title.toLowerCase().replace(/\s+/g, '-')}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait between downloads
+    }
+  };
   const [documents, setDocuments] = useState<Document[]>([
     {
       id: 'vision-v2',
@@ -152,7 +199,16 @@ export default function SOSPage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-sm text-gray-500">Last updated: Today</span>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button 
+                onClick={handleExportCurrent}
+                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Export Current
+              </button>
+              <button 
+                onClick={handleExportAll}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
                 Export All
               </button>
             </div>
@@ -210,7 +266,7 @@ export default function SOSPage() {
           </div>
 
           {/* Content Area */}
-          <div className="lg:col-span-3">
+          <div id="document-content" className="lg:col-span-3">
             {activeDoc === 'vision-v2' && (
               <VisionFrameworkV2Page companyId="demo-company" embedded={true} editOnly={true} />
             )}
