@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Completion Update</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a2e;
+      color: #fff;
+    }
+    .button {
+      background: #4CAF50;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    .button:hover { background: #45a049; }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      background: #2d2d44;
+      border-radius: 5px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      background: #2d2d44;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test Completion Update</h1>
+  
+  <div class="test-section">
+    <h2>Step 1: Generate Fresh Framework</h2>
+    <p>Click this to generate a new vision framework with YardBird data:</p>
+    <button class="button" onclick="generateFramework()">🚀 Generate Framework</button>
+  </div>
+
+  <div class="test-section">
+    <h2>Step 2: View Framework</h2>
+    <p>After generation completes, click this to see the vision framework:</p>
+    <button class="button" onclick="goToFramework()">👁️ View Framework</button>
+  </div>
+
+  <div class="test-section">
+    <h2>Step 3: Check Console</h2>
+    <p>1. Open browser console (Right-click → Inspect → Console)<br>
+    2. Look for: <code>📊 Completion: X/25 fields (XX%)</code><br>
+    3. The progress bar should show the percentage</p>
+  </div>
+  
+  <div id="status" class="status">Ready to test...</div>
+
+  <script>
+    async function generateFramework() {
+      const status = document.getElementById('status');
+      status.textContent = '🔄 Generating framework with YardBird data...';
+      
+      try {
+        const response = await fetch('/api/vision-framework/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            companyId: 'yardbird-test',
+            responses: {
+              stage: 'early_traction',
+              vision_audience_timing: "We're building a dynamic dispatch layer for mid-market construction contractors (50-500 employees in NYC, Chicago, LA) who lose 30% of crew time to delivery delays.",
+              hard_decisions: "Should we build horizontally or go deep with GCs first? And do we hire a head of sales now or wait until we hit $500K ARR?",
+              success_definition: "Financially: Build a $100M+ revenue business with 70%+ gross margins. Culturally: Build a team where operators feel ownership and where we never compromise on safety.",
+              core_principles: "Safety first, always. Speed without shortcuts. Earn trust through transparency. Never compromise on quality.",
+              required_capabilities: "Real-time routing algorithms. Mobile app for foremen. API integrations with major construction software. Sales team that understands operations.",
+              current_state: "3 co-founders (ex-Procore PM, ex-Uber Freight ops, CTO). 2 paid pilots, 18 active sites, 1,240 drops coordinated. $500K cash, $25K monthly burn (20 months runway)."
+            }
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'draft') {
+          status.textContent = '✅ Framework generated!\n\n' + 
+            'Vision Purpose: ' + data.framework.vision.purpose + '\n\n' +
+            'Vision End State: ' + data.framework.vision.endState + '\n\n' +
+            '👉 Now click "View Framework" to see the completion percentage!';
+          
+          // Store in session storage
+          sessionStorage.setItem('visionFrameworkDraft', JSON.stringify({
+            framework: data.framework,
+            fromBrief: true,
+            autoFilledFields: ['all']
+          }));
+        } else {
+          status.textContent = '❌ Error: ' + JSON.stringify(data, null, 2);
+        }
+      } catch (error) {
+        status.textContent = '❌ Error: ' + error.message;
+      }
+    }
+    
+    function goToFramework() {
+      window.location.href = '/vision-framework';
+    }
+  </script>
+</body>
+</html>

@@ -162,37 +162,116 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
   }, [companyId]);
 
   // Calculate completion progress
+  // Calculate completion progress whenever framework changes
   useEffect(() => {
     if (!framework) return;
     
-    const totalFields = 25; // Approximate total fields
+    // We count 14 total field groups: 2 vision + 4 mission + 1 principles + 1 objectives + 6 brand
+    const totalFields = 14;
     let completedFields = 0;
+    const fieldStatus: string[] = [];
     
-    // Check vision
-    if (framework.vision.purpose) completedFields++;
-    if (framework.vision.endState) completedFields++;
+    // Helper to check if a string field has meaningful content
+    const hasContent = (str: string | undefined) => str && str.trim().length > 0;
     
-    // Check mission
-    if (framework.mission.whatWeDo) completedFields++;
-    if (framework.mission.whoFor) completedFields++;
-    if (framework.mission.howWeWin) completedFields++;
-    if (framework.mission.successSignals.length >= 3) completedFields++;
+    // Check vision (2 fields)
+    if (hasContent(framework.vision.purpose)) {
+      completedFields++;
+      fieldStatus.push('✅ vision.purpose');
+    } else {
+      fieldStatus.push('❌ vision.purpose');
+    }
+    if (hasContent(framework.vision.endState)) {
+      completedFields++;
+      fieldStatus.push('✅ vision.endState');
+    } else {
+      fieldStatus.push('❌ vision.endState');
+    }
     
-    // Check operating principles
-    if (framework.operatingPrinciples.length >= 3) completedFields += 3;
+    // Check mission (4 fields)
+    if (hasContent(framework.mission.whatWeDo)) {
+      completedFields++;
+      fieldStatus.push('✅ mission.whatWeDo');
+    } else {
+      fieldStatus.push('❌ mission.whatWeDo');
+    }
+    if (hasContent(framework.mission.whoFor)) {
+      completedFields++;
+      fieldStatus.push('✅ mission.whoFor');
+    } else {
+      fieldStatus.push('❌ mission.whoFor');
+    }
+    if (hasContent(framework.mission.howWeWin)) {
+      completedFields++;
+      fieldStatus.push('✅ mission.howWeWin');
+    } else {
+      fieldStatus.push('❌ mission.howWeWin');
+    }
+    if (framework.mission.successSignals.length >= 3) {
+      completedFields++;
+      fieldStatus.push(`✅ mission.successSignals (${framework.mission.successSignals.length})`);
+    } else {
+      fieldStatus.push(`❌ mission.successSignals (${framework.mission.successSignals.length})`);
+    }
     
-    // Check objectives
-    if (framework.objectives.length >= 2) completedFields += 2;
+    // Check operating principles (1 field group)
+    if (framework.operatingPrinciples.length >= 3) {
+      completedFields++;
+      fieldStatus.push(`✅ operatingPrinciples (${framework.operatingPrinciples.length})`);
+    } else {
+      fieldStatus.push(`❌ operatingPrinciples (${framework.operatingPrinciples.length})`);
+    }
     
-    // Check brand brief
-    if (framework.brandBrief.oneLiner) completedFields++;
-    if (framework.brandBrief.positioning) completedFields++;
-    if (framework.brandBrief.audience) completedFields++;
-    if (framework.brandBrief.tone.length >= 3) completedFields++;
-    if (framework.brandBrief.story) completedFields++;
-    if (framework.brandBrief.visualCues.length >= 3) completedFields++;
+    // Check objectives (1 field group)
+    if (framework.objectives.length >= 2) {
+      completedFields++;
+      fieldStatus.push(`✅ objectives (${framework.objectives.length})`);
+    } else {
+      fieldStatus.push(`❌ objectives (${framework.objectives.length})`);
+    }
     
-    setCompletionProgress(Math.round((completedFields / totalFields) * 100));
+    // Check brand brief (6 fields)
+    if (hasContent(framework.brandBrief.oneLiner)) {
+      completedFields++;
+      fieldStatus.push('✅ brandBrief.oneLiner');
+    } else {
+      fieldStatus.push('❌ brandBrief.oneLiner');
+    }
+    if (hasContent(framework.brandBrief.positioning)) {
+      completedFields++;
+      fieldStatus.push('✅ brandBrief.positioning');
+    } else {
+      fieldStatus.push('❌ brandBrief.positioning');
+    }
+    if (hasContent(framework.brandBrief.audience)) {
+      completedFields++;
+      fieldStatus.push('✅ brandBrief.audience');
+    } else {
+      fieldStatus.push('❌ brandBrief.audience');
+    }
+    if (framework.brandBrief.tone.length >= 3) {
+      completedFields++;
+      fieldStatus.push(`✅ brandBrief.tone (${framework.brandBrief.tone.length})`);
+    } else {
+      fieldStatus.push(`❌ brandBrief.tone (${framework.brandBrief.tone.length})`);
+    }
+    if (hasContent(framework.brandBrief.story)) {
+      completedFields++;
+      fieldStatus.push('✅ brandBrief.story');
+    } else {
+      fieldStatus.push('❌ brandBrief.story');
+    }
+    if (framework.brandBrief.visualCues.length >= 3) {
+      completedFields++;
+      fieldStatus.push(`✅ brandBrief.visualCues (${framework.brandBrief.visualCues.length})`);
+    } else {
+      fieldStatus.push(`❌ brandBrief.visualCues (${framework.brandBrief.visualCues.length})`);
+    }
+    
+    const newProgress = Math.round((completedFields / totalFields) * 100);
+    console.log(`📊 Completion: ${completedFields}/${totalFields} fields (${newProgress}%)`);
+    console.log('Field breakdown:', fieldStatus.join('\n'));
+    setCompletionProgress(newProgress);
   }, [framework]);
 
   const generateNewSpine = async () => {

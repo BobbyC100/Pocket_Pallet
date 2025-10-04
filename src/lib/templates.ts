@@ -1,45 +1,45 @@
 export const PROMPT_STEPS = [
   {
-    id: 'problem',
-    title: 'Problem / Why Now',
-    description: 'What problem are you solving and why is now the right time?',
-    placeholder: 'Describe the core problem your startup addresses and what makes this the perfect timing...',
-    field: 'problem_now'
+    id: 'vision',
+    title: 'What are you building, for whom, and why now?',
+    description: 'A single question that merges vision, audience, and urgency. Tell us about the problem, who experiences it, and what makes this the right moment.',
+    placeholder: 'Example: We\'re building a dynamic dispatch layer for mid-market construction contractors who lose 30% of crew time to delivery delays. Cities are tightening curb access and contractors are moving to software-first scheduling — APIs and telematics are finally standardized.',
+    field: 'vision_audience_timing'
   },
   {
-    id: 'customer',
-    title: 'Customer + GTM',
-    description: 'Who are your customers and how will you reach them?',
-    placeholder: 'Define your target customer segments and your go-to-market strategy...',
-    field: 'customer_gtm'
+    id: 'decisions',
+    title: 'What decisions feel hardest right now?',
+    description: 'Invites friction and reveals blind spots without defensiveness. What strategic choices are keeping you up at night?',
+    placeholder: 'Example: Should we build horizontally across construction trades or go deep with GCs first? And do we hire a head of sales now or wait until we hit $500K ARR?',
+    field: 'hard_decisions'
   },
   {
-    id: 'traction',
-    title: 'Progress or Traction',
-    description: 'What traction or validation do you have so far?',
-    placeholder: 'Share your key metrics, customer feedback, partnerships, or other validation...',
-    field: 'traction_proud'
+    id: 'success',
+    title: 'What does success look like for you — financially and culturally?',
+    description: 'Keep dual horizons visible: performance and people. What metrics matter and what kind of company do you want to build?',
+    placeholder: 'Example: Financially, we want to build a $100M+ revenue business with strong unit economics. Culturally, we want a team where operators feel ownership and where we never compromise on safety.',
+    field: 'success_definition'
   },
   {
-    id: 'milestone',
-    title: '6-Month Milestone',
-    description: 'What do you want to achieve in the next 6 months?',
-    placeholder: 'Describe your key objectives and milestones for the next 6 months...',
-    field: 'milestone_6mo'
+    id: 'principles',
+    title: 'What beliefs or principles should your company never compromise on?',
+    description: 'Shifts from aspiration to ethic — the durable backbone. What are your non-negotiables?',
+    placeholder: 'Example: Safety first, always. Speed without shortcuts. We earn trust by being radically transparent with customers about delays.',
+    field: 'core_principles'
   },
   {
-    id: 'cash',
-    title: 'Cash + Burn',
-    description: 'What\'s your current cash position and monthly burn rate?',
-    placeholder: 'Current cash: $50,000\nMonthly burn: $8,000',
-    field: 'cash_on_hand'
+    id: 'capabilities',
+    title: 'What capabilities or systems do you need to make this vision real?',
+    description: 'Translates belief into infrastructure. What do you need to build, hire, or integrate to execute?',
+    placeholder: 'Example: We need real-time routing algorithms, mobile app for foremen, integrations with major construction software, and a sales team that understands operations.',
+    field: 'required_capabilities'
   },
   {
-    id: 'risk',
-    title: 'Risks / Assumptions',
-    description: 'What are your biggest risks and key assumptions?',
-    placeholder: 'Identify the main risks to your business and key assumptions you\'re making...',
-    field: 'risky_assumption'
+    id: 'reality',
+    title: 'Where are you now — team, traction, stage, rough runway?',
+    description: 'Captures factual context only after the story has coherence. Give us the current state: team size, revenue/users, funding, burn.',
+    placeholder: 'Example: 3 co-founders (ex-Procore PM, ex-Uber Freight ops, CTO). 2 paid pilots, 18 active sites, 1,240 drops coordinated. $500K cash, $25K monthly burn (20 months runway).',
+    field: 'current_state'
   }
 ];
 

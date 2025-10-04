@@ -103,57 +103,55 @@ export async function POST(request: NextRequest) {
 }
 
 function createFounderPrompt(responses: any): string {
-  return `You are an expert startup advisor helping founders create comprehensive investor briefs. 
+  return `You are an expert startup advisor helping founders create comprehensive investor briefs.
 
-Create a detailed brief using the following information. Do NOT include a title or heading - start directly with the content sections:
+Create a detailed, strategic brief using the founder's responses below. Do NOT include a title - start directly with content sections.
 
-**Problem & Timing:**
-${responses.problem_now || 'Not specified'}
+**Vision, Audience & Timing:**
+${responses.vision_audience_timing || 'Not specified'}
 
-**Target Market & Go-to-Market:**
-${responses.customer_gtm || 'Not specified'}
+**Strategic Tensions & Hard Decisions:**
+${responses.hard_decisions || 'Not specified'}
 
-**Progress & Traction:**
-${responses.traction_proud || 'Early stage - seeking validation'}
+**Success Definition (Financial & Cultural):**
+${responses.success_definition || 'Not specified'}
 
-**6-Month Goals:**
-${responses.milestone_6mo || 'Not specified'}
+**Core Principles & Non-Negotiables:**
+${responses.core_principles || 'Not specified'}
 
-**Financial Position:**
-Cash on hand: $${responses.cash_on_hand || 0}
-Monthly burn: $${responses.monthly_burn || 0}
-Runway: ${responses.cash_on_hand && responses.monthly_burn ? Math.round(responses.cash_on_hand / responses.monthly_burn) : 'Unknown'} months
+**Required Capabilities & Systems:**
+${responses.required_capabilities || 'Not specified'}
 
-**Risks & Assumptions:**
-${responses.risky_assumption || 'Not specified'}
+**Current State (Team, Traction, Runway):**
+${responses.current_state || 'Not specified'}
 
-IMPORTANT: Do NOT include any title, heading, or "Founder Brief" text at the beginning. Start directly with the content sections like "## Problem & Timing". Create a professional, comprehensive brief in markdown format. Structure it with clear headings and make the content compelling while staying truthful to the provided information. Include insights and recommendations where appropriate.`;
+Create a professional, narrative-driven brief in markdown format. Structure it with clear headings. Synthesize the founder's responses into a compelling story that shows: (1) deep market insight, (2) strategic clarity despite uncertainty, (3) cultural intentionality, and (4) operational realism. Make it investor-ready while preserving the founder's voice.`;
 }
 
 function createVCPrompt(responses: any): string {
-  return `You are a VC analyst creating a concise investment summary. 
+  return `You are a VC analyst creating a concise investment summary.
 
-Create a VC-ready summary using this information. Do NOT include a title or heading - start directly with the content sections:
+Create a VC-ready summary from these founder responses. Do NOT include a title - start directly with sections.
 
-**Problem & Timing:**
-${responses.problem_now || 'Not specified'}
+**Opportunity (What, Who, Why Now):**
+${responses.vision_audience_timing || 'Not specified'}
 
-**Target Market & Go-to-Market:**
-${responses.customer_gtm || 'Not specified'}
+**Strategic Position & Open Questions:**
+${responses.hard_decisions || 'Not specified'}
 
-**Progress & Traction:**
-${responses.traction_proud || 'Early stage - seeking validation'}
+**Ambition & Culture:**
+${responses.success_definition || 'Not specified'}
 
-**6-Month Goals:**
-${responses.milestone_6mo || 'Not specified'}
+**Values & Decision Filters:**
+${responses.core_principles || 'Not specified'}
 
-**Financial Position:**
-Cash: $${responses.cash_on_hand || 0} | Burn: $${responses.monthly_burn || 0}/mo
+**Execution Requirements:**
+${responses.required_capabilities || 'Not specified'}
 
-**Risks & Assumptions:**
-${responses.risky_assumption || 'Not specified'}
+**Current State:**
+${responses.current_state || 'Not specified'}
 
-Create a concise, investment-focused summary in markdown format. Focus on key metrics, market opportunity, traction, and risks. Make it easy for VCs to quickly assess the opportunity.`;
+Create a concise, investment-focused summary in markdown format. Distill into: (1) Market Opportunity & Timing, (2) Team & Traction, (3) Business Model Clarity, (4) Capital Efficiency, (5) Key Risks. Be direct and analytical. Make it easy for VCs to quickly assess fit.`;
 }
 
 function createConsensusBrief(gpt4Content: string, claudeContent: string, type: 'founder' | 'vc'): string {

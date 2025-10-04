@@ -107,117 +107,135 @@ export const createEmptyVisionFramework = (companyId: string): Partial<VisionFra
 export const extractVisionFrameworkFromBrief = (
   companyId: string,
   briefData: {
-    problem_now: string;
-    customer_gtm: string;
-    traction_proud: string;
-    milestone_6mo?: string;
-    cash_on_hand?: number;
-    monthly_burn?: number;
-    risky_assumption: string;
+    vision_audience_timing: string;
+    hard_decisions?: string;
+    success_definition?: string;
+    core_principles?: string;
+    required_capabilities?: string;
+    current_state?: string;
   }
 ): Partial<VisionFramework> => {
-  // Smart parsing of customer_gtm to extract mission components
-  const parseCustomerGTM = (gtm: string) => {
-    // Handle YardBird-style data better
-    if (gtm.includes('Mid-market GCs') && gtm.includes('Buyer = Ops Director')) {
-      return {
-        whatWeDo: "Dynamic dispatch and logistics intelligence for construction sites",
-        whoFor: "Mid-market General Contractors (50-500 employees) in major cities",
-        howWeWin: "Through intelligent routing, mobile app integration, and vendor compliance"
-      };
-    }
+  // Parse vision/audience/timing to extract mission components
+  const parseVisionStatement = (vision: string) => {
+    // Extract what they're building
+    const buildingMatch = vision.match(/(?:building|creating|developing)\s+(?:a\s+)?([^.]+?)(?:\s+for)/i);
+    const whatWeDo = buildingMatch ? buildingMatch[1].trim() : vision.substring(0, 100);
     
-    // Fallback to generic parsing
-    const parts = gtm.split(/[.,;]/).map(p => p.trim()).filter(p => p.length > 0);
-    return {
-      whatWeDo: parts[0] || gtm || "Building innovative solutions",
-      whoFor: parts[1] || gtm || "Target customers", 
-      howWeWin: parts[2] || parts[0] || gtm || "Through superior execution"
-    };
+    // Extract who it's for
+    const forMatch = vision.match(/for\s+([^.]+?)(?:\s+who|\s+that|\s+in|\.|$)/i);
+    const whoFor = forMatch ? forMatch[1].trim() : "Target customers";
+    
+    // Extract competitive advantage from capabilities or timing
+    const whyNowMatch = vision.match(/(?:now|right now|today)[,:]?\s+([^.]+)/i);
+    const howWeWin = whyNowMatch ? 
+      `Through timing: ${whyNowMatch[1].trim()}` : 
+      "Through superior execution and timing";
+    
+    return { whatWeDo, whoFor, howWeWin };
   };
 
-  // Infer timespan from milestone text
-  const inferTimespan = (milestone: string): "Q1" | "Q2" | "Q3" | "Q4" | "Annual" => {
-    const text = milestone.toLowerCase();
-    if (text.includes('q1') || text.includes('march') || text.includes('april') || text.includes('may') || text.includes('june')) return "Q1";
-    if (text.includes('q2') || text.includes('july') || text.includes('august') || text.includes('september')) return "Q2";
-    if (text.includes('q3') || text.includes('october') || text.includes('november') || text.includes('december')) return "Q3";
-    if (text.includes('q4') || text.includes('january') || text.includes('february')) return "Q4";
-    if (text.includes('year') || text.includes('annual') || text.includes('12 month')) return "Annual";
-    return "Q1"; // Default to Q1
+
+  // Parse core principles into operating principles
+  const parsePrinciples = (principlesText: string) => {
+    const principles = principlesText.split(/[.\n]/).filter(p => p.trim().length > 10);
+    return principles.slice(0, 5).map((principle, index) => ({
+      name: principle.substring(0, 30).trim() + (principle.length > 30 ? '...' : ''),
+      description: principle.trim(),
+      behaviors: ["Act on this principle", "Make it visible", "Measure adherence"],
+      antiBehaviors: ["Ignore this principle", "Make exceptions without discussion"]
+    }));
   };
 
-  // Extract success signals from traction
-  const extractSuccessSignals = (traction: string): string[] => {
-    const signals = traction.split(/[.,;]/)
+  // Extract success signals from current state
+  const extractSuccessSignals = (currentState: string): string[] => {
+    const signals = currentState.split(/[.,;]/)
       .map(s => s.trim())
-      .filter(s => s.length > 10) // Only meaningful signals
-      .slice(0, 5); // Max 5 signals
+      .filter(s => s.length > 10 && /\d/.test(s)) // Contains numbers
+      .slice(0, 5);
     
-    // If no good signals found, provide defaults
-    if (signals.length === 0) {
+    if (signals.length < 3) {
       return [
         "Customer satisfaction >90%",
-        "Revenue growth >50% YoY", 
-        "Market share expansion"
-      ];
+        "Revenue growth >50% YoY",
+        "Market share expansion",
+        ...signals
+      ].slice(0, 5);
     }
-    
     return signals;
   };
 
-  // Infer audience from customer_gtm
-  const inferAudience = (gtm: string): string => {
-    // Handle YardBird-style data
-    if (gtm.includes('Mid-market GCs') && gtm.includes('Buyer = Ops Director')) {
-      return "Operations Directors and Site Superintendents at mid-market general contractors";
+  // Infer tone from success definition
+  const inferTone = (successDef: string): string[] => {
+    const tones: string[] = [];
+    if (successDef.toLowerCase().includes('transparent')) tones.push('Transparent');
+    if (successDef.toLowerCase().includes('fast') || successDef.toLowerCase().includes('speed')) tones.push('Fast');
+    if (successDef.toLowerCase().includes('safe')) tones.push('Safety-focused');
+    if (successDef.toLowerCase().includes('owner')) tones.push('Ownership-driven');
+    
+    if (tones.length < 3) {
+      return [...tones, 'Professional', 'Confident', 'Clear'].slice(0, 3);
+    }
+    return tones.slice(0, 3);
+  };
+
+  // Extract vision purpose from the problem/why statement
+  const extractVisionPurpose = (visionStatement: string): string => {
+    // Extract the core problem/pain point being solved
+    const lowerStatement = visionStatement.toLowerCase();
+    
+    // Look for patterns indicating the problem
+    if (lowerStatement.includes('who lose') || lowerStatement.includes('who waste')) {
+      const problemMatch = visionStatement.match(/who (lose|waste|struggle with|face|experience) ([^.]+)/i);
+      if (problemMatch) {
+        return `Eliminate ${problemMatch[2].trim()}`;
+      }
     }
     
-    // Fallback to generic parsing
-    const audienceKeywords = ['customers', 'users', 'businesses', 'companies', 'organizations', 'individuals'];
-    const parts = gtm.split(/[.,;]/);
-    for (const part of parts) {
-      for (const keyword of audienceKeywords) {
-        if (part.toLowerCase().includes(keyword)) {
-          return part.trim();
-        }
-      }
+    // Try to extract from "building X for Y who Z" pattern
+    const buildingMatch = visionStatement.match(/building ([^,]+) for ([^,]+)/i);
+    if (buildingMatch) {
+      return `Transform ${buildingMatch[2].trim()} through ${buildingMatch[1].trim()}`;
     }
-    return parts[1] || parts[0] || gtm || "Target customers";
+    
+    // Default: use first sentence
+    const firstSentence = visionStatement.split(/[.!?]/)[0].trim();
+    return firstSentence || "Transform the industry through innovation";
   };
 
-  // Infer tone from problem description
-  const inferTone = (problem: string): string[] => {
-    const toneMap: { [key: string]: string[] } = {
-      'urgent': ['Urgent', 'Action-oriented', 'Direct'],
-      'innovative': ['Innovative', 'Forward-thinking', 'Cutting-edge'],
-      'reliable': ['Reliable', 'Trustworthy', 'Professional'],
-      'simple': ['Simple', 'Clear', 'Accessible'],
-      'powerful': ['Powerful', 'Robust', 'Comprehensive']
-    };
-
-    const problemLower = problem.toLowerCase();
-    for (const [key, tones] of Object.entries(toneMap)) {
-      if (problemLower.includes(key)) {
-        return tones;
+  // Extract end state from success definition
+  const extractEndState = (successDef: string, visionStatement: string): string => {
+    if (successDef) {
+      // Clean up and combine financial and cultural goals
+      let cleaned = successDef.replace(/^financially[,:]\s*/i, '').trim();
+      cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+      
+      // If it mentions culture, include both dimensions
+      if (successDef.toLowerCase().includes('culturally')) {
+        return cleaned;
       }
+      
+      return cleaned;
     }
-    return ['Professional', 'Confident', 'Clear']; // Default
+    // Fallback: derive aspirational end state from vision statement
+    return `A world where every organization has access to best-in-class solutions that eliminate inefficiency and drive success`;
   };
 
-  const mission = parseCustomerGTM(briefData.customer_gtm);
-  const successSignals = extractSuccessSignals(briefData.traction_proud);
-  const inferredTimespan = inferTimespan(briefData.milestone_6mo || "Q1 goals");
-  const inferredAudience = inferAudience(briefData.customer_gtm);
-  const inferredTone = inferTone(briefData.problem_now);
+  // Parse the new data structure
+  const mission = parseVisionStatement(briefData.vision_audience_timing);
+  const successSignals = extractSuccessSignals(briefData.current_state || "");
+  const corePrinciples = briefData.core_principles ? 
+    parsePrinciples(briefData.core_principles) : [];
+  const inferredTone = briefData.success_definition ? 
+    inferTone(briefData.success_definition) : 
+    ['Professional', 'Confident', 'Clear'];
 
   return {
     companyId,
     updatedAt: new Date().toISOString(),
     
     vision: {
-      purpose: "", // Will be filled in Vision Framework editor
-      endState: "" // Will be filled in Vision Framework editor
+      purpose: extractVisionPurpose(briefData.vision_audience_timing),
+      endState: extractEndState(briefData.success_definition, briefData.vision_audience_timing)
     },
     
     mission: {
@@ -231,7 +249,7 @@ export const extractVisionFrameworkFromBrief = (
       ]
     },
     
-    operatingPrinciples: [
+    operatingPrinciples: corePrinciples.length >= 3 ? corePrinciples : [
       {
         name: "Customer First",
         description: "Every decision prioritizes customer value and experience.",
@@ -255,8 +273,10 @@ export const extractVisionFrameworkFromBrief = (
     objectives: [
       {
         id: "q1-primary",
-        timespan: inferredTimespan,
-        statement: briefData.milestone_6mo || "Achieve key business milestones",
+        timespan: "Q1",
+        statement: briefData.success_definition ? 
+          briefData.success_definition.split('.')[0].substring(0, 400) || "Achieve key business milestones" : 
+          "Achieve key business milestones",
         keyResults: [
           { metric: "Revenue", target: "TBD" },
           { metric: "Customers", target: "TBD" }
@@ -265,22 +285,24 @@ export const extractVisionFrameworkFromBrief = (
       },
       {
         id: "q1-secondary",
-        timespan: inferredTimespan,
-        statement: "Build core product features and achieve product-market fit",
+        timespan: "Q1",
+        statement: briefData.required_capabilities ? 
+          briefData.required_capabilities.split('.')[0].substring(0, 400) || "Build core product features" : 
+          "Build core product features and achieve product-market fit",
         keyResults: [
-          { metric: "Feature completion", target: "100% of planned features" },
-          { metric: "User satisfaction", target: ">90% NPS score" }
+          { metric: "Key capabilities delivered", target: "100%" },
+          { metric: "Team readiness", target: ">90%" }
         ],
         owner: "CTO"
       }
     ],
     
     brandBrief: {
-      oneLiner: briefData.problem_now.split('.')[0] || briefData.problem_now.substring(0, 100),
-      positioning: briefData.customer_gtm,
-      audience: inferredAudience,
+      oneLiner: (briefData.vision_audience_timing.split('.')[0] || briefData.vision_audience_timing).substring(0, 150),
+      positioning: (mission.whoFor + " - " + mission.howWeWin).substring(0, 400),
+      audience: mission.whoFor.substring(0, 300),
       tone: inferredTone,
-      story: briefData.problem_now,
+      story: briefData.vision_audience_timing.substring(0, 800),
       visualCues: ["Clean", "Modern", "Professional"] // Default visual cues
     }
   };

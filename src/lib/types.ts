@@ -2,13 +2,12 @@ export type Stage = "idea" | "early_traction" | "angel" | "seed_ready";
 
 export interface PromptInput {
   stage: Stage;
-  problem_now: string;
-  customer_gtm: string;
-  traction_proud: string;
-  milestone_6mo: string;
-  cash_on_hand: number;
-  monthly_burn: number;
-  risky_assumption: string;
+  vision_audience_timing: string;
+  hard_decisions: string;
+  success_definition: string;
+  core_principles: string;
+  required_capabilities: string;
+  current_state: string;
 }
 
 export interface BriefOutput {

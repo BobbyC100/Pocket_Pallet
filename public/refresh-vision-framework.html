@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Refresh Vision Framework</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a2e;
+      color: #fff;
+    }
+    .button {
+      background: #4CAF50;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 0;
+      display: block;
+      width: 100%;
+    }
+    .button:hover { background: #45a049; }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      background: #2d2d44;
+      border-radius: 5px;
+      min-height: 50px;
+    }
+    .success { color: #4CAF50; }
+    .error { color: #f44336; }
+  </style>
+</head>
+<body>
+  <h1>🔄 Refresh Vision Framework</h1>
+  <p>This will clear your session storage and take you through the flow again with improved vision extraction.</p>
+  
+  <button class="button" onclick="clearAndRedirect()">Clear & Start Fresh</button>
+  <button class="button" onclick="goToVisionFramework()">Go to Vision Framework (Keep Current Data)</button>
+  
+  <div id="status" class="status"></div>
+
+  <script>
+    function clearAndRedirect() {
+      const status = document.getElementById('status');
+      status.innerHTML = '🧹 Clearing session storage...';
+      
+      sessionStorage.clear();
+      
+      status.innerHTML = '✅ Cleared! Redirecting to wizard...';
+      
+      setTimeout(() => {
+        window.location.href = '/new';
+      }, 1000);
+    }
+    
+    function goToVisionFramework() {
+      window.location.href = '/vision-framework';
+    }
+  </script>
+</body>
+</html>
