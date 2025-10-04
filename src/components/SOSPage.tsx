@@ -28,7 +28,7 @@ export default function SOSPage() {
     {
       id: 'vision-v2',
       title: 'Vision Framework',
-      icon: '🎯',
+      icon: '',
       status: 'complete',
       lastUpdated: 'Today',
       completionPercent: 100
@@ -36,7 +36,7 @@ export default function SOSPage() {
     {
       id: 'executive-onepager',
       title: 'Executive One-Pager',
-      icon: '📋',
+      icon: '',
       status: 'complete',
       lastUpdated: 'Today',
       completionPercent: 100
@@ -44,7 +44,7 @@ export default function SOSPage() {
     {
       id: 'founder-brief',
       title: 'Founder Brief',
-      icon: '📄',
+      icon: '',
       status: 'complete',
       lastUpdated: 'Today',
       completionPercent: 100
@@ -52,7 +52,7 @@ export default function SOSPage() {
     {
       id: 'vc-summary',
       title: 'VC Summary',
-      icon: '📊',
+      icon: '',
       status: 'complete',
       lastUpdated: 'Today',
       completionPercent: 100
@@ -60,7 +60,7 @@ export default function SOSPage() {
     {
       id: 'qa-results',
       title: 'QA Results',
-      icon: '✅',
+      icon: '',
       status: 'complete',
       lastUpdated: 'Today',
       completionPercent: 100
