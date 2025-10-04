@@ -5,6 +5,7 @@ import PromptWizard from "@/components/PromptWizard";
 import ResultTabs from "@/components/ResultTabs";
 import GenerationProgressModal from "@/components/GenerationProgressModal";
 import SaveModal from "@/components/SaveModal";
+import { SaveBar } from "@/components/SaveBar";
 import { saveDraft, getAllDrafts, getAnonymousId } from "@/lib/anonymous-session";
 
 interface GenerationStep {
@@ -25,6 +26,7 @@ export default function NewPage() {
   const [isCreatingFramework, setIsCreatingFramework] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [frameworkSteps, setFrameworkSteps] = useState<GenerationStep[]>([
     { id: 'mapping', label: 'Mapping strategic questions to framework', status: 'pending', estimatedSeconds: 10 },
     { id: 'tensions', label: 'Detecting contradictions and tensions', status: 'pending', estimatedSeconds: 8 },
@@ -72,6 +74,7 @@ export default function NewPage() {
         metadata: { autoSaved: true, timestamp: new Date().toISOString() }
       });
       setCurrentDraftId(draft.id);
+      setHasUnsavedChanges(true);
       console.log('✅ Draft saved:', draft.id);
     }
   }, [result]);
@@ -107,6 +110,7 @@ export default function NewPage() {
       
       const data = await response.json();
       console.log('✅ Saved to database:', data);
+      setHasUnsavedChanges(false);
       alert('Brief saved successfully!');
     } catch (error) {
       console.error('❌ Save failed:', error);
@@ -292,6 +296,11 @@ export default function NewPage() {
         </div>
       )}
       </main>
+      
+      <SaveBar 
+        onSave={handleSave}
+        hasUnsavedChanges={hasUnsavedChanges && result !== null}
+      />
     </>
   );
 }

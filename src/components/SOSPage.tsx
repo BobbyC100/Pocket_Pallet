@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import VisionFrameworkV2Page from '@/components/VisionFrameworkV2Page';
+import VcSummaryDisplay from '@/components/VcSummaryDisplay';
+import { VcSummary, validateVcSummary } from '@/lib/vc-summary-schema';
 import { exportToPDF, exportToMarkdown } from '@/lib/pdf-export';
 
 type DocType = 'vision-v2' | 'executive-onepager' | 'founder-brief' | 'vc-summary' | 'qa-results';
@@ -114,7 +116,7 @@ export default function SOSPage() {
     }
   ]);
 
-  const [briefContent, setBriefContent] = useState<{founderBrief?: string; vcSummary?: string} | null>(null);
+  const [briefContent, setBriefContent] = useState<{founderBrief?: string; vcSummary?: string; vcSummaryStructured?: VcSummary} | null>(null);
   const [visionV2Content, setVisionV2Content] = useState<{executiveOnePager?: string; qaResults?: any} | null>(null);
 
   // Check for data in session storage to update document statuses and load content
@@ -132,9 +134,22 @@ export default function SOSPage() {
           founderBriefLength: parsed.founderBriefMd?.length,
           vcSummaryLength: parsed.vcSummaryMd?.length
         });
+        // Validate structured VC Summary if available
+        let vcSummaryStructured = undefined;
+        if (parsed.vcSummaryStructured) {
+          const validation = validateVcSummary(parsed.vcSummaryStructured);
+          if (validation.success) {
+            vcSummaryStructured = validation.data;
+            console.log('✅ Structured VC Summary loaded and validated');
+          } else {
+            console.warn('⚠️ VC Summary validation failed:', validation.errors);
+          }
+        }
+        
         setBriefContent({
           founderBrief: parsed.founderBriefMd,
-          vcSummary: parsed.vcSummaryMd
+          vcSummary: parsed.vcSummaryMd,
+          vcSummaryStructured
         });
       } catch (error) {
         console.error('Error parsing brief data:', error);
@@ -345,7 +360,16 @@ export default function SOSPage() {
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">VC Summary</h2>
                 </div>
-                {briefContent?.vcSummary ? (
+                {briefContent?.vcSummaryStructured ? (
+                  <>
+                    <VcSummaryDisplay summary={briefContent.vcSummaryStructured} />
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <p className="text-sm text-gray-500">
+                        <strong>Purpose:</strong> Investor pitch deck companion / email intro
+                      </p>
+                    </div>
+                  </>
+                ) : briefContent?.vcSummary ? (
                   <>
                     <div className="prose prose-sm max-w-none">
                       <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
@@ -355,6 +379,9 @@ export default function SOSPage() {
                     <div className="mt-6 pt-6 border-t border-gray-200">
                       <p className="text-sm text-gray-500">
                         <strong>Purpose:</strong> Investor pitch deck companion / email intro
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        Note: Using fallback markdown format. Generate a new brief for structured format.
                       </p>
                     </div>
                   </>
