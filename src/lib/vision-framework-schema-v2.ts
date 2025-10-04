@@ -60,22 +60,31 @@ export type Metric = z.infer<typeof MetricSchema>;
  */
 export function validateVisionFrameworkV2(framework: any): { success: boolean; errors?: string[] } {
   try {
+    console.log('🔍 Validating framework:', JSON.stringify(framework, null, 2).substring(0, 500));
     const result = VisionFrameworkV2Schema.safeParse(framework);
     
     if (!result.success) {
-      const errors = result.error?.errors?.map(err => `${err.path.join('.')}: ${err.message}`) || ['Unknown validation error'];
+      console.error('❌ Zod validation failed:', result.error);
+      console.error('❌ Validation errors:', JSON.stringify(result.error.errors, null, 2));
+      
+      const errors = result.error?.errors?.map(err => {
+        const path = err.path.join('.') || 'root';
+        return `${path}: ${err.message}`;
+      }) || ['Unknown validation error'];
+      
       return {
         success: false,
         errors
       };
     }
     
+    console.log('✅ Validation passed!');
     return { success: true };
   } catch (error) {
-    console.error('Validation threw an error:', error);
+    console.error('❌ Validation threw an exception:', error);
     return {
       success: false,
-      errors: [`Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`]
+      errors: [`Validation exception: ${error instanceof Error ? error.message : JSON.stringify(error)}`]
     };
   }
 }
