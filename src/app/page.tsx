@@ -2,60 +2,74 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <main className="mx-auto max-w-4xl px-6 py-24">
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            Your vision, <span className="text-blue-400">fully formed</span>
+        <div className="text-center py-20">
+          {/* Headline */}
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+            Your vision, <span className="text-blue-500">fully formed</span>
           </h1>
-          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-            From executive one-pagers to quality assessments, Banyan turns rough ideas into polished, strategic documents that move your company forward.
+
+          {/* Subhead */}
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-400">
+            From first pitch notes to investor updates, Banyan turns your rough ideas
+            into clear, strategic documents that grow with your company.
           </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a 
-              href="/new" 
-              className="rounded-lg bg-blue-600 hover:bg-blue-700 px-8 py-4 text-white font-medium transition-colors duration-200"
+
+          {/* CTAs */}
+          <div className="mt-8 flex justify-center gap-4">
+            <a
+              href="/new"
+              className="rounded-lg bg-blue-600 px-6 py-3 text-white font-semibold hover:bg-blue-500"
             >
               Create Your Brief
             </a>
-            <a 
-              href="/showcase" 
-              className="rounded-lg bg-gray-700 hover:bg-gray-600 px-8 py-4 text-white font-medium transition-colors duration-200"
+            <a
+              href="/showcase"
+              className="rounded-lg border border-gray-600 px-6 py-3 text-gray-300 hover:bg-gray-800"
             >
-              View Document Examples
+              See Examples
             </a>
           </div>
         </div>
 
         {/* Feature Cards */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <div className="grid gap-6 md:grid-cols-3 mt-12">
+          {/* Simple Prompts */}
+          <div className="rounded-lg bg-gray-900 p-6 text-center">
+            <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-blue-600">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Simple Prompts</h3>
-            <p className="text-gray-300">Answer key questions about your startup in minutes, not hours.</p>
+            <h3 className="text-lg font-semibold">Simple Prompts</h3>
+            <p className="mt-2 text-sm text-gray-400">
+              Answer just a few focused questions and watch your ideas take shape in minutes, not hours.
+            </p>
           </div>
-          
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+          {/* Instant Generation */}
+          <div className="rounded-lg bg-gray-900 p-6 text-center">
+            <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-blue-600">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Instant Generation</h3>
-            <p className="text-gray-300">Get both founder and VC-ready versions of your brief automatically.</p>
+            <h3 className="text-lg font-semibold">Instant Generation</h3>
+            <p className="mt-2 text-sm text-gray-400">
+              Turn your notes into polished drafts instantly — ready for your pitch deck or to guide your own roadmap.
+            </p>
           </div>
-          
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+          {/* Always Updated */}
+          <div className="rounded-lg bg-gray-900 p-6 text-center">
+            <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-blue-600">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Always Updated</h3>
-            <p className="text-gray-300">Keep your briefs current with easy updates and version tracking.</p>
+            <h3 className="text-lg font-semibold">Always Updated</h3>
+            <p className="mt-2 text-sm text-gray-400">
+              Keep documents current with quick edits and automatic version tracking, so your story stays sharp.
+            </p>
           </div>
         </div>
       </main>
