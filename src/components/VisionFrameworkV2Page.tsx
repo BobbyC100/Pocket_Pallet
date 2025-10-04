@@ -239,7 +239,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
               <textarea
                 value={framework.vision}
                 onChange={(e) => setFramework({ ...framework, vision: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 rows={3}
                 placeholder="Your aspirational end state (2-3 sentences)"
               />
@@ -258,7 +258,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
                       updated[index] = e.target.value;
                       setFramework({ ...framework, strategy: updated });
                     }}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                     placeholder="Strategic pillar"
                   />
                 </div>
@@ -284,7 +284,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
                       updated[index] = e.target.value;
                       setFramework({ ...framework, operating_principles: updated });
                     }}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                     placeholder="Operating principle"
                   />
                 </div>
@@ -438,7 +438,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
                       updated[index] = e.target.value;
                       setFramework({ ...framework, tensions: updated });
                     }}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                     placeholder="E.g., premium positioning vs need for rapid growth"
                   />
                 </div>
