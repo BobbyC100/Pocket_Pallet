@@ -44,7 +44,6 @@ export default function NewPage() {
 
   // Auto-save to localStorage when result changes
   useEffect(() => {
-    console.log('🔍 Auto-save check:', { hasResult: !!result, isSignedIn });
     if (result && !isSignedIn) {
       console.log('💾 Auto-saving draft to localStorage...');
       const draft = saveDraft({
@@ -205,9 +204,6 @@ export default function NewPage() {
           <PromptWizard onGenerated={setResult} />
       ) : (
         <div className="space-y-6">
-          {/* Debug: Check if this section renders */}
-          {console.log('🎨 Rendering results section. isSignedIn:', isSignedIn, 'user:', user)}
-          
           {/* Save Status Bar */}
           <div className="bg-white rounded-lg border-2 border-gray-200 p-4 flex items-center justify-between shadow-lg">
             <div className="flex items-center gap-3">
