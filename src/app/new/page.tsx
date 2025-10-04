@@ -55,7 +55,7 @@ export default function NewPage() {
     try {
       const apiEndpoint = useV2 ? '/api/vision-framework-v2/generate' : '/api/vision-framework/generate';
       const storageKey = useV2 ? 'visionFrameworkV2Draft' : 'visionFrameworkDraft';
-      const targetPage = useV2 ? '/vision-framework-v2' : '/vision-framework';
+      const targetPage = '/sos'; // Always redirect to SOS hub
 
       // Simulate progress through steps (since the API is a single call)
       updateFrameworkStepStatus('mapping', 'active');

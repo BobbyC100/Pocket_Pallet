@@ -15,7 +15,14 @@ interface Document {
 }
 
 export default function SOSPage() {
-  const [activeDoc, setActiveDoc] = useState<DocType>('vision-v2');
+  // Check if we just created V2 framework and should show it
+  const [activeDoc, setActiveDoc] = useState<DocType>(() => {
+    if (typeof window !== 'undefined') {
+      const hasV2 = sessionStorage.getItem('visionFrameworkV2Draft');
+      return hasV2 ? 'vision-v2' : 'founder-brief';
+    }
+    return 'vision-v2';
+  });
   const [documents, setDocuments] = useState<Document[]>([
     {
       id: 'founder-brief',

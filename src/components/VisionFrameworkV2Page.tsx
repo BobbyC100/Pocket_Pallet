@@ -14,7 +14,8 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
   const [qaResults, setQaResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'edit' | 'onepager' | 'qa'>('edit');
+  // Default to QA tab when embedded (users want to see results first)
+  const [activeTab, setActiveTab] = useState<'edit' | 'onepager' | 'qa'>(embedded ? 'qa' : 'edit');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Load framework from session storage on mount
