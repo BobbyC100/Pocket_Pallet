@@ -34,10 +34,16 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
       try {
         // Check for draft from brief first
         const draftData = sessionStorage.getItem('visionFrameworkDraft');
+        console.log('🔍 V1 Session storage check:', draftData ? 'FOUND' : 'NOT FOUND');
         if (draftData) {
+          console.log('📦 Raw session data (first 200 chars):', draftData.substring(0, 200));
           try {
-            const { framework, fromBrief, autoFilledFields } = JSON.parse(draftData);
-            console.log('Loading framework from session storage:', framework);
+            const parsed = JSON.parse(draftData);
+            console.log('✅ Parsed data keys:', Object.keys(parsed));
+            console.log('📊 Framework exists:', !!parsed.framework);
+            console.log('📄 Framework keys:', parsed.framework ? Object.keys(parsed.framework) : 'NO FRAMEWORK');
+            
+            const { framework, fromBrief, autoFilledFields } = parsed;
             setFramework(framework);
             setFromBrief(fromBrief);
             setAutoFilledFields(autoFilledFields || []);
@@ -45,9 +51,11 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
             setIsLoading(false);
             return;
           } catch (error) {
-            console.error('Error parsing session storage data:', error);
+            console.error('❌ Error parsing session storage data:', error);
             sessionStorage.removeItem('visionFrameworkDraft'); // Clear corrupted data
           }
+        } else {
+          console.log('⚠️ No visionFrameworkDraft in session storage');
         }
 
         // Otherwise load from API

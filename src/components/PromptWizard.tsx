@@ -126,6 +126,20 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       updateStepStatus('framework', 'complete');
       
       console.log('✅ Both brief and framework generated successfully!');
+      console.log('📦 Full framework result:', frameworkResult);
+      console.log('📊 Framework data:', frameworkResult.framework);
+      console.log('🔍 Framework keys:', frameworkResult.framework ? Object.keys(frameworkResult.framework) : 'NO FRAMEWORK');
+      
+      // Store framework in session storage for VisionFrameworkPage
+      if (frameworkResult.framework) {
+        const frameworkDraftData = {
+          framework: frameworkResult.framework,
+          fromBrief: true,
+          autoFilledFields: Object.keys(frameworkResult.framework)
+        };
+        sessionStorage.setItem('visionFrameworkDraft', JSON.stringify(frameworkDraftData));
+        console.log('✅ Framework saved to session storage');
+      }
       
       // Combine both results
       const combinedResult = {
