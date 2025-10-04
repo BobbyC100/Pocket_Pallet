@@ -191,7 +191,7 @@ export default function SOSPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                🌳 Strategic Operating System
+                Strategic Operating System
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 Your living documentation hub
