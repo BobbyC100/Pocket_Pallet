@@ -5,13 +5,12 @@ export default function Landing() {
         <div className="text-center py-20">
           {/* Headline */}
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Your vision, <span className="text-blue-500">fully formed</span>
+            From first draft to <span className="text-blue-500">focused strategy</span>
           </h1>
 
           {/* Subhead */}
           <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-400">
-            From first pitch notes to investor updates, Banyan turns your rough ideas
-            into clear, strategic documents that grow with your company.
+            Banyan helps founders turn rough ideas into clear, strategic documents — from pitch notes to investor updates.
           </p>
 
           {/* CTAs */}
