@@ -42,9 +42,28 @@ export default function NewPage() {
     }
   };
 
+  // Restore data from localStorage on mount (after login redirect)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const drafts = getAllDrafts();
+    if (drafts.length > 0 && !result) {
+      // Get the most recent draft
+      const mostRecent = drafts.sort((a, b) => 
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      )[0];
+      
+      if (mostRecent.type === 'brief' && mostRecent.contentJson) {
+        console.log('📥 Restoring draft after login:', mostRecent.id);
+        setResult(mostRecent.contentJson);
+        setCurrentDraftId(mostRecent.id);
+      }
+    }
+  }, []);
+
   // Auto-save to localStorage when result changes
   useEffect(() => {
-    if (result && !isSignedIn) {
+    if (result) {
       console.log('💾 Auto-saving draft to localStorage...');
       const draft = saveDraft({
         type: 'brief',
@@ -55,7 +74,7 @@ export default function NewPage() {
       setCurrentDraftId(draft.id);
       console.log('✅ Draft saved:', draft.id);
     }
-  }, [result, isSignedIn]);
+  }, [result]);
 
   // Handle save button click
   const handleSave = () => {
