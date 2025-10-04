@@ -789,7 +789,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       vision: { ...framework.vision, purpose: e.target.value }
                     })}
                     placeholder="1-2 sentences describing why your company exists..."
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    style={{ color: '#f3f4f6' }}
                   />
                   <div className="text-xs text-gray-400 mt-1">
                     Used in: About page, onboarding, OKRs
@@ -806,7 +807,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       vision: { ...framework.vision, endState: e.target.value }
                     })}
                     placeholder="2-3 vivid sentences describing the world you're creating..."
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 h-32"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-32"
+                    style={{ color: '#f3f4f6' }}
                   />
                   <div className="text-xs text-gray-400 mt-1">
                     Used in: Strategic planning, investor presentations
@@ -828,7 +830,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       mission: { ...framework.mission, whatWeDo: e.target.value }
                     })}
                     placeholder="Product/service in plain English..."
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    style={{ color: '#f3f4f6' }}
                   />
                   <div className="text-xs text-gray-400 mt-1">
                     Used in: Product descriptions, marketing copy
@@ -845,7 +848,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       mission: { ...framework.mission, whoFor: e.target.value }
                     })}
                     placeholder="Primary audience/users..."
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    style={{ color: '#f3f4f6' }}
                   />
                   <div className="text-xs text-gray-400 mt-1">
                     Used in: Customer personas, targeting
@@ -862,7 +866,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       mission: { ...framework.mission, howWeWin: e.target.value }
                     })}
                     placeholder="Unique approach/edge..."
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    style={{ color: '#f3f4f6' }}
                   />
                   <div className="text-xs text-gray-400 mt-1">
                     Used in: Competitive positioning, sales materials
@@ -886,7 +891,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                           });
                         }}
                         placeholder={`Success signal ${index + 1}...`}
-                        className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400"
+                        className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
+                        style={{ color: '#f3f4f6' }}
                       />
                     ))}
                     <button
@@ -923,7 +929,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                             updateSpine({ operatingPrinciples: updated });
                           }}
                           placeholder="e.g., Default to Action"
-                          className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400"
+                          className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
+                          style={{ color: '#f3f4f6' }}
                         />
                       </div>
                       
@@ -991,7 +998,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                               updateSpine({ objectives: updated });
                             }}
                             placeholder="e.g., CEO, VP Engineering"
-                            className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
+                          style={{ color: '#f3f4f6' }}
                           />
                         </div>
                       </div>
@@ -1033,7 +1041,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       brandBrief: { ...framework.brandBrief, oneLiner: e.target.value }
                     })}
                     placeholder="Tagline/value proposition..."
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
+                    style={{ color: '#f3f4f6' }}
                   />
                   <div className="text-xs text-gray-400 mt-1">
                     Used in: Website headers, elevator pitches
@@ -1050,7 +1059,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       brandBrief: { ...framework.brandBrief, positioning: e.target.value }
                     })}
                     placeholder="Frame of reference + why different..."
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    style={{ color: '#f3f4f6' }}
                   />
                   <div className="text-xs text-gray-400 mt-1">
                     Used in: Marketing materials, competitive analysis
@@ -1067,7 +1077,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       brandBrief: { ...framework.brandBrief, audience: e.target.value }
                     })}
                     placeholder="Ideal Customer Profile in a sentence..."
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    style={{ color: '#f3f4f6' }}
                   />
                   <div className="text-xs text-gray-400 mt-1">
                     Used in: Customer personas, targeting strategies
@@ -1091,7 +1102,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                           });
                         }}
                         placeholder={`Tone word ${index + 1}...`}
-                        className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400"
+                        className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
+                        style={{ color: '#f3f4f6' }}
                       />
                     ))}
                     <button
@@ -1118,7 +1130,8 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       brandBrief: { ...framework.brandBrief, story: e.target.value }
                     })}
                     placeholder="Short founding narrative..."
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 h-32"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-32"
+                    style={{ color: '#f3f4f6' }}
                   />
                   <div className="text-xs text-gray-400 mt-1">
                     Used in: About page, investor presentations
