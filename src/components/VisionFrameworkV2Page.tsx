@@ -456,9 +456,24 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
         {activeTab === 'onepager' && (
           <div className="bg-white rounded-lg shadow-sm p-8">
             <div className="prose prose-sm max-w-none">
-              <div className="whitespace-pre-wrap font-sans text-gray-800 leading-relaxed">
-                {executiveOnePager || 'Executive one-pager will appear here after generation.'}
-              </div>
+              {executiveOnePager ? (
+                <div 
+                  className="text-gray-800 leading-relaxed"
+                  dangerouslySetInnerHTML={{ 
+                    __html: executiveOnePager
+                      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
+                      .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
+                      .replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>') // H3
+                      .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>') // H2
+                      .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>') // H1
+                      .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc list-inside">$1</li>') // List items
+                      .replace(/\n\n/g, '</p><p class="mb-4">') // Paragraphs
+                      .replace(/^(.+)$/gm, (match) => match.startsWith('<') ? match : `<p class="mb-2">${match}</p>`) // Wrap remaining lines
+                  }}
+                />
+              ) : (
+                <div className="text-gray-500">Executive one-pager will appear here after generation.</div>
+              )}
             </div>
           </div>
         )}
