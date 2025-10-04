@@ -231,7 +231,7 @@ export default function SOSPage() {
                         .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold mt-6 mb-3">$1</h2>')
                         .replace(/^### (.+)$/gm, '<h3 class="text-xl font-semibold mt-4 mb-2">$1</h3>')
                         .replace(/^- (.+)$/gm, '<li class="ml-4">$1</li>')
-                        .replace(/(<li.*<\/li>)/s, '<ul class="list-disc ml-6 space-y-1">$1</ul>')
+                        .replace(/(<li.*<\/li>)/g, '<ul class="list-disc ml-6 space-y-1">$1</ul>')
                         .replace(/\n\n/g, '<br/><br/>')
                     }}
                   />
