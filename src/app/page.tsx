@@ -2,7 +2,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <main className="mx-auto max-w-4xl px-6 py-24">
-        <div className="text-center py-20">
+        <div className="text-center py-[70px]">
           {/* Headline */}
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             From first draft to <span className="text-blue-500">focused strategy</span>
@@ -31,7 +31,7 @@ export default function Landing() {
         </div>
 
         {/* Feature Cards */}
-        <div className="grid gap-6 md:grid-cols-3 mt-12">
+        <div className="grid gap-6 md:grid-cols-3 mt-7">
           {/* Polished Drafts */}
           <div className="rounded-lg bg-gray-900 p-6 text-center">
             <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-blue-600">
