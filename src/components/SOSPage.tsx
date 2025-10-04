@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import VisionFrameworkV2Page from '@/components/VisionFrameworkV2Page';
 
 type DocType = 'vision-v2' | 'founder-brief' | 'vc-summary';
@@ -25,17 +26,17 @@ export default function SOSPage() {
   });
   const [documents, setDocuments] = useState<Document[]>([
     {
-      id: 'founder-brief',
-      title: 'Founder Brief',
-      icon: '📄',
+      id: 'vision-v2',
+      title: 'Vision Framework V2',
+      icon: '🎯',
       status: 'complete',
       lastUpdated: 'Today',
       completionPercent: 100
     },
     {
-      id: 'vision-v2',
-      title: 'Vision Framework V2',
-      icon: '🎯',
+      id: 'founder-brief',
+      title: 'Founder Brief',
+      icon: '📄',
       status: 'complete',
       lastUpdated: 'Today',
       completionPercent: 100
@@ -50,10 +51,25 @@ export default function SOSPage() {
     }
   ]);
 
-  // Check for data in session storage to update document statuses
+  const [briefContent, setBriefContent] = useState<{founderBrief?: string; vcSummary?: string} | null>(null);
+
+  // Check for data in session storage to update document statuses and load content
   useEffect(() => {
     const briefData = sessionStorage.getItem('lastGeneratedBrief');
     const visionV2Data = sessionStorage.getItem('visionFrameworkV2Draft');
+    
+    // Load brief content if available
+    if (briefData) {
+      try {
+        const parsed = JSON.parse(briefData);
+        setBriefContent({
+          founderBrief: parsed.founderBriefMd,
+          vcSummary: parsed.vcSummaryMd
+        });
+      } catch (error) {
+        console.error('Error parsing brief data:', error);
+      }
+    }
     
     setDocuments(prev => prev.map(doc => {
       if (doc.id === 'founder-brief' && briefData) {
@@ -164,30 +180,42 @@ export default function SOSPage() {
             {activeDoc === 'founder-brief' && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Founder Brief</h2>
-                <div className="prose prose-sm max-w-none">
-                  <p className="text-gray-600">
-                    Your founder brief will appear here. Generate a brief from the{' '}
-                    <a href="/new" className="text-blue-600 hover:text-blue-700">
-                      Create Brief
-                    </a>{' '}
-                    page.
-                  </p>
-                </div>
+                {briefContent?.founderBrief ? (
+                  <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700">
+                    <ReactMarkdown>{briefContent.founderBrief}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <div className="prose prose-sm max-w-none">
+                    <p className="text-gray-600">
+                      Your founder brief will appear here. Generate a brief from the{' '}
+                      <a href="/new" className="text-blue-600 hover:text-blue-700">
+                        Create Brief
+                      </a>{' '}
+                      page.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
             
             {activeDoc === 'vc-summary' && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">VC Summary</h2>
-                <div className="prose prose-sm max-w-none">
-                  <p className="text-gray-600">
-                    Your VC summary will appear here. Generate a brief from the{' '}
-                    <a href="/new" className="text-blue-600 hover:text-blue-700">
-                      Create Brief
-                    </a>{' '}
-                    page.
-                  </p>
-                </div>
+                {briefContent?.vcSummary ? (
+                  <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700">
+                    <ReactMarkdown>{briefContent.vcSummary}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <div className="prose prose-sm max-w-none">
+                    <p className="text-gray-600">
+                      Your VC summary will appear here. Generate a brief from the{' '}
+                      <a href="/new" className="text-blue-600 hover:text-blue-700">
+                        Create Brief
+                      </a>{' '}
+                      page.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>

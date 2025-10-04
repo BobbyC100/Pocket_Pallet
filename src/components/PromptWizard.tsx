@@ -141,6 +141,10 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         console.log('✅ Framework saved to session storage');
       }
       
+      // Store brief data for SOS page
+      sessionStorage.setItem('lastGeneratedBrief', JSON.stringify(briefResult));
+      console.log('✅ Brief saved to session storage');
+      
       // Combine both results
       const combinedResult = {
         ...briefResult,
