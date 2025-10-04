@@ -113,6 +113,8 @@ export const extractVisionFrameworkFromBrief = (
     core_principles?: string;
     required_capabilities?: string;
     current_state?: string;
+    vision_purpose?: string;
+    vision_endstate?: string;
   }
 ): Partial<VisionFramework> => {
   // Parse vision/audience/timing to extract mission components
@@ -236,7 +238,7 @@ export const extractVisionFrameworkFromBrief = (
     vision: {
       // Use the explicit vision fields from wizard if provided, otherwise extract
       purpose: briefData.vision_purpose || extractVisionPurpose(briefData.vision_audience_timing),
-      endState: briefData.vision_endstate || extractEndState(briefData.success_definition, briefData.vision_audience_timing)
+      endState: briefData.vision_endstate || extractEndState(briefData.success_definition || "", briefData.vision_audience_timing)
     },
     
     mission: {
