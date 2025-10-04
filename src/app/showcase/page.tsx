@@ -250,7 +250,7 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            📄 Founder Brief
+            Founder Brief
           </button>
           <button
             onClick={() => setActiveDoc('framework')}
@@ -260,7 +260,7 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            🎯 Vision Framework V2
+            Vision Framework V2
           </button>
         </div>
       </div>
@@ -361,10 +361,10 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
                       <div key={i} className="p-3 bg-gray-50 rounded-lg">
                         <p className="text-sm font-medium text-gray-900">{bet.bet}</p>
                         <div className="flex gap-4 mt-2 text-xs text-gray-600">
-                          <span>👤 {bet.owner}</span>
-                          <span>📅 {bet.horizon}</span>
+                          <span>Owner: {bet.owner}</span>
+                          <span>Horizon: {bet.horizon}</span>
                         </div>
-                        <p className="text-xs text-gray-600 mt-1">📊 {bet.measure}</p>
+                        <p className="text-xs text-gray-600 mt-1">Measure: {bet.measure}</p>
                       </div>
                     ))}
                   </div>
