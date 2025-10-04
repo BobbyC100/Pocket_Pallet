@@ -258,7 +258,7 @@ Create a professional, narrative-driven brief in markdown format. Structure it w
 function createVCPrompt(responses: any): string {
   return `You are a VC analyst creating a concise investment summary.
 
-Create a VC-ready summary from these founder responses. Do NOT include a title - start directly with sections.
+Create a VC-ready summary from these founder responses. Do NOT include a company name title - start directly with sections.
 
 **Opportunity (What, Who, Why Now):**
 ${responses.vision_audience_timing || 'Not specified'}
@@ -278,7 +278,39 @@ ${responses.required_capabilities || 'Not specified'}
 **Current State:**
 ${responses.current_state || 'Not specified'}
 
-Create a concise, investment-focused summary in markdown format. Distill into: (1) Market Opportunity & Timing, (2) Team & Traction, (3) Business Model Clarity, (4) Capital Efficiency, (5) Key Risks. Be direct and analytical. Make it easy for VCs to quickly assess fit.`;
+**CRITICAL: Use this exact structure with these section headings:**
+
+**Thesis**
+[2-3 sentences: What problem, how you solve it, why this creates value]
+
+**Market Opportunity**
+[Market size, TAM/SAM, underserved segment, why this market matters now]
+
+**Product**
+[What you've built, how it works, key features that create value]
+
+**Traction**
+[Bullets with numbers: users, revenue, growth metrics, validation signals]
+
+**Business Model**
+[Pricing, unit economics, expansion strategy, path to scale]
+
+**Team**
+[Founder backgrounds, relevant experience, why this team can execute]
+
+**Competition & Moat**
+[Competitive landscape, why existing solutions fail, your defensibility]
+
+**Financials**
+[Current: cash, burn, runway. Raising: amount, use of funds. Milestones: what this capital unlocks]
+
+**Why Now**
+[Market forces, technology enablers, regulatory changes - why this moment]
+
+**The Ask**
+[Funding amount, use of proceeds, 12-18 month milestones]
+
+Be direct, analytical, and metrics-focused. Use bullet points for traction and financials. Keep each section tight (2-4 sentences max, except traction which should be bullets).`;
 }
 
 /**
