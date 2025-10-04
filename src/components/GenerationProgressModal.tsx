@@ -20,21 +20,25 @@ export default function GenerationProgressModal({
   currentStep,
   steps 
 }: GenerationProgressModalProps) {
+  const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   
   useEffect(() => {
     if (!isOpen) {
+      setStartTime(null);
       setElapsedTime(0);
       return;
     }
     
-    // Start the timer
+    // Set start time when modal opens
+    const start = Date.now();
+    setStartTime(start);
+    
+    // Update elapsed time every second
     const interval = setInterval(() => {
-      setElapsedTime(prev => {
-        const newTime = prev + 1;
-        return newTime;
-      });
-    }, 1000);
+      const elapsed = Math.floor((Date.now() - start) / 1000);
+      setElapsedTime(elapsed);
+    }, 100); // Update every 100ms for smoother display
     
     // Cleanup function
     return () => {
@@ -53,7 +57,7 @@ export default function GenerationProgressModal({
   const remainingTime = Math.max(0, totalEstimatedTime - elapsedTime);
   
   // Debug log
-  // console.log('Progress Modal State:', { elapsedTime, remainingTime, completedSteps, totalSteps });
+  console.log('⏱️ Progress Modal State:', { elapsedTime, remainingTime, completedSteps, totalSteps, isOpen });
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
