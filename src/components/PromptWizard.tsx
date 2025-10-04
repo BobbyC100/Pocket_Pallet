@@ -21,7 +21,9 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       success_definition: "Financially: Build a $100M+ revenue business with 70%+ gross margins and become the default logistics layer for construction. Culturally: Build a team where operators feel ownership, where safety is never compromised, and where we're radically transparent about delays with customers.",
       core_principles: "Safety first, always — no delivery is worth a workplace injury. Speed without shortcuts — we move fast but never cut corners on quality. Earn trust through transparency — if there's a delay, customers hear it from us first, with a plan.",
       required_capabilities: "Real-time routing algorithms that account for traffic, crane windows, and permit schedules. Mobile app for foremen to coordinate drops and confirm deliveries. API integrations with Procore, Autodesk, and major construction software. Sales team that understands operations, not just software.",
-      current_state: "3 co-founders: ex-Procore PM (10 years in construction tech), ex-Uber Freight ops lead (scaled logistics from 10 to 100 cities), and CTO (MIT, built routing systems at scale). 2 paid pilot customers (GCs doing $200M+/year). 18 active sites, 1,240 drops coordinated, 27% reduction in idle crew hours. $500K cash, $25K monthly burn, 20 months runway."
+      current_state: "3 co-founders: ex-Procore PM (10 years in construction tech), ex-Uber Freight ops lead (scaled logistics from 10 to 100 cities), and CTO (MIT, built routing systems at scale). 2 paid pilot customers (GCs doing $200M+/year). 18 active sites, 1,240 drops coordinated, 27% reduction in idle crew hours. $500K cash, $25K monthly burn, 20 months runway.",
+      vision_purpose: "Eliminate construction site delivery delays that waste time, money, and momentum",
+      vision_endstate: "A world where every construction site receives materials exactly when and where needed, eliminating costly delays and improving project efficiency across the entire industry"
     };
     setResponses(testData);
   }

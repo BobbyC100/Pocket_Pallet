@@ -40,6 +40,20 @@ export const PROMPT_STEPS = [
     description: 'Captures factual context only after the story has coherence. Give us the current state: team size, revenue/users, funding, burn.',
     placeholder: 'Example: 3 co-founders (ex-Procore PM, ex-Uber Freight ops, CTO). 2 paid pilots, 18 active sites, 1,240 drops coordinated. $500K cash, $25K monthly burn (20 months runway).',
     field: 'current_state'
+  },
+  {
+    id: 'vision_purpose',
+    title: 'Vision: Why does your company exist?',
+    description: 'In one clean sentence, what is the fundamental reason you\'re building this? What change are you bringing to the world?',
+    placeholder: 'Example: To eliminate construction site delivery delays that waste time and money',
+    field: 'vision_purpose'
+  },
+  {
+    id: 'vision_endstate',
+    title: 'Vision: What does the end state look like?',
+    description: 'Paint your end-state in 2–3 sentences. When you\'ve achieved your mission, what will the world look like?',
+    placeholder: 'Example: A world where every construction site receives materials exactly when and where needed, eliminating costly delays and improving project efficiency across the industry',
+    field: 'vision_endstate'
   }
 ];
 

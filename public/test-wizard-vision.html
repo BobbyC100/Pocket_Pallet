@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Wizard with Vision</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a2e;
+      color: #fff;
+    }
+    .button {
+      background: #4CAF50;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+      display: inline-block;
+    }
+    .button:hover { background: #45a049; }
+    .info {
+      background: #2d2d44;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .success { color: #4CAF50; }
+    h2 { color: #4CAF50; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test Updated Wizard Flow</h1>
+  
+  <div class="info">
+    <h2>✨ What Changed</h2>
+    <p><strong>Before:</strong> 6 strategic questions → Brief generated → Popup asks for 2 vision fields → Vision Framework</p>
+    <p class="success"><strong>After:</strong> 8 questions in wizard (includes 2 vision fields) → Brief + Framework generated seamlessly</p>
+  </div>
+
+  <div class="info">
+    <h2>📝 Testing Steps</h2>
+    <ol>
+      <li>Click "Start Wizard" below</li>
+      <li>Click "🚀 Load Test Data (YardBird)" button</li>
+      <li>Notice there are now <strong>8 steps</strong> instead of 6</li>
+      <li>Steps 7 & 8 are the vision fields (no popup needed!)</li>
+      <li>Click "Generate Brief"</li>
+      <li>Click "Create Vision Framework" (no popup!)</li>
+      <li>You should go directly to the framework page</li>
+    </ol>
+  </div>
+
+  <div class="info">
+    <h2>🎯 Expected Behavior</h2>
+    <ul>
+      <li>✅ Wizard has 8 steps (6 strategic + 2 vision)</li>
+      <li>✅ Vision fields pre-filled with test data</li>
+      <li>✅ No popup after clicking "Create Vision Framework"</li>
+      <li>✅ Smooth transition to Vision Framework page</li>
+      <li>✅ Vision Purpose and End State already populated</li>
+    </ul>
+  </div>
+
+  <a href="/new" class="button">🚀 Start Wizard</a>
+  <a href="/" class="button">🏠 Home</a>
+
+</body>
+</html>

@@ -234,8 +234,9 @@ export const extractVisionFrameworkFromBrief = (
     updatedAt: new Date().toISOString(),
     
     vision: {
-      purpose: extractVisionPurpose(briefData.vision_audience_timing),
-      endState: extractEndState(briefData.success_definition, briefData.vision_audience_timing)
+      // Use the explicit vision fields from wizard if provided, otherwise extract
+      purpose: briefData.vision_purpose || extractVisionPurpose(briefData.vision_audience_timing),
+      endState: briefData.vision_endstate || extractEndState(briefData.success_definition, briefData.vision_audience_timing)
     },
     
     mission: {

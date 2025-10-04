@@ -2,63 +2,46 @@
 import { useState } from "react";
 import PromptWizard from "@/components/PromptWizard";
 import ResultTabs from "@/components/ResultTabs";
-import VisionModal from "@/components/VisionModal";
 
 export default function NewPage() {
   const [result, setResult] = useState<null | {
     founderBriefMd: string; 
     vcSummaryMd: string; 
     runwayMonths: number | null;
-    responses?: any; // Store wizard responses for spine generation
+    responses?: any; // Store wizard responses for framework generation
   }>(null);
-  const [showVisionModal, setShowVisionModal] = useState(false);
   const [isCreatingFramework, setIsCreatingFramework] = useState(false);
 
-  const handleCreateVisionFramework = async (visionPurpose: string, visionEndState: string) => {
+  const handleCreateVisionFramework = async () => {
     if (!result?.responses) {
-      console.error('No responses available:', result);
       alert('No brief data available. Please complete the wizard first.');
       return;
     }
 
-    console.log('Creating vision framework with:', { 
-      briefData: result.responses, 
-      visionPurpose, 
-      visionEndState 
-    });
-
     setIsCreatingFramework(true);
     try {
-      console.log('Making API request to /api/vision-framework/from-brief');
-      const response = await fetch('/api/vision-framework/from-brief', {
+      // Call the generation API with wizard responses (includes vision fields)
+      const response = await fetch('/api/vision-framework/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          briefData: result.responses,
-          visionPurpose,
-          visionEndState,
-          companyId: 'demo-company'
+          companyId: 'demo-company',
+          responses: result.responses
         })
       });
 
-      console.log('API response status:', response.status);
-      console.log('API response ok:', response.ok);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('API error data:', errorData);
         throw new Error(errorData.error || 'Failed to create vision framework');
       }
 
       const frameworkData = await response.json();
-      console.log('Framework data received:', frameworkData);
       
-      // Store in session storage for the vision framework page to pick up
+      // Store in session storage for the vision framework page
       sessionStorage.setItem('visionFrameworkDraft', JSON.stringify({
         framework: frameworkData.framework,
         fromBrief: true,
-        autoFilledFields: frameworkData.autoFilledFields,
-        frameworkId: frameworkData.frameworkId
+        autoFilledFields: ['all']
       }));
 
       // Navigate to vision framework page
@@ -101,13 +84,7 @@ export default function NewPage() {
             </div>
             
             <button
-              onClick={() => {
-                if (!result?.responses) {
-                  alert('Please complete a brief first by going through the wizard steps above.');
-                  return;
-                }
-                setShowVisionModal(true);
-              }}
+              onClick={handleCreateVisionFramework}
               disabled={isCreatingFramework || !result?.responses}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -115,7 +92,7 @@ export default function NewPage() {
             </button>
             
             <div className="mt-3 text-xs text-gray-400 text-center">
-              We'll ask for 2 quick vision fields, then auto-fill everything else from your brief
+              All data auto-filled from your brief responses — ready to review and refine
             </div>
           </div>
 
@@ -124,12 +101,6 @@ export default function NewPage() {
           </div>
         </div>
       )}
-
-      <VisionModal
-        isOpen={showVisionModal}
-        onClose={() => setShowVisionModal(false)}
-        onSubmit={handleCreateVisionFramework}
-      />
     </main>
   );
 }

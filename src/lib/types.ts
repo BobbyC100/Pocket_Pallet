@@ -8,6 +8,8 @@ export interface PromptInput {
   core_principles: string;
   required_capabilities: string;
   current_state: string;
+  vision_purpose: string;
+  vision_endstate: string;
 }
 
 export interface BriefOutput {
