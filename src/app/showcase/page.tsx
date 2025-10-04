@@ -227,7 +227,7 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Document Showcase</h1>
-              <p className="text-gray-600 mt-1">YardBird Example Documents</p>
+              <p className="text-gray-600 mt-1">Example Documents</p>
             </div>
             <a
               href="/"
