@@ -227,12 +227,12 @@ export default function SOSPage() {
                     className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700"
                     dangerouslySetInnerHTML={{ 
                       __html: visionV2Content.executiveOnePager
-                        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold mt-6 mb-3">$1</h2>')
-                        .replace(/^### (.+)$/gm, '<h3 class="text-xl font-semibold mt-4 mb-2">$1</h3>')
-                        .replace(/^- (.+)$/gm, '<li class="ml-4">$1</li>')
-                        .replace(/(<li.*<\/li>)/g, '<ul class="list-disc ml-6 space-y-1">$1</ul>')
-                        .replace(/\n\n/g, '<br/><br/>')
+                       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                       .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold mt-6 mb-3">$1</h2>')
+                       .replace(/^### (.+)$/gm, '<h3 class="text-xl font-semibold mt-4 mb-2">$1</h3>')
+                       .replace(/^- (.+)$/gm, '<li class="ml-4">$1</li>')
+                       .replace(/(<li[\s\S]*?<\/li>)/g, '<ul class="list-disc ml-6 space-y-1">$1</ul>')
+                       .replace(/\n\n/g, '<br/><br/>')
                     }}
                   />
                 ) : (
