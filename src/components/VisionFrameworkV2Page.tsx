@@ -19,16 +19,23 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company' }: Vi
   // Load framework from session storage on mount
   useEffect(() => {
     const draftData = sessionStorage.getItem('visionFrameworkV2Draft');
+    console.log('🔍 Session storage raw data:', draftData ? draftData.substring(0, 200) : 'null');
+    
     if (draftData) {
       try {
         const parsed = JSON.parse(draftData);
+        console.log('📦 Parsed data:', parsed);
+        console.log('🎯 Framework:', parsed.framework);
+        
         setFramework(parsed.framework || null);
         setExecutiveOnePager(parsed.executiveOnePager || '');
         setQaResults(parsed.metadata?.qaChecks || null);
         console.log('✅ Loaded Vision Framework V2 from session');
       } catch (error) {
-        console.error('Failed to parse draft data:', error);
+        console.error('❌ Failed to parse draft data:', error);
       }
+    } else {
+      console.log('⚠️ No visionFrameworkV2Draft in session storage');
     }
   }, []);
 

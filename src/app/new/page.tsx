@@ -103,6 +103,7 @@ export default function NewPage() {
       }));
 
       // Navigate to vision framework page
+      console.log('🚀 Navigating to:', targetPage);
       window.location.href = targetPage;
     } catch (error) {
       console.error('Error creating vision framework:', error);
