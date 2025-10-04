@@ -20,7 +20,7 @@ export const exportToPDF = async (framework: VisionFramework, filename?: string)
     container.style.lineHeight = '1.6';
     
     // Generate HTML content for the PDF
-    container.innerHTML = generatePDFHTML(spine);
+    container.innerHTML = generatePDFHTML(framework);
     
     // Add to DOM temporarily
     document.body.appendChild(container);
@@ -67,7 +67,7 @@ export const exportToPDF = async (framework: VisionFramework, filename?: string)
 /**
  * Generate HTML content for PDF export
  */
-const generatePDFHTML = (spine: NarrativeSpine): string => {
+const generatePDFHTML = (framework: VisionFramework): string => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
