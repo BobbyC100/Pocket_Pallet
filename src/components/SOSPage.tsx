@@ -273,11 +273,8 @@ export default function SOSPage() {
             
             {activeDoc === 'executive-onepager' && (
               <div className="bg-white rounded-lg shadow-sm p-8">
-                <div className="flex items-center justify-between mb-6">
+                <div className="mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">Executive One-Pager</h2>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-                    Gemini 2.5 Flash
-                  </span>
                 </div>
                 {visionV2Content?.executiveOnePager ? (
                   <>
@@ -313,11 +310,8 @@ export default function SOSPage() {
             
             {activeDoc === 'founder-brief' && (
               <div className="bg-white rounded-lg shadow-sm p-8">
-                <div className="flex items-center justify-between mb-6">
+                <div className="mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">Founder Brief</h2>
-                  <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                    GPT-4 Generated
-                  </span>
                 </div>
                 {briefContent?.founderBrief ? (
                   <>
@@ -348,11 +342,8 @@ export default function SOSPage() {
             
             {activeDoc === 'vc-summary' && (
               <div className="bg-white rounded-lg shadow-sm p-8">
-                <div className="flex items-center justify-between mb-6">
+                <div className="mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">VC Summary</h2>
-                  <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                    GPT-4 Generated
-                  </span>
                 </div>
                 {briefContent?.vcSummary ? (
                   <>
@@ -383,11 +374,8 @@ export default function SOSPage() {
             
             {activeDoc === 'qa-results' && (
               <div className="bg-white rounded-lg shadow-sm p-8">
-                <div className="flex items-center justify-between mb-6">
+                <div className="mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">QA Results</h2>
-                  <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">
-                    Gemini 2.5 Pro
-                  </span>
                 </div>
                 {visionV2Content?.qaResults ? (
                   <div className="space-y-6">

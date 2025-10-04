@@ -271,11 +271,8 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Founder Brief */}
             <div className="bg-white rounded-lg shadow-sm p-8">
-              <div className="flex items-center justify-between mb-6">
+              <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Founder Brief</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                  GPT-4 Generated
-                </span>
               </div>
               <div className="prose prose-sm max-w-none">
                 <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
@@ -294,11 +291,8 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
 
             {/* VC Summary */}
             <div className="bg-white rounded-lg shadow-sm p-8">
-              <div className="flex items-center justify-between mb-6">
+              <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">VC Summary</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                  GPT-4 Generated
-                </span>
               </div>
               <div className="prose prose-sm max-w-none">
                 <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
@@ -319,11 +313,8 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Vision Framework - Full */}
             <div className="bg-white rounded-lg shadow-sm p-8">
-              <div className="flex items-center justify-between mb-6">
+              <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Full Framework</h2>
-                <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">
-                  Gemini 2.5 Pro
-                </span>
               </div>
               
               <div className="space-y-6">
@@ -408,11 +399,8 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
 
             {/* Executive One-Pager */}
             <div className="bg-white rounded-lg shadow-sm p-8">
-              <div className="flex items-center justify-between mb-6">
+              <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Executive One-Pager</h2>
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-                  Gemini 2.5 Flash
-                </span>
               </div>
               <div className="prose prose-sm max-w-none">
                 <div className="whitespace-pre-wrap text-gray-700 leading-relaxed text-sm">
