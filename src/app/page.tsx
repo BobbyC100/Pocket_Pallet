@@ -4,12 +4,10 @@ export default function Landing() {
       <main className="mx-auto max-w-4xl px-6 py-24">
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            Transform founder instinct into{' '}
-            <span className="text-blue-400">investor-ready clarity</span>
+            Your vision, <span className="text-blue-400">fully formed</span>
           </h1>
           <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-            Banyan helps you turn what's in your head into a brief investors can trust.
-            Simple prompts in, strategic clarity out.
+            From executive one-pagers to quality assessments, Banyan turns rough ideas into polished, strategic documents that move your company forward.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
