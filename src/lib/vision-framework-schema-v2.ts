@@ -65,12 +65,12 @@ export function validateVisionFrameworkV2(framework: any): { success: boolean; e
     
     if (!result.success) {
       console.error('❌ Zod validation failed:', result.error);
-      console.error('❌ Validation errors:', JSON.stringify(result.error.errors, null, 2));
+      console.error('❌ Validation errors:', JSON.stringify(result.error.issues, null, 2));
       
-      const errors = result.error?.errors?.map(err => {
+      const errors = result.error?.issues?.map(err => {
         const path = err.path.join('.') || 'root';
-        const received = err.message.includes('Required') ? 'missing' : JSON.stringify((err as any).received);
-        return `${path}: ${err.message} (received: ${received})`;
+        const received = err.message.includes('Required') ? 'missing' : '';
+        return `${path}: ${err.message}${received ? ` (received: ${received})` : ''}`;
       }) || ['Unknown validation error'];
       
       console.error('❌ Formatted errors:', errors);
