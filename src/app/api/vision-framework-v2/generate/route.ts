@@ -13,12 +13,12 @@ export async function POST(request: NextRequest) {
   try {
     const { companyId, responses } = await request.json();
 
-    console.log('🚀 Starting Vision Framework V2 generation with Gemini 2.0 Flash');
+    console.log('🚀 Starting Vision Framework V2 generation with Gemini 1.5 Flash');
     console.log('📝 Company:', companyId);
 
     // Step 1: Gemini Flash generates the framework with contradiction detection
     console.log('Step 1: Gemini Flash mapping sections and detecting tensions...');
-    const geminiFlash = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const geminiFlash = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     const frameworkPrompt = createVisionFrameworkPrompt(responses);
     const frameworkResult = await geminiFlash.generateContent(frameworkPrompt);
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       framework: completeFramework,
       executiveOnePager,
       metadata: {
-        modelsUsed: ['gemini-2.0-flash-exp'],
+        modelsUsed: ['gemini-1.5-flash'],
         qaChecks: qaResults,
         generatedAt: new Date().toISOString()
       }
