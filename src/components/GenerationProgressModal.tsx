@@ -56,8 +56,8 @@ export default function GenerationProgressModal({
   const totalEstimatedTime = steps.reduce((acc, step) => acc + step.estimatedSeconds, 0);
   const remainingTime = Math.max(0, totalEstimatedTime - elapsedTime);
   
-  // Debug log
-  console.log('⏱️ Progress Modal State:', { elapsedTime, remainingTime, completedSteps, totalSteps, isOpen });
+  // Debug log (uncomment to troubleshoot)
+  // console.log('⏱️ Progress Modal State:', { elapsedTime, remainingTime, completedSteps, totalSteps, isOpen });
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
