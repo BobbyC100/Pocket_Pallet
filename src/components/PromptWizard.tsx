@@ -73,6 +73,9 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         throw new Error(`Failed to generate vision framework: ${errorData.error || 'Unknown error'}`);
       }
 
+      // Parse framework result immediately after success check
+      const frameworkResult = await spineResponse.json();
+
       // Then generate the traditional briefs
       console.log('✓ Vision framework generated!');
       console.log('Step 2/2: Generating AI briefs (this takes 10-15 seconds)...');
@@ -91,7 +94,6 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       }
 
       const briefResult = await briefResponse.json()
-      const frameworkResult = await spineResponse.json()
       
       console.log('✓ Briefs generated successfully!');
       console.log('🎉 All done! Displaying results...');

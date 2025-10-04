@@ -1,96 +1,90 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-// import Anthropic from '@anthropic-ai/sdk'; // Commented out - not available in France
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// const anthropic = new Anthropic({
-//   apiKey: process.env.ANTHROPIC_API_KEY,
-// }); // Commented out - not available in France
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(request: NextRequest) {
   try {
-    const { responses } = await request.json();
-
-    // Create prompts for both founder and VC briefs
-    const founderPrompt = createFounderPrompt(responses);
-    const vcPrompt = createVCPrompt(responses);
-
-    // Try to generate with both models, but handle failures gracefully
-    let gpt4FounderContent = '';
-    let gpt4VCContent = '';
-    let claudeFounderContent = '';
-    let claudeVCContent = '';
-    let modelsUsed = ['gpt-4'];
-
+    // Parse request body with error handling
+    let body;
     try {
-      // Generate with GPT-4
-      const [gpt4Founder, gpt4VC] = await Promise.all([
-        openai.chat.completions.create({
-          model: "gpt-4",
-          messages: [{ role: "user", content: founderPrompt }],
-          temperature: 0.7,
-          max_tokens: 2000,
-        }),
-        openai.chat.completions.create({
-          model: "gpt-4",
-          messages: [{ role: "user", content: vcPrompt }],
-          temperature: 0.7,
-          max_tokens: 1500,
-        })
-      ]);
-
-      gpt4FounderContent = gpt4Founder.choices[0]?.message?.content || '';
-      gpt4VCContent = gpt4VC.choices[0]?.message?.content || '';
-    } catch (error) {
-      console.error('GPT-4 error:', error);
-      throw new Error('GPT-4 generation failed');
+      body = await request.json();
+    } catch (parseError) {
+      console.error('❌ JSON parse error:', parseError);
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body', details: parseError instanceof Error ? parseError.message : 'Unknown error' },
+        { status: 400 }
+      );
     }
 
-    try {
-      // Try to generate with Claude (commented out - not available in France)
-      // const [claudeFounder, claudeVC] = await Promise.all([
-      //   anthropic.messages.create({
-      //     model: "claude-3-sonnet-20240229",
-      //     max_tokens: 2000,
-      //     messages: [{ role: "user", content: founderPrompt }],
-      //   }),
-      //   anthropic.messages.create({
-      //     model: "claude-3-sonnet-20240229", 
-      //     max_tokens: 1500,
-      //     messages: [{ role: "user", content: vcPrompt }],
-      //   })
-      // ]);
-
-      // claudeFounderContent = claudeFounder.content[0].type === 'text' ? claudeFounder.content[0].text : '';
-      // claudeVCContent = claudeVC.content[0].type === 'text' ? claudeVC.content[0].text : '';
-      // modelsUsed.push('claude');
-    } catch (error) {
-      console.error('Claude error:', error);
-      // Continue with GPT-4 only
+    const { responses } = body;
+    
+    if (!responses) {
+      console.error('❌ No responses in request body');
+      return NextResponse.json(
+        { error: 'Missing responses in request body' },
+        { status: 400 }
+      );
     }
 
-    // Create consensus briefs
-    const founderBriefMd = createConsensusBrief(gpt4FounderContent, claudeFounderContent, 'founder');
-    const vcSummaryMd = createConsensusBrief(gpt4VCContent, claudeVCContent, 'vc');
+    console.log('🚀 Starting brief generation with Gemini 2.5 + GPT-4');
+    console.log('📝 Responses received:', Object.keys(responses));
 
-    // Calculate runway
-    const runwayMonths = responses.cash_on_hand && responses.monthly_burn 
-      ? Math.floor(responses.cash_on_hand / responses.monthly_burn)
-      : null;
+    // Step 1: Gemini 2.5 Pro generates structured outline
+    console.log('Step 1: Generating outline with Gemini 2.5 Pro...');
+    const geminiPro = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+    
+    const outlinePrompt = createOutlinePrompt(responses);
+    const outlineResult = await geminiPro.generateContent(outlinePrompt);
+    const outline = outlineResult.response.text();
+    console.log('✅ Outline generated');
+
+    // Step 2: Generate briefs from both models in parallel
+    console.log('Step 2: Generating briefs with GPT-4 and Gemini 2.5 Pro...');
+    const [gpt4Briefs, geminiProBriefs] = await Promise.all([
+      generateGPT4Briefs(responses),
+      generateGeminiProBriefs(responses, outline)
+    ]);
+    console.log('✅ Both briefs generated');
+
+    // Step 3: Gemini 2.5 Flash tightens and polishes
+    console.log('Step 3: Tightening with Gemini 2.5 Flash...');
+    const geminiFlash = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    
+    const [founderBriefMd, vcSummaryMd] = await Promise.all([
+      tightenWithFlash(geminiFlash, gpt4Briefs.founder, geminiProBriefs.founder, 'founder'),
+      tightenWithFlash(geminiFlash, gpt4Briefs.vc, geminiProBriefs.vc, 'vc')
+    ]);
+    console.log('✅ Briefs tightened');
+
+    // Step 4: QA checks
+    console.log('Step 4: Running QA checks...');
+    const qaResults = await performQAChecks(geminiFlash, founderBriefMd, responses);
+    console.log('✅ QA checks complete');
+
+    // Calculate runway if available
+    const runwayMonths = calculateRunway(responses);
 
     return NextResponse.json({
       founderBriefMd,
       vcSummaryMd,
       runwayMonths,
-      models: modelsUsed,
-      consensus: modelsUsed.length > 1
+      responses, // Pass through for framework generation
+      metadata: {
+        modelsUsed: ['gpt-4', 'gemini-2.5-pro', 'gemini-2.5-flash'],
+        outline,
+        qaChecks: qaResults
+      }
     });
 
   } catch (error) {
-    console.error('AI API error:', error);
+    console.error('❌ Brief generation error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
       { 
         error: 'Failed to generate brief',
@@ -102,6 +96,162 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * Step 1: Gemini Pro creates structured outline
+ */
+function createOutlinePrompt(responses: any): string {
+  return `You are an expert startup advisor. Given these 8 inputs from a founder, produce a detailed two-level outline for their investor brief.
+
+**Strategic Inputs:**
+1. **Vision, Audience & Timing:** ${responses.vision_audience_timing}
+2. **Hard Decisions:** ${responses.hard_decisions}
+3. **Success Definition:** ${responses.success_definition}
+4. **Core Principles:** ${responses.core_principles}
+5. **Required Capabilities:** ${responses.required_capabilities}
+6. **Current State:** ${responses.current_state}
+7. **Vision Purpose:** ${responses.vision_purpose}
+8. **Vision End State:** ${responses.vision_endstate}
+
+Create a structured outline with:
+- Executive Summary (1-sentence "why now")
+- Problem & Opportunity
+- Solution & Approach
+- Market & Customer
+- Traction & Milestones
+- Team & Execution
+- Financial Position
+- Strategic Priorities
+
+For each section, include 2-3 bullet points. Flag any missing numbers with [[NEEDS_DATA: description]].
+
+The outline should serve as the foundation for both a founder-facing brief (narrative, strategic) and a VC-facing brief (metrics, opportunity).`;
+}
+
+/**
+ * Step 2a: GPT-4 generates its versions
+ */
+async function generateGPT4Briefs(responses: any) {
+  const founderPrompt = createFounderPrompt(responses);
+  const vcPrompt = createVCPrompt(responses);
+
+  const [founderResult, vcResult] = await Promise.all([
+    openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [{ role: "user", content: founderPrompt }],
+      temperature: 0.7,
+      max_tokens: 2000,
+    }),
+    openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [{ role: "user", content: vcPrompt }],
+      temperature: 0.7,
+      max_tokens: 1500,
+    })
+  ]);
+
+  return {
+    founder: founderResult.choices[0]?.message?.content || '',
+    vc: vcResult.choices[0]?.message?.content || ''
+  };
+}
+
+/**
+ * Step 2b: Gemini Pro generates its versions
+ */
+async function generateGeminiProBriefs(responses: any, outline: string) {
+  const geminiPro = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+
+  const founderPrompt = `Using this outline:\n\n${outline}\n\nCreate a 500-800 word founder-facing brief that tells a compelling narrative. Include the one-sentence "why now" prominently. Use the founder's voice and preserve strategic nuance. Start directly with content (no title).
+
+Context: ${JSON.stringify(responses, null, 2)}`;
+
+  const vcPrompt = `Using this outline:\n\n${outline}\n\nCreate a concise VC-facing summary (400-600 words) focused on: market opportunity, traction metrics, team credibility, capital efficiency, and key risks. Be analytical and direct. Start directly with content (no title).
+
+Context: ${JSON.stringify(responses, null, 2)}`;
+
+  const [founderResult, vcResult] = await Promise.all([
+    geminiPro.generateContent(founderPrompt),
+    geminiPro.generateContent(vcPrompt)
+  ]);
+
+  return {
+    founder: founderResult.response.text(),
+    vc: vcResult.response.text()
+  };
+}
+
+/**
+ * Step 3: Gemini Flash tightens and polishes
+ */
+async function tightenWithFlash(geminiFlash: any, gpt4Content: string, geminiContent: string, type: 'founder' | 'vc'): Promise<string> {
+  const targetGrade = type === 'founder' ? '10th grade' : '12th grade';
+  
+  const prompt = `You are an editor. Here are two versions of the same ${type} brief:
+
+**Version A (GPT-4):**
+${gpt4Content}
+
+**Version B (Gemini Pro):**
+${geminiContent}
+
+Your task:
+1. Synthesize the best insights from both versions
+2. Remove all hedging language ("might", "could", "perhaps")
+3. Make every sentence earn its place
+4. Target reading level: ${targetGrade}
+5. Maintain ${type === 'founder' ? 'narrative flow and strategic depth' : 'analytical clarity and investor focus'}
+6. Keep length: ${type === 'founder' ? '500-800 words' : '400-600 words'}
+
+Output the final polished brief in markdown format. Start directly with content (no title).`;
+
+  const result = await geminiFlash.generateContent(prompt);
+  return result.response.text();
+}
+
+/**
+ * Step 4: QA checks
+ */
+async function performQAChecks(geminiFlash: any, brief: string, responses: any) {
+  const qaPrompt = `Review this founder brief and perform QA checks:
+
+**Brief:**
+${brief}
+
+**Original Responses:**
+${JSON.stringify(responses, null, 2)}
+
+Check for:
+1. **Claims vs Numbers**: Are quantitative claims backed by data from responses?
+2. **Timelines**: Are timeframes clear and consistent?
+3. **"Why Now" Clarity**: Is the market timing argument compelling?
+4. **Single-Sentence Summary**: Can you distill this to one powerful sentence?
+
+Return a JSON object:
+{
+  "claimsVsNumbers": { "pass": true/false, "issues": ["..."] },
+  "timelines": { "pass": true/false, "issues": ["..."] },
+  "whyNowClarity": { "pass": true/false, "score": 1-10, "feedback": "..." },
+  "oneSentenceSummary": "..."
+}`;
+
+  try {
+    const result = await geminiFlash.generateContent(qaPrompt);
+    const text = result.response.text();
+    // Extract JSON from response (handle markdown code blocks)
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+    return { error: 'Could not parse QA results' };
+  } catch (error) {
+    console.error('QA check error:', error);
+    return { error: 'QA checks failed' };
+  }
+}
+
+/**
+ * Prompt builders
+ */
 function createFounderPrompt(responses: any): string {
   return `You are an expert startup advisor helping founders create comprehensive investor briefs.
 
@@ -124,6 +274,12 @@ ${responses.required_capabilities || 'Not specified'}
 
 **Current State (Team, Traction, Runway):**
 ${responses.current_state || 'Not specified'}
+
+**Vision Purpose:**
+${responses.vision_purpose || 'Not specified'}
+
+**Vision End State:**
+${responses.vision_endstate || 'Not specified'}
 
 Create a professional, narrative-driven brief in markdown format. Structure it with clear headings. Synthesize the founder's responses into a compelling story that shows: (1) deep market insight, (2) strategic clarity despite uncertainty, (3) cultural intentionality, and (4) operational realism. Make it investor-ready while preserving the founder's voice.`;
 }
@@ -154,12 +310,29 @@ ${responses.current_state || 'Not specified'}
 Create a concise, investment-focused summary in markdown format. Distill into: (1) Market Opportunity & Timing, (2) Team & Traction, (3) Business Model Clarity, (4) Capital Efficiency, (5) Key Risks. Be direct and analytical. Make it easy for VCs to quickly assess fit.`;
 }
 
-function createConsensusBrief(gpt4Content: string, claudeContent: string, type: 'founder' | 'vc'): string {
-  // For now, we'll use GPT-4 as the primary and add Claude insights as additional sections
-  // In a more sophisticated implementation, we could use another AI call to synthesize both
+/**
+ * Calculate runway from current state
+ */
+function calculateRunway(responses: any): number | null {
+  if (!responses.current_state) return null;
   
-  // Remove any existing titles from the content
-  const cleanContent = gpt4Content.replace(/^#\s+.*?\n\n/gm, '').replace(/^\*.*?\*\n\n/gm, '');
+  const cashMatch = responses.current_state.match(/\$?([\d,]+)K?\s*cash/i);
+  const burnMatch = responses.current_state.match(/\$?([\d,]+)K?\s*(monthly\s*)?burn/i);
   
-  return cleanContent;
+  if (cashMatch && burnMatch) {
+    const cash = parseInt(cashMatch[1].replace(/,/g, '')) * (cashMatch[0].includes('K') ? 1000 : 1);
+    const burn = parseInt(burnMatch[1].replace(/,/g, '')) * (burnMatch[0].includes('K') ? 1000 : 1);
+    
+    if (burn > 0) {
+      return Math.floor(cash / burn);
+    }
+  }
+  
+  // Look for explicit runway mention
+  const runwayMatch = responses.current_state.match(/([\d]+)\s*months?\s*runway/i);
+  if (runwayMatch) {
+    return parseInt(runwayMatch[1]);
+  }
+  
+  return null;
 }
