@@ -28,11 +28,18 @@ export default function GenerationProgressModal({
       return;
     }
     
+    // Start the timer
     const interval = setInterval(() => {
-      setElapsedTime(prev => prev + 1);
+      setElapsedTime(prev => {
+        const newTime = prev + 1;
+        return newTime;
+      });
     }, 1000);
     
-    return () => clearInterval(interval);
+    // Cleanup function
+    return () => {
+      clearInterval(interval);
+    };
   }, [isOpen]);
   
   if (!isOpen) return null;
@@ -40,10 +47,13 @@ export default function GenerationProgressModal({
   const currentStepIndex = steps.findIndex(s => s.id === currentStep);
   const completedSteps = steps.filter(s => s.status === 'complete').length;
   const totalSteps = steps.length;
-  const overallProgress = (completedSteps / totalSteps) * 100;
+  const overallProgress = Math.min(100, Math.round((completedSteps / totalSteps) * 100));
   
   const totalEstimatedTime = steps.reduce((acc, step) => acc + step.estimatedSeconds, 0);
   const remainingTime = Math.max(0, totalEstimatedTime - elapsedTime);
+  
+  // Debug log
+  // console.log('Progress Modal State:', { elapsedTime, remainingTime, completedSteps, totalSteps });
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
