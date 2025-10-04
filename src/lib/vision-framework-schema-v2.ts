@@ -59,16 +59,25 @@ export type Metric = z.infer<typeof MetricSchema>;
  * Validate a Vision Framework V2
  */
 export function validateVisionFrameworkV2(framework: any): { success: boolean; errors?: string[] } {
-  const result = VisionFrameworkV2Schema.safeParse(framework);
-  
-  if (!result.success) {
+  try {
+    const result = VisionFrameworkV2Schema.safeParse(framework);
+    
+    if (!result.success) {
+      const errors = result.error?.errors?.map(err => `${err.path.join('.')}: ${err.message}`) || ['Unknown validation error'];
+      return {
+        success: false,
+        errors
+      };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Validation threw an error:', error);
     return {
       success: false,
-      errors: result.error.errors.map(err => `${err.path.join('.')}: ${err.message}`)
+      errors: [`Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`]
     };
   }
-  
-  return { success: true };
 }
 
 /**

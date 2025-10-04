@@ -20,10 +20,10 @@ export default function Landing() {
               Create Your Brief
             </a>
             <a 
-              href="/example" 
-              className="text-gray-300 hover:text-white transition-colors duration-200"
+              href="/showcase" 
+              className="rounded-lg bg-gray-700 hover:bg-gray-600 px-8 py-4 text-white font-medium transition-colors duration-200"
             >
-              See an Example Brief →
+              View Document Examples
             </a>
           </div>
         </div>

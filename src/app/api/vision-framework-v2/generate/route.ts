@@ -67,9 +67,18 @@ export async function POST(request: NextRequest) {
       tensionsCount: completeFramework.tensions.length
     });
 
+    // Log sample bet to check structure
+    if (completeFramework.near_term_bets.length > 0) {
+      console.log('Sample bet structure:', JSON.stringify(completeFramework.near_term_bets[0], null, 2));
+    }
+    if (completeFramework.metrics.length > 0) {
+      console.log('Sample metric structure:', JSON.stringify(completeFramework.metrics[0], null, 2));
+    }
+
     // Validate
     console.log('Step 2: Validating framework...');
     const validation = validateVisionFrameworkV2(completeFramework);
+    console.log('Validation result:', validation);
     
     if (!validation.success) {
       console.error('❌ Validation failed:', validation.errors);
