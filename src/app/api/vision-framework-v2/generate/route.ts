@@ -13,12 +13,14 @@ export async function POST(request: NextRequest) {
   try {
     const { companyId, responses } = await request.json();
 
-    console.log('🚀 Starting Vision Framework V2 generation with Gemini Pro');
+    console.log('🚀 Starting Vision Framework V2 generation with Gemini 1.5 Pro');
     console.log('📝 Company:', companyId);
 
-    // Step 1: Gemini Pro generates the framework with contradiction detection
-    console.log('Step 1: Gemini Pro mapping sections and detecting tensions...');
-    const geminiFlash = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Step 1: Gemini 1.5 Pro generates the framework with contradiction detection
+    console.log('Step 1: Gemini 1.5 Pro mapping sections and detecting tensions...');
+    const geminiFlash = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-pro-latest"
+    });
     
     const frameworkPrompt = createVisionFrameworkPrompt(responses);
     const frameworkResult = await geminiFlash.generateContent(frameworkPrompt);
@@ -111,7 +113,7 @@ export async function POST(request: NextRequest) {
       framework: completeFramework,
       executiveOnePager,
       metadata: {
-        modelsUsed: ['gemini-pro'],
+        modelsUsed: ['gemini-1.5-pro-latest'],
         qaChecks: qaResults,
         generatedAt: new Date().toISOString()
       }
