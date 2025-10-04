@@ -107,13 +107,13 @@ async function generateGPT4Briefs(responses: any) {
 
   const [founderResult, vcResult] = await Promise.all([
     openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4-turbo-preview",
       messages: [{ role: "user", content: founderPrompt }],
       temperature: 0.7,
       max_tokens: 2000,
     }),
     openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4-turbo-preview",
       messages: [{ role: "user", content: vcPrompt }],
       temperature: 0.7,
       max_tokens: 1500,

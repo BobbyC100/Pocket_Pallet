@@ -13,15 +13,15 @@ export async function POST(request: NextRequest) {
   try {
     const { companyId, responses } = await request.json();
 
-    console.log('🚀 Starting Vision Framework V2 generation with Gemini 2.5 Pro');
+    console.log('🚀 Starting Vision Framework V2 generation with Gemini 2.0 Flash');
     console.log('📝 Company:', companyId);
 
-    // Step 1: Gemini Pro generates the framework with contradiction detection
-    console.log('Step 1: Gemini Pro mapping sections and detecting tensions...');
-    const geminiPro = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+    // Step 1: Gemini Flash generates the framework with contradiction detection
+    console.log('Step 1: Gemini Flash mapping sections and detecting tensions...');
+    const geminiFlash = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
     
     const frameworkPrompt = createVisionFrameworkPrompt(responses);
-    const frameworkResult = await geminiPro.generateContent(frameworkPrompt);
+    const frameworkResult = await geminiFlash.generateContent(frameworkPrompt);
     const frameworkText = frameworkResult.response.text();
     
     console.log('✅ Framework structure generated');
@@ -93,17 +93,15 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Framework validated');
 
-    // Step 3: Gemini Flash creates executive one-pager
-    console.log('Step 3: Gemini Flash creating executive one-pager...');
-    const geminiFlash = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    
+    // Step 3: Create executive one-pager (use same Flash model)
+    console.log('Step 3: Creating executive one-pager...');
     const onePagerPrompt = createExecutiveOnePagerPrompt(completeFramework);
     const onePagerResult = await geminiFlash.generateContent(onePagerPrompt);
     const executiveOnePager = onePagerResult.response.text();
     
     console.log('✅ Executive one-pager generated');
 
-    // Step 4: QA checks
+    // Step 4: QA checks (use same Flash model)
     console.log('Step 4: Running QA checks...');
     const qaResults = await performQAChecks(geminiFlash, completeFramework);
     console.log('✅ QA checks complete');
@@ -113,7 +111,7 @@ export async function POST(request: NextRequest) {
       framework: completeFramework,
       executiveOnePager,
       metadata: {
-        modelsUsed: ['gemini-2.5-pro', 'gemini-2.5-flash'],
+        modelsUsed: ['gemini-2.0-flash-exp'],
         qaChecks: qaResults,
         generatedAt: new Date().toISOString()
       }

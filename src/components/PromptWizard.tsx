@@ -72,58 +72,60 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   const handleSubmit = async () => {
     setIsSubmitting(true)
     
-    // Reset steps
+    // Reset steps - both run in parallel now
     setGenerationSteps([
-      { id: 'framework', label: 'Generating Vision Framework', status: 'pending', estimatedSeconds: 2 },
-      { id: 'brief', label: 'Generating Founder Brief & VC Summary', status: 'pending', estimatedSeconds: 18 }
+      { id: 'brief', label: 'Generating Founder Brief & VC Summary', status: 'pending', estimatedSeconds: 12 },
+      { id: 'framework', label: 'Generating Vision Framework', status: 'pending', estimatedSeconds: 30 }
     ]);
 
     try {
-      // Step 1: Generate vision framework
+      // Start both generations in parallel
       updateStepStatus('framework', 'active');
+      updateStepStatus('brief', 'active');
       
-      const spineResponse = await fetch('/api/vision-framework/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          companyId: 'demo-company',
-          responses 
+      console.log('🚀 Starting parallel generation of Brief + Vision Framework...');
+      
+      const [briefResponse, spineResponse] = await Promise.all([
+        fetch('/api/generate-brief', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ responses }),
         }),
-      })
+        fetch('/api/vision-framework/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            companyId: 'demo-company',
+            responses 
+          }),
+        })
+      ]);
 
+      // Check responses
+      if (!briefResponse.ok) {
+        const errorData = await briefResponse.json().catch(() => ({}));
+        console.error('Brief generation failed:', errorData);
+        throw new Error(`Failed to generate brief: ${errorData.error || 'Unknown error'}`);
+      }
+      
       if (!spineResponse.ok) {
         const errorData = await spineResponse.json().catch(() => ({}));
         console.error('Vision framework generation failed:', errorData);
         throw new Error(`Failed to generate vision framework: ${errorData.error || 'Unknown error'}`);
       }
 
-      // Parse framework result immediately after success check
+      // Parse results
+      const briefResult = await briefResponse.json();
       const frameworkResult = await spineResponse.json();
-      updateStepStatus('framework', 'complete');
-
-      // Step 2: Generate the traditional briefs
-      updateStepStatus('brief', 'active');
       
-      const briefResponse = await fetch('/api/generate-brief', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ responses }),
-      })
-
-      if (!briefResponse.ok) {
-        const errorData = await briefResponse.json().catch(() => ({}));
-        console.error('Brief generation failed:', errorData);
-        throw new Error(`Failed to generate brief: ${errorData.error || 'Unknown error'}`);
-      }
-
-      const briefResult = await briefResponse.json()
       updateStepStatus('brief', 'complete');
+      updateStepStatus('framework', 'complete');
       
-      console.log('✅ Complete');
+      console.log('✅ Both brief and framework generated successfully!');
       
       // Combine both results
       const combinedResult = {
