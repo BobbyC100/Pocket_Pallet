@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import VisionFrameworkV2Page from '@/components/VisionFrameworkV2Page';
 import VcSummaryDisplay from '@/components/VcSummaryDisplay';
+import LensBadge from '@/components/LensBadge';
 import { VcSummary, validateVcSummary } from '@/lib/vc-summary-schema';
 import { exportToPDF, exportToMarkdown } from '@/lib/pdf-export';
 
@@ -124,8 +125,9 @@ export default function SOSPage() {
     }
   ]);
 
-  const [briefContent, setBriefContent] = useState<{founderBrief?: string; vcSummary?: string; vcSummaryStructured?: VcSummary; vcSummaryScores?: any} | null>(null);
+  const [briefContent, setBriefContent] = useState<{founderBrief?: string; vcSummary?: string; vcSummaryStructured?: VcSummary; vcSummaryScores?: any; vcLensScores?: any} | null>(null);
   const [visionV2Content, setVisionV2Content] = useState<{executiveOnePager?: string; qaResults?: any} | null>(null);
+  const [scoringVcLens, setScoringVcLens] = useState(false);
 
   // Check for data in session storage to update document statuses and load content
   useEffect(() => {
@@ -160,11 +162,18 @@ export default function SOSPage() {
           console.log('✅ VC Summary scores loaded');
         }
         
+        // Load VC Lens scores if available
+        const vcLensScores = parsed.vcLensScores;
+        if (vcLensScores) {
+          console.log('✅ VC Lens scores loaded');
+        }
+        
         setBriefContent({
           founderBrief: parsed.founderBriefMd,
           vcSummary: parsed.vcSummaryMd,
           vcSummaryStructured,
-          vcSummaryScores
+          vcSummaryScores,
+          vcLensScores
         });
       } catch (error) {
         console.error('Error parsing brief data:', error);
@@ -203,6 +212,73 @@ export default function SOSPage() {
       return doc;
     }));
   }, []);
+
+  const handleScoreVcWithLens = async () => {
+    if (!briefContent?.vcSummaryStructured) return;
+    
+    setScoringVcLens(true);
+    
+    try {
+      // Convert structured VC summary to text for scoring
+      const summary = briefContent.vcSummaryStructured;
+      const content = `
+What & Why Now: ${summary.whatWhyNow}
+
+Market: ${summary.market}
+
+Solution & Differentiation:
+${summary.solutionDiff.map((d: string, i: number) => `${i + 1}. ${d}`).join('\n')}
+
+Traction:
+${summary.traction.map((t: any, i: number) => `${i + 1}. ${t.metric}: ${t.value} (${t.timeframe})`).join('\n')}
+
+Business Model: ${summary.businessModel}
+
+Go-to-Market: ${summary.gtm}
+
+Team: ${summary.team}
+
+Ask & Use of Funds: ${summary.ask.amount}
+${summary.ask.useOfFunds.map((u: string, i: number) => `${i + 1}. ${u}`).join('\n')}
+
+Risks & Mitigations:
+${summary.risks.map((r: any, i: number) => `${i + 1}. Risk: ${r.risk} | Mitigation: ${r.mitigation}`).join('\n')}
+
+KPIs (6 months):
+${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
+      `.trim();
+
+      const response = await fetch('/api/lens/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content,
+          documentId: 'vc-summary',
+          documentType: 'vc_summary'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to score VC summary');
+      }
+
+      const result = await response.json();
+      
+      // Update briefContent with lens scores
+      setBriefContent(prev => prev ? { ...prev, vcLensScores: result } : null);
+      
+      // Store in session storage
+      const briefData = JSON.parse(sessionStorage.getItem('lastGeneratedBrief') || '{}');
+      briefData.vcLensScores = result;
+      sessionStorage.setItem('lastGeneratedBrief', JSON.stringify(briefData));
+      
+      console.log('✅ VC Summary lens scored:', result);
+    } catch (error) {
+      console.error('❌ VC Summary lens scoring failed:', error);
+    } finally {
+      setScoringVcLens(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -372,9 +448,37 @@ export default function SOSPage() {
             
             {activeDoc === 'vc-summary' && (
               <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-banyan-text-default">VC Summary</h2>
+                <div className="mb-6 flex items-start justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-banyan-text-default">VC Summary</h2>
+                  </div>
+                  {briefContent?.vcSummaryStructured && (
+                    <button
+                      onClick={handleScoreVcWithLens}
+                      disabled={scoringVcLens}
+                      className="btn-banyan-ghost text-sm"
+                      title="Score with Founder's Lens"
+                    >
+                      {scoringVcLens ? 'Scoring...' : 'Score with Lens'}
+                    </button>
+                  )}
                 </div>
+                
+                {/* Lens Badge */}
+                {briefContent?.vcLensScores && (
+                  <div className="mb-6">
+                    <LensBadge
+                      clarity={briefContent.vcLensScores.scores?.clarity}
+                      alignment={briefContent.vcLensScores.scores?.alignment}
+                      actionability={briefContent.vcLensScores.scores?.actionability}
+                      overall={briefContent.vcLensScores.scores?.overall}
+                      badge={briefContent.vcLensScores.badge}
+                      message={briefContent.vcLensScores.message}
+                      feedback={briefContent.vcLensScores.scores?.feedback}
+                    />
+                  </div>
+                )}
+                
                 {briefContent?.vcSummaryStructured ? (
                   <>
                     <VcSummaryDisplay 
