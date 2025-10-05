@@ -81,42 +81,56 @@ export default function RefinementPanel({
 
       {/* Quick Action Buttons */}
       {showQuickActions && (
-        <div className="mb-3 flex flex-wrap gap-2">
-          <button
-            onClick={() => handleQuickAction('more_specific')}
-            disabled={isRefining}
-            className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            More Specific
-          </button>
-          <button
-            onClick={() => handleQuickAction('more_concise')}
-            disabled={isRefining}
-            className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            More Concise
-          </button>
-          <button
-            onClick={() => handleQuickAction('different_angle')}
-            disabled={isRefining}
-            className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Different Angle
-          </button>
-          <button
-            onClick={() => handleQuickAction('add_detail')}
-            disabled={isRefining}
-            className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Add Detail
-          </button>
-          <button
-            onClick={() => handleQuickAction('regenerate')}
-            disabled={isRefining}
-            className="px-3 py-1.5 text-xs bg-banyan-warning/20 hover:bg-banyan-warning/30 text-banyan-warning rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Regenerate
-          </button>
+        <div className="mb-4 space-y-3">
+          {/* Primary Refinement Actions */}
+          <div>
+            <p className="text-xs text-banyan-text-subtle mb-2 font-medium">QUICK REFINEMENTS</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => handleQuickAction('more_specific')}
+                disabled={isRefining}
+                className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-banyan-border-default"
+              >
+                More Specific
+              </button>
+              <button
+                onClick={() => handleQuickAction('more_concise')}
+                disabled={isRefining}
+                className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-banyan-border-default"
+              >
+                More Concise
+              </button>
+              <button
+                onClick={() => handleQuickAction('different_angle')}
+                disabled={isRefining}
+                className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-banyan-border-default"
+              >
+                Different Angle
+              </button>
+              <button
+                onClick={() => handleQuickAction('add_detail')}
+                disabled={isRefining}
+                className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-banyan-border-default"
+              >
+                Add Detail
+              </button>
+            </div>
+          </div>
+
+          {/* Nuclear Option - Visually Separated */}
+          <div className="pt-3 border-t border-banyan-border-default">
+            <p className="text-xs text-banyan-text-subtle mb-2 font-medium">NUCLEAR OPTION</p>
+            <button
+              onClick={() => handleQuickAction('regenerate')}
+              disabled={isRefining}
+              className="px-4 py-2 text-sm bg-banyan-warning/10 hover:bg-banyan-warning/20 text-banyan-warning rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-2 border-banyan-warning/40 hover:border-banyan-warning font-medium"
+            >
+              ⚠️ Regenerate from Scratch
+            </button>
+            <p className="text-xs text-banyan-text-subtle mt-1 italic">
+              Completely rewrites this section. Use only if current version misses the mark.
+            </p>
+          </div>
         </div>
       )}
 
