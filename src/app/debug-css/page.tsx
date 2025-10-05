@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 export default function DebugCSSPage() {
   const [vars, setVars] = useState<Record<string, string>>({});
   const [theme, setTheme] = useState<string>("system");
+  const [systemPreference, setSystemPreference] = useState<string>("unknown");
+  const [bodyStyle, setBodyStyle] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const root = document.documentElement;
@@ -31,6 +33,16 @@ export default function DebugCSSPage() {
     // Check current theme
     const currentTheme = root.getAttribute('data-theme') || 'system';
     setTheme(currentTheme);
+    
+    // Check system preference
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setSystemPreference(isDark ? 'dark' : 'light');
+    
+    // Get body computed styles
+    setBodyStyle({
+      color: getComputedStyle(document.body).color,
+      backgroundColor: getComputedStyle(document.body).backgroundColor,
+    });
   }, []);
 
   return (
@@ -40,7 +52,7 @@ export default function DebugCSSPage() {
       <div style={{ marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Current Theme</h2>
         <p style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{theme}</p>
-        <p>System preference: {window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'}</p>
+        <p>System preference: {systemPreference}</p>
       </div>
       
       <div style={{ marginBottom: '2rem' }}>
@@ -109,10 +121,7 @@ export default function DebugCSSPage() {
       <div>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Body Computed Style</h2>
         <pre style={{ background: '#f5f5f5', padding: '1rem', overflow: 'auto' }}>
-          {JSON.stringify({
-            color: getComputedStyle(document.body).color,
-            backgroundColor: getComputedStyle(document.body).backgroundColor,
-          }, null, 2)}
+          {JSON.stringify(bodyStyle, null, 2)}
         </pre>
       </div>
     </div>
