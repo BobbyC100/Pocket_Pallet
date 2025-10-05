@@ -1,0 +1,59 @@
+# Environment Variables Template for Banyan
+# Copy these to your Vercel project's Environment Variables settings
+# Replace all placeholder values with your actual API keys
+
+# ============================================
+# OpenAI API Key
+# ============================================
+# Get from: https://platform.openai.com/account/api-keys
+# Should start with: sk-
+OPENAI_API_KEY=sk-your-actual-openai-key-here
+
+# ============================================
+# Google Gemini API Key
+# ============================================
+# Get from: Google AI Studio
+GEMINI_API_KEY=your-actual-gemini-key-here
+
+# ============================================
+# Supabase Configuration
+# ============================================
+# Get from: Your Supabase project dashboard → Settings → API
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-actual-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-actual-supabase-service-role-key
+
+# Get from: Your Supabase project dashboard → Settings → Database
+DATABASE_URL=postgresql://postgres:your-password@db.your-project-ref.supabase.co:5432/postgres
+
+# ============================================
+# Clerk Authentication
+# ============================================
+# Get from: https://dashboard.clerk.com/last-active?path=api-keys
+# Publishable key should start with: pk_test_ or pk_live_
+# Secret key should start with: sk_test_ or sk_live_
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your-actual-clerk-key-here
+CLERK_SECRET_KEY=sk_test_your-actual-clerk-secret-key-here
+
+# Clerk redirect URLs (these are correct, don't change)
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/sos
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/sos
+
+# ============================================
+# Optional: PostHog Analytics
+# ============================================
+# Get from: PostHog project settings (if using)
+NEXT_PUBLIC_POSTHOG_KEY=phc_your-actual-posthog-key
+NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+
+# ============================================
+# IMPORTANT INSTRUCTIONS:
+# ============================================
+# 1. Replace ALL placeholder values above with your actual API keys
+# 2. Copy these to Vercel Dashboard → Your Project → Settings → Environment Variables
+# 3. Make sure to check "Production" (and Preview if testing) for each variable
+# 4. After adding/updating, redeploy your project for changes to take effect
+# 5. Never share these keys publicly or commit them to git
+

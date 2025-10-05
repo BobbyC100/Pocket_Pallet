@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { VisionFrameworkV2, NearTermBet, Metric } from '@/lib/vision-framework-schema-v2';
+import RefinementPanel from './RefinementPanel';
 
 interface VisionFrameworkV2PageProps {
   companyId?: string;
@@ -18,6 +19,9 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
   // Default to edit tab when editOnly, QA tab when embedded
   const [activeTab, setActiveTab] = useState<'edit' | 'onepager' | 'qa'>(editOnly ? 'edit' : embedded ? 'qa' : 'edit');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [refiningSection, setRefiningSection] = useState<string | null>(null);
+  const [originalResponses, setOriginalResponses] = useState<any>(null);
+  const [sectionQualities, setSectionQualities] = useState<Record<string, any>>({});
 
   // Load framework from session storage on mount
   useEffect(() => {
@@ -43,6 +47,10 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
         if (parsed.metadata?.qaChecks) {
           setQaResults(parsed.metadata.qaChecks);
           console.log('✅ QA results set');
+        }
+        if (parsed.originalResponses) {
+          setOriginalResponses(parsed.originalResponses);
+          console.log('✅ Original responses captured for refinement');
         }
         console.log('✅ Loaded Vision Framework V2 from session');
       } catch (error) {
@@ -83,6 +91,64 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleRefineSection = async (section: string, feedback: string) => {
+    if (!framework) return;
+    
+    setRefiningSection(section);
+    
+    try {
+      const response = await fetch('/api/vision-framework-v2/refine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          section,
+          currentContent: (framework as any)[section],
+          feedback,
+          originalResponses,
+          fullFramework: framework
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to refine section');
+      }
+
+      const result = await response.json();
+      
+      // Update the framework with refined content
+      setFramework({
+        ...framework,
+        [section]: result.refinedContent
+      });
+
+      // Store quality scores
+      if (result.quality) {
+        setSectionQualities(prev => ({
+          ...prev,
+          [section]: result.quality
+        }));
+      }
+
+      // Show success message
+      setMessage({
+        type: 'success',
+        text: `✨ ${section.charAt(0).toUpperCase() + section.slice(1)} refined successfully!`
+      });
+
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
+
+    } catch (error) {
+      console.error('Refinement error:', error);
+      setMessage({
+        type: 'error',
+        text: 'Failed to refine section. Please try again.'
+      });
+    } finally {
+      setRefiningSection(null);
     }
   };
 
@@ -256,6 +322,13 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 rows={3}
                 placeholder="Your aspirational end state (2-3 sentences)"
+              />
+              <RefinementPanel
+                section="vision"
+                content={framework.vision}
+                onRefine={(feedback) => handleRefineSection('vision', feedback)}
+                quality={sectionQualities.vision}
+                isRefining={refiningSection === 'vision'}
               />
             </section>
 

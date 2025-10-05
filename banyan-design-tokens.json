@@ -1,0 +1,349 @@
+{
+  "banyan": {
+    "meta": {
+      "version": "1.0",
+      "owner": "Banyan Design System",
+      "last_update": "2025-10-05",
+      "description": "Banyan's design tokens define a unified visual and behavioral language across the site and app. The core palette uses deep green, warm neutrals, and soft accents to convey steadiness and focus, with color serving clarity, not decoration."
+    },
+
+    "color": {
+      "brand": {
+        "primary": {
+          "value": "#1B4D3E",
+          "description": "Deep green - primary brand color for buttons, links, and key UI elements"
+        },
+        "primary_contrast": {
+          "value": "#F9FAF9",
+          "description": "Off-white - text color on primary brand backgrounds"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "#1E1E1E",
+          "description": "Near-black - primary text color for body copy and headings"
+        },
+        "subtle": {
+          "value": "#4A4A4A",
+          "description": "Medium gray - secondary text, captions, and placeholder text"
+        }
+      },
+      "background": {
+        "base": {
+          "value": "#F9FAF9",
+          "description": "Off-white - page background color"
+        },
+        "surface": {
+          "value": "#FFFFFF",
+          "description": "Pure white - cards, modals, and elevated surfaces"
+        }
+      },
+      "border": {
+        "default": {
+          "value": "#E2E2E2",
+          "description": "Light gray - default border color for inputs and dividers"
+        }
+      },
+      "state": {
+        "success": {
+          "value": "#2FB57C",
+          "description": "Green - success states and positive feedback"
+        },
+        "warning": {
+          "value": "#FFB64C",
+          "description": "Orange - warning states and caution messages"
+        },
+        "error": {
+          "value": "#E45757",
+          "description": "Red - error states and destructive actions"
+        },
+        "info": {
+          "value": "#4B91F1",
+          "description": "Blue - informational messages and neutral highlights"
+        }
+      },
+      "accent": {
+        "sand": {
+          "value": "#F4EDE2",
+          "description": "Warm beige - accent background for highlighting content"
+        },
+        "mist": {
+          "value": "#E5EEF5",
+          "description": "Cool blue-gray - subtle accent for hover states"
+        }
+      }
+    },
+
+    "typography": {
+      "family": {
+        "primary": {
+          "value": "Inter",
+          "fallback": "system-ui, sans-serif",
+          "description": "Modern humanist sans-serif for UI and body text"
+        },
+        "secondary": {
+          "value": "Publico",
+          "fallback": "Georgia, serif",
+          "description": "Serif font for editorial content (future use)"
+        }
+      },
+      "size": {
+        "display": {
+          "value": 64,
+          "unit": "px",
+          "description": "Large display headlines"
+        },
+        "h1": {
+          "value": 48,
+          "unit": "px",
+          "description": "Page-level headings"
+        },
+        "h2": {
+          "value": 32,
+          "unit": "px",
+          "description": "Section headings"
+        },
+        "h3": {
+          "value": 24,
+          "unit": "px",
+          "description": "Subsection headings"
+        },
+        "body": {
+          "value": 18,
+          "unit": "px",
+          "description": "Default body text, buttons, and UI elements"
+        },
+        "caption": {
+          "value": 14,
+          "unit": "px",
+          "description": "Small text, labels, and helper text"
+        }
+      },
+      "weight": {
+        "regular": {
+          "value": 400,
+          "description": "Normal text weight"
+        },
+        "medium": {
+          "value": 500,
+          "description": "Slightly emphasized text"
+        },
+        "semibold": {
+          "value": 600,
+          "description": "Headings and important UI elements"
+        }
+      },
+      "line_height": {
+        "tight": {
+          "value": "110%",
+          "description": "Headings and display text"
+        },
+        "normal": {
+          "value": "130%",
+          "description": "Subheadings and short text blocks"
+        },
+        "relaxed": {
+          "value": "160%",
+          "description": "Body text and long-form content"
+        }
+      },
+      "letter_spacing": {
+        "default": {
+          "value": "0%",
+          "description": "Default letter spacing"
+        }
+      }
+    },
+
+    "spacing": {
+      "xxs": {
+        "value": 4,
+        "unit": "px",
+        "description": "Minimal spacing for tight layouts"
+      },
+      "xs": {
+        "value": 8,
+        "unit": "px",
+        "description": "Small gaps between related elements"
+      },
+      "s": {
+        "value": 12,
+        "unit": "px",
+        "description": "Compact spacing for buttons and inputs"
+      },
+      "m": {
+        "value": 16,
+        "unit": "px",
+        "description": "Base spacing unit - standard gaps and padding"
+      },
+      "l": {
+        "value": 24,
+        "unit": "px",
+        "description": "Generous spacing between sections"
+      },
+      "xl": {
+        "value": 48,
+        "unit": "px",
+        "description": "Large spacing for major sections"
+      },
+      "xxl": {
+        "value": 96,
+        "unit": "px",
+        "description": "Extra-large spacing for page-level separation"
+      }
+    },
+
+    "radius": {
+      "s": {
+        "value": 4,
+        "unit": "px",
+        "description": "Subtle rounding for small elements"
+      },
+      "m": {
+        "value": 8,
+        "unit": "px",
+        "description": "Standard rounding for buttons and inputs"
+      },
+      "l": {
+        "value": 12,
+        "unit": "px",
+        "description": "Cards and panels"
+      },
+      "xl": {
+        "value": 20,
+        "unit": "px",
+        "description": "Large containers and modals"
+      }
+    },
+
+    "shadow": {
+      "surface_low": {
+        "value": "0 1px 2px rgba(0,0,0,0.06)",
+        "description": "Subtle elevation for cards"
+      },
+      "surface_mid": {
+        "value": "0 2px 4px rgba(0,0,0,0.08)",
+        "description": "Medium elevation for hover states"
+      },
+      "surface_high": {
+        "value": "0 4px 12px rgba(0,0,0,0.10)",
+        "description": "High elevation for modals and dropdowns"
+      }
+    },
+
+    "motion": {
+      "duration": {
+        "fast": {
+          "value": "100ms",
+          "description": "Quick transitions for hover states"
+        },
+        "base": {
+          "value": "200ms",
+          "description": "Standard transition duration"
+        },
+        "slow": {
+          "value": "300ms",
+          "description": "Deliberate transitions for larger movements"
+        }
+      },
+      "ease": {
+        "default": {
+          "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "description": "Gentle easing for most transitions"
+        },
+        "in": {
+          "value": "cubic-bezier(0.4, 0, 1, 1)",
+          "description": "Acceleration easing"
+        },
+        "out": {
+          "value": "cubic-bezier(0, 0, 0.2, 1)",
+          "description": "Deceleration easing"
+        }
+      }
+    },
+
+    "components": {
+      "button": {
+        "primary": {
+          "bg": "#1B4D3E",
+          "text": "#F9FAF9",
+          "hover": "color-mix(in srgb, #1B4D3E 90%, black)",
+          "description": "Primary action buttons"
+        },
+        "secondary": {
+          "bg": "#FFFFFF",
+          "text": "#1B4D3E",
+          "border": "#1B4D3E",
+          "description": "Secondary action buttons"
+        },
+        "ghost": {
+          "bg": "transparent",
+          "text": "#1E1E1E",
+          "hover_bg": "#E5EEF5",
+          "description": "Tertiary or subtle actions"
+        }
+      },
+      "input": {
+        "bg": "#FFFFFF",
+        "border": "#E2E2E2",
+        "focus_border": "#1B4D3E",
+        "text": "#1E1E1E",
+        "placeholder": "#4A4A4A"
+      },
+      "card": {
+        "bg": "#FFFFFF",
+        "shadow": "0 1px 2px rgba(0,0,0,0.06)",
+        "radius": "12px"
+      },
+      "alert": {
+        "success": {
+          "bg": "#2FB57C",
+          "description": "Success notifications"
+        },
+        "warning": {
+          "bg": "#FFB64C",
+          "description": "Warning notifications"
+        },
+        "error": {
+          "bg": "#E45757",
+          "description": "Error notifications"
+        },
+        "info": {
+          "bg": "#4B91F1",
+          "description": "Info notifications"
+        }
+      }
+    },
+
+    "semantic": {
+      "color": {
+        "interactive": "#1B4D3E",
+        "neutral_bg": "#F9FAF9",
+        "text_primary": "#1E1E1E",
+        "text_secondary": "#4A4A4A",
+        "surface": "#FFFFFF"
+      }
+    },
+
+    "accessibility": {
+      "contrast_minimum": {
+        "value": "4.5:1",
+        "description": "WCAG AA minimum contrast ratio"
+      },
+      "tap_target_minimum": {
+        "value": "44px",
+        "description": "Minimum touch target size for mobile"
+      },
+      "font_size_minimum": {
+        "value": 14,
+        "unit": "px",
+        "description": "Minimum readable font size"
+      },
+      "supports_reduced_motion": {
+        "value": true,
+        "description": "Respects prefers-reduced-motion setting"
+      }
+    }
+  }
+}
+
