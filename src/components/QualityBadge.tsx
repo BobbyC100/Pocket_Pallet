@@ -1,13 +1,18 @@
 'use client';
 
 interface QualityBadgeProps {
-  score: number;
+  score?: number;
   issues?: string[];
   suggestions?: string[];
   strengths?: string[];
 }
 
 export default function QualityBadge({ score, issues = [], suggestions = [], strengths = [] }: QualityBadgeProps) {
+  // Don't render if no score is available
+  if (score === undefined || score === null) {
+    return null;
+  }
+
   const getQualityLevel = () => {
     if (score >= 8) return { level: 'Excellent', color: 'bg-banyan-success', textColor: 'text-banyan-success', emoji: '✨' };
     if (score >= 6) return { level: 'Good', color: 'bg-banyan-warning', textColor: 'text-banyan-warning', emoji: '⚠️' };

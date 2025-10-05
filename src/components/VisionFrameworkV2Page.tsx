@@ -322,12 +322,12 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-banyan-text-default">Vision</h2>
-                {sectionQualities.vision && (
+                {sectionQualities.vision && sectionQualities.vision.overallScore && (
                   <QualityBadge
                     score={sectionQualities.vision.overallScore}
-                    issues={sectionQualities.vision.issues}
-                    suggestions={sectionQualities.vision.suggestions}
-                    strengths={sectionQualities.vision.strengths}
+                    issues={sectionQualities.vision.issues || []}
+                    suggestions={sectionQualities.vision.suggestions || []}
+                    strengths={sectionQualities.vision.strengths || []}
                   />
                 )}
               </div>
@@ -351,12 +351,12 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-banyan-text-default">Strategy (How We Win)</h2>
-                {sectionQualities.strategy && (
+                {sectionQualities.strategy && sectionQualities.strategy.overallScore && (
                   <QualityBadge
                     score={sectionQualities.strategy.overallScore}
-                    issues={sectionQualities.strategy.issues}
-                    suggestions={sectionQualities.strategy.suggestions}
-                    strengths={sectionQualities.strategy.strengths}
+                    issues={sectionQualities.strategy.issues || []}
+                    suggestions={sectionQualities.strategy.suggestions || []}
+                    strengths={sectionQualities.strategy.strengths || []}
                   />
                 )}
               </div>
@@ -394,12 +394,12 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-banyan-text-default">Operating Principles</h2>
-                {sectionQualities.operating_principles && (
+                {sectionQualities.operating_principles && sectionQualities.operating_principles.overallScore && (
                   <QualityBadge
                     score={sectionQualities.operating_principles.overallScore}
-                    issues={sectionQualities.operating_principles.issues}
-                    suggestions={sectionQualities.operating_principles.suggestions}
-                    strengths={sectionQualities.operating_principles.strengths}
+                    issues={sectionQualities.operating_principles.issues || []}
+                    suggestions={sectionQualities.operating_principles.suggestions || []}
+                    strengths={sectionQualities.operating_principles.strengths || []}
                   />
                 )}
               </div>
@@ -437,12 +437,12 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-banyan-text-default">Near-term Bets</h2>
-                {sectionQualities.near_term_bets && (
+                {sectionQualities.near_term_bets && sectionQualities.near_term_bets.overallScore && (
                   <QualityBadge
                     score={sectionQualities.near_term_bets.overallScore}
-                    issues={sectionQualities.near_term_bets.issues}
-                    suggestions={sectionQualities.near_term_bets.suggestions}
-                    strengths={sectionQualities.near_term_bets.strengths}
+                    issues={sectionQualities.near_term_bets.issues || []}
+                    suggestions={sectionQualities.near_term_bets.suggestions || []}
+                    strengths={sectionQualities.near_term_bets.strengths || []}
                   />
                 )}
               </div>
@@ -524,12 +524,12 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-banyan-text-default">Metrics</h2>
-                {sectionQualities.metrics && (
+                {sectionQualities.metrics && sectionQualities.metrics.overallScore && (
                   <QualityBadge
                     score={sectionQualities.metrics.overallScore}
-                    issues={sectionQualities.metrics.issues}
-                    suggestions={sectionQualities.metrics.suggestions}
-                    strengths={sectionQualities.metrics.strengths}
+                    issues={sectionQualities.metrics.issues || []}
+                    suggestions={sectionQualities.metrics.suggestions || []}
+                    strengths={sectionQualities.metrics.strengths || []}
                   />
                 )}
               </div>
@@ -601,12 +601,12 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                   <h2 className="text-xl font-bold text-banyan-text-default">Tensions to Watch</h2>
                   <p className="text-sm text-banyan-text-subtle mt-1">Known contradictions or trade-offs in your strategy</p>
                 </div>
-                {sectionQualities.tensions && (
+                {sectionQualities.tensions && sectionQualities.tensions.overallScore && (
                   <QualityBadge
                     score={sectionQualities.tensions.overallScore}
-                    issues={sectionQualities.tensions.issues}
-                    suggestions={sectionQualities.tensions.suggestions}
-                    strengths={sectionQualities.tensions.strengths}
+                    issues={sectionQualities.tensions.issues || []}
+                    suggestions={sectionQualities.tensions.suggestions || []}
+                    strengths={sectionQualities.tensions.strengths || []}
                   />
                 )}
               </div>
