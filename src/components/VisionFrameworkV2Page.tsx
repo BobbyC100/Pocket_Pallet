@@ -86,6 +86,23 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
 
       setMessage({ type: 'success', text: '✅ Vision Framework saved!' });
       
+      // Analytics: Track save event
+      try {
+        const draftData = JSON.parse(sessionStorage.getItem('visionFrameworkV2Draft') || '{}');
+        const timeSinceGeneration = draftData.generatedAt 
+          ? (Date.now() - new Date(draftData.generatedAt).getTime()) / 1000
+          : null;
+        
+        console.log('📊 ANALYTICS:', {
+          event: 'framework_saved',
+          totalRefinements: draftData.totalRefinements || 0,
+          timeSinceGeneration: timeSinceGeneration ? `${(timeSinceGeneration / 60).toFixed(1)} min` : null,
+          timestamp: new Date().toISOString()
+        });
+      } catch (e) {
+        // Analytics logging failed, continue
+      }
+      
       // Clear session storage after successful save
       sessionStorage.removeItem('visionFrameworkV2Draft');
     } catch (error) {
@@ -155,6 +172,16 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
           
           sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(draftData));
           console.log('📝 Refinement history updated:', history.length, 'refinements');
+          
+          // Analytics: Track refinement event
+          console.log('📊 ANALYTICS:', {
+            event: 'refinement_completed',
+            section,
+            feedback,
+            qualityImprovement: (result.quality?.overallScore || 0) - (sectionQualities[section]?.overallScore || 0),
+            duration,
+            totalRefinements: history.length
+          });
         }
       } catch (storageError) {
         console.warn('⚠️ Failed to update refinement history:', storageError);

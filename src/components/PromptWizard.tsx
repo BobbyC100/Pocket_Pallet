@@ -139,10 +139,23 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
           qualityScores: frameworkResult.metadata?.qualityScores || {},
           fromBrief: true,
           autoFilledFields: Object.keys(frameworkResult.framework),
-          originalResponses: responses // Store for refinement
+          originalResponses: responses, // Store for refinement
+          generatedAt: new Date().toISOString(),
+          refinementHistory: [] // Initialize empty history
         };
         sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(frameworkDraftData));
         console.log('✅ Framework saved to session storage with quality scores');
+        
+        // Analytics: Track framework generation
+        const avgQuality = Object.values(frameworkResult.metadata?.qualityScores || {})
+          .reduce((sum: number, section: any) => sum + (section.overallScore || 0), 0) / 6;
+        
+        console.log('📊 ANALYTICS:', {
+          event: 'framework_generated',
+          avgQualityScore: avgQuality.toFixed(2),
+          sectionsGenerated: Object.keys(frameworkResult.framework).length,
+          timestamp: new Date().toISOString()
+        });
       }
       
       // Store brief data for SOS page
