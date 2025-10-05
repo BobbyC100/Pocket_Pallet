@@ -132,11 +132,17 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       
       // Store framework in session storage for VisionFrameworkPage
       if (frameworkResult.framework) {
+        // Extract quality scores from metadata
+        const qualityScores = frameworkResult.metadata?.qualityScores || {};
+        
+        console.log('📊 Extracted quality scores:', qualityScores);
+        console.log('📊 Quality scores keys:', Object.keys(qualityScores));
+        
         const frameworkDraftData = {
           framework: frameworkResult.framework,
           executiveOnePager: frameworkResult.executiveOnePager,
           metadata: frameworkResult.metadata,
-          qualityScores: frameworkResult.metadata?.qualityScores || {},
+          qualityScores: qualityScores, // Store at top level for easy access
           fromBrief: true,
           autoFilledFields: Object.keys(frameworkResult.framework),
           originalResponses: responses, // Store for refinement
@@ -145,15 +151,19 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         };
         sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(frameworkDraftData));
         console.log('✅ Framework saved to session storage with quality scores');
+        console.log('✅ Quality scores available:', Object.keys(qualityScores).length > 0);
         
         // Analytics: Track framework generation
-        const avgQuality = Object.values(frameworkResult.metadata?.qualityScores || {})
-          .reduce((sum: number, section: any) => sum + (section.overallScore || 0), 0) / 6;
+        const qualityValues = Object.values(qualityScores);
+        const avgQuality = qualityValues.length > 0
+          ? qualityValues.reduce((sum: number, section: any) => sum + (section.overallScore || 0), 0) / qualityValues.length
+          : 0;
         
         console.log('📊 ANALYTICS:', {
           event: 'framework_generated',
           avgQualityScore: avgQuality.toFixed(2),
           sectionsGenerated: Object.keys(frameworkResult.framework).length,
+          sectionsWithScores: qualityValues.length,
           timestamp: new Date().toISOString()
         });
       }
