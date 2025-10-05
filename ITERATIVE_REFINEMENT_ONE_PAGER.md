@@ -64,13 +64,17 @@ This feature represents Banyan's evolution from a **one-shot generation tool** t
 Automatically scores each framework section on generation:
 - **Specificity** (1-10): Generic vs. Concrete
 - **Actionability** (1-10): Vague vs. Clear
-- **Alignment** (1-10): Off-brand vs. On-brand
+- **Alignment** (1-10): Off-brand vs. On-brand ⭐ *Most Critical*
 - **Measurability** (1-10): For bets/metrics only
+
+**Why Alignment is Weighted Heavily:**
+The **Alignment** score compares AI output against the founder's original 8-question wizard responses. A score of 7.5 in Alignment (misaligned with founder's voice) is more concerning than a 5.0 in Specificity (just needs more detail). Alignment builds **trust and ownership**—the foundation of this feature.
 
 **Visual Indicators:**
 - 🟢 **Excellent (8-10)**: Green badge with score
 - 🟡 **Good (6-7.9)**: Yellow badge with score
 - 🔴 **Needs Work (<6)**: Red badge + "👀 Needs Attention" flag
+- 🚨 **Low Alignment (<7)**: Special "Voice Misalignment" flag to prioritize founder attention
 
 **Quality Details:**
 - **Issues**: What needs improvement
@@ -83,13 +87,19 @@ Automatically scores each framework section on generation:
 Founders can refine any section with one click or custom feedback:
 
 #### **Quick Actions** (Pre-defined refinements)
-| Action | What It Does | When to Use |
-|--------|--------------|-------------|
-| **More Specific** | Replaces generic language with concrete details from your brief (markets, numbers, timelines) | Content feels too high-level or vague |
-| **More Concise** | Shortens wordy content, removes fluff, makes it punchier | Content is too verbose or redundant |
-| **Different Angle** | Reframes the same idea from a new perspective while keeping core meaning | Current framing doesn't resonate |
-| **Add Detail** | Expands content with examples, context, and specifics | Content feels incomplete or surface-level |
-| **Regenerate** | Complete rewrite from scratch using original brief data | Starting over when current version misses the mark |
+| Action | What It Does | When to Use | Target Speed |
+|--------|--------------|-------------|--------------|
+| **More Specific** | Replaces generic language with concrete details from your brief (markets, numbers, timelines) | Content feels too high-level or vague | 8-12 sec |
+| **More Concise** | Shortens wordy content, removes fluff, makes it punchier | Content is too verbose or redundant | 8-12 sec |
+| **Different Angle** | Reframes the same idea from a new perspective while keeping core meaning | Current framing doesn't resonate | 10-15 sec |
+| **Add Detail** | Expands content with examples, context, and specifics | Content feels incomplete or surface-level | 10-15 sec |
+
+#### **Regenerate** (The Nuclear Option - Visually Separated)
+| Action | What It Does | When to Use | Target Speed |
+|--------|--------------|-------------|--------------|
+| **Regenerate** | Complete rewrite from scratch using original brief data | Starting over when current version completely misses the mark | 10-15 sec |
+
+*Note: "Regenerate" is visually/structurally separated in the UI as a secondary, more forceful button to ensure founders use it intentionally, not accidentally.*
 
 #### **Custom Feedback**
 Founders can type specific instructions:
@@ -98,10 +108,13 @@ Founders can type specific instructions:
 - "Connect this to our competitive advantage"
 - "Add specific timelines and numbers"
 
-**AI interprets and applies feedback while:**
-- Staying true to the founder's original brief responses
-- Maintaining consistency with the rest of the framework
-- Following section-specific best practices
+**The Refinement Engine is Context-Anchored:**
+- Stays true to the founder's original 8-question wizard responses
+- Maintains consistency with the rest of the framework
+- Follows section-specific best practices
+- **Preserves the founder's authentic voice and strategic tenets** — even as it rewrites
+
+This means refinements won't just make content "better"—they'll make it better **while staying aligned with your vision**.
 
 ---
 
@@ -208,12 +221,15 @@ Founders can type specific instructions:
 
 ## 🔮 **Future Enhancements**
 
-### **Phase 2 (Potential)**
+### **Phase 2 (High Priority)**
 - **Refinement History**: Show before/after comparison for each refinement
+  - *Strategic Value:* Creates a documented audit trail showing how the framework evolved from initial AI output to founder-owned strategy
+  - *Data Stored:* Original generation + all refinement versions + quality score progression
+  - *Use Case:* Founder can show their board: "Here's how we refined our vision from a 5.2 to an 8.1"
 - **Undo/Redo**: Roll back refinements that made content worse
 - **A/B Comparison**: Generate 2 versions, founder picks best
 - **Bulk Refinement**: "Improve all weak sections" button
-- **Export Refinement Report**: Show what changed and why
+- **Export Refinement Report**: Show what changed and why (perfect bridge to V3 team collaboration)
 
 ### **Phase 3 (Advanced)**
 - **Collaborative Refinement**: Team members suggest improvements
@@ -295,4 +311,62 @@ The AI receives:
 Iterative Refinement transforms Banyan from a "one-shot generation tool" into a **collaborative co-creation platform** where founders and AI work together to craft high-quality strategic frameworks. By combining automatic quality detection with guided refinement, founders gain confidence that their Vision Framework is specific, actionable, and authentically theirs.
 
 **Impact:** Founders spend less time manually editing and more time thinking strategically, while Banyan delivers consistently high-quality output that founders are proud to share.
+
+---
+
+## 🎯 **Strategic Product Insights**
+
+### **What Makes This Feature a Masterstroke:**
+
+1. **Addresses the Inevitable "AI Generics" Problem**
+   - Rather than pretending AI output is perfect, we acknowledge it and provide a solution
+   - Shifts founder mindset from **"Is this right?"** to **"How do I make this perfectly mine?"**
+   - Builds crucial sense of **ownership** through co-creation
+
+2. **Alignment is the Secret Weapon**
+   - The **Context-Anchored Refinement Engine** preserves founder's authentic voice
+   - Low Alignment scores (<7) are treated more seriously than low Specificity scores
+   - Trust-building mechanism: "The AI won't just rewrite—it will stay true to your vision"
+
+3. **Quality Scoring = Objective Truth**
+   - Founders see **5.2/10 Needs Attention** instead of vague "this could be better"
+   - Measurable progress: **5.2 → 8.1** is tangible improvement
+   - Removes guesswork from strategic refinement
+
+4. **Quick Actions Eliminate Prompt Engineering**
+   - Founders don't need to be AI experts to get expert results
+   - Most common refinement needs (More Specific, More Concise) are one-click
+   - Target speed: 8-12 seconds for most actions (optimized for flow state)
+
+5. **Regenerate is the Nuclear Option**
+   - Visually/structurally separated to prevent accidental use
+   - Forces intentionality: "Are you sure you want to start over?"
+   - Other actions are refinements; Regenerate is a restart
+
+### **Why This Elevates Banyan:**
+
+From **"useful tool"** → **"must-have strategic partner"**
+
+- **Before:** Founders use Banyan once, export to Google Docs, edit manually
+- **After:** Founders iterate within Banyan until framework is perfect
+- **Result:** Higher engagement, more sessions per user, stronger product-market fit
+
+### **Key Performance Indicators to Watch:**
+
+| Metric | What It Reveals |
+|--------|-----------------|
+| % of frameworks using refinement | Feature adoption & product-market fit |
+| Avg # of refinements per framework | Depth of engagement & iteration value |
+| Time from generation to "Save" | User flow efficiency (target: <10 min) |
+| Avg quality score increase per refinement | AI effectiveness (+1.5 target) |
+| % sections scoring 8+ after refinement | Output quality consistency (70%+ target) |
+| Most-used Quick Action | User pain point insights (hypothesis: "More Specific") |
+
+### **Future-Proofing for V3 (Team Collaboration):**
+
+**Refinement History as Strategic Asset:**
+- Store original generation + all refinement versions + quality score progression
+- Creates documented audit trail: "Here's how we refined our vision from 5.2 to 8.1"
+- Founders can show boards/investors the evolution of their strategic thinking
+- Perfect bridge to team collaboration: teammates see the "why" behind changes
 
