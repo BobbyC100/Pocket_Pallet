@@ -3,9 +3,45 @@
 
 ---
 
+## 🌳 **About Banyan**
+
+**Banyan** is an AI-powered strategic operating system for founders and leadership teams. The platform helps founders articulate, align, and operationalize their company's strategic vision through structured frameworks and AI-assisted content generation.
+
+### **Core Product:**
+Banyan transforms unstructured founder insights (captured through an 8-question wizard) into three interconnected strategic artifacts:
+
+1. **Vision Framework V2** - A comprehensive strategic blueprint covering:
+   - Vision (aspirational end state)
+   - Strategy (how we win)
+   - Operating Principles (cultural DNA)
+   - Near-term Bets (6-12 month commitments)
+   - Metrics (what we track)
+   - Tensions (strategic trade-offs)
+
+2. **Founder Brief** - A narrative document capturing the founder's thinking, market insights, and strategic context
+
+3. **Executive One-Pager** - An investor-ready summary distilling the vision into a single page
+
+### **The Banyan Philosophy:**
+Like the banyan tree that grows deep roots and provides shelter, Banyan helps startups build strong strategic foundations that support sustainable growth. The platform believes strategy should be:
+- **Clear** - Not buried in decks or lost in meetings
+- **Living** - Evolving as the company learns
+- **Aligned** - Shared language across the team
+- **Actionable** - Connected to real decisions and bets
+
+---
+
 ## 🎯 **Feature Overview**
 
-Banyan's Iterative Refinement system enables founders to improve AI-generated Vision Framework content through intelligent, AI-powered feedback loops. Combined with Auto-Quality Detection, founders receive immediate quality assessments and guided improvement suggestions for each section of their framework.
+Banyan's **Iterative Refinement** system enables founders to improve AI-generated Vision Framework content through intelligent, AI-powered feedback loops. Combined with **Auto-Quality Detection**, founders receive immediate quality assessments and guided improvement suggestions for each section of their framework.
+
+### **Where This Fits in the Product:**
+This feature represents Banyan's evolution from a **one-shot generation tool** to a **collaborative co-creation platform**. Rather than founders accepting AI output as-is or manually rewriting elsewhere, they can now refine content iteratively within Banyan—creating a feedback loop where AI learns their voice and founders feel true ownership.
+
+**Product Journey:**
+1. **V1 (Launch)**: Wizard → AI Generation → View/Export
+2. **V2 (This Feature)**: Wizard → AI Generation → **Quality Assessment** → **Iterative Refinement** → Save/Export
+3. **V3 (Future)**: Add team collaboration, version history, and strategic updates as the company evolves
 
 ---
 
@@ -16,8 +52,9 @@ Banyan's Iterative Refinement system enables founders to improve AI-generated Vi
 - No visibility into which sections are strong vs. weak
 - No guidance on how to make content more specific, actionable, or aligned with their vision
 - High friction to iterate: founders must exit Banyan, edit in Google Docs, then re-input changes
+- AI-generated content sometimes feels generic or doesn't capture the founder's authentic voice
 
-**Result:** Generic or misaligned content that founders don't feel ownership over.
+**Result:** Generic or misaligned content that founders don't feel ownership over, leading to low satisfaction and reduced likelihood of actually using the framework.
 
 ---
 
