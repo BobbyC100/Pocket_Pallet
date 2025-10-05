@@ -27,10 +27,23 @@ export async function POST(request: NextRequest) {
       fullFramework
     );
 
+    // Use faster model for simple refinements (More Specific, More Concise)
+    // Use GPT-4 for complex refinements (Different Angle, Add Detail, Regenerate)
+    const isSimpleRefinement = 
+      feedback.includes('more specific') || 
+      feedback.includes('more concise') ||
+      feedback.includes('Make this more specific') ||
+      feedback.includes('Make this more concise');
+    
+    const model = isSimpleRefinement ? "gpt-3.5-turbo" : "gpt-4-turbo-preview";
+    const temperature = isSimpleRefinement ? 0.5 : 0.7;
+
+    console.log(`⚡ Using ${model} for ${isSimpleRefinement ? 'fast' : 'complex'} refinement`);
+
     const result = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model,
       messages: [{ role: "user", content: refinementPrompt }],
-      temperature: 0.7,
+      temperature,
       response_format: { type: "json_object" }
     });
 
