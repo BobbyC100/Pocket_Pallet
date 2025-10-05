@@ -178,9 +178,21 @@ export default function RefinementPanel({
       </div>
 
       {isRefining && (
-        <div className="mt-3 flex items-center gap-2 text-sm text-banyan-text-subtle">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-banyan-primary"></div>
-          <span>AI is refining this section...</span>
+        <div className="mt-3 p-3 bg-banyan-primary/5 border border-banyan-primary/20 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-5 w-5 border-2 border-banyan-primary/30 border-t-banyan-primary"></div>
+              <div className="absolute inset-0 rounded-full bg-banyan-primary/10 animate-pulse"></div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-banyan-primary">
+                Banyan is thoughtfully incorporating your feedback...
+              </p>
+              <p className="text-xs text-banyan-text-subtle mt-0.5">
+                This usually takes 8-12 seconds
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </div>
