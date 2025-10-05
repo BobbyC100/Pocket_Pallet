@@ -27,7 +27,6 @@ export default function QualityBadge({ score, alignment, issues = [], suggestion
     <div className="inline-flex items-center gap-2 flex-wrap">
       {/* Score Badge */}
       <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${quality.color}/20 border border-${quality.color}`}>
-        <span className="text-sm">{quality.emoji}</span>
         <span className={`text-xs font-semibold ${quality.textColor}`}>
           {score.toFixed(1)}/10
         </span>
