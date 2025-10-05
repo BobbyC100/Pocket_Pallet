@@ -349,7 +349,17 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
 
             {/* Strategy */}
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
-              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Strategy (How We Win)</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-banyan-text-default">Strategy (How We Win)</h2>
+                {sectionQualities.strategy && (
+                  <QualityBadge
+                    score={sectionQualities.strategy.overallScore}
+                    issues={sectionQualities.strategy.issues}
+                    suggestions={sectionQualities.strategy.suggestions}
+                    strengths={sectionQualities.strategy.strengths}
+                  />
+                )}
+              </div>
               {framework.strategy.map((pillar, index) => (
                 <div key={index} className="mb-3">
                   <input
@@ -382,7 +392,17 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
 
             {/* Operating Principles */}
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
-              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Operating Principles</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-banyan-text-default">Operating Principles</h2>
+                {sectionQualities.operating_principles && (
+                  <QualityBadge
+                    score={sectionQualities.operating_principles.overallScore}
+                    issues={sectionQualities.operating_principles.issues}
+                    suggestions={sectionQualities.operating_principles.suggestions}
+                    strengths={sectionQualities.operating_principles.strengths}
+                  />
+                )}
+              </div>
               {framework.operating_principles.map((principle, index) => (
                 <div key={index} className="mb-3">
                   <input
@@ -415,7 +435,17 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
 
             {/* Near-term Bets */}
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
-              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Near-term Bets</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-banyan-text-default">Near-term Bets</h2>
+                {sectionQualities.near_term_bets && (
+                  <QualityBadge
+                    score={sectionQualities.near_term_bets.overallScore}
+                    issues={sectionQualities.near_term_bets.issues}
+                    suggestions={sectionQualities.near_term_bets.suggestions}
+                    strengths={sectionQualities.near_term_bets.strengths}
+                  />
+                )}
+              </div>
               {framework.near_term_bets.map((bet, index) => (
                 <div key={index} className="mb-4 p-4 border border-banyan-border-default bg-banyan-bg-base rounded-lg">
                   <div className="grid grid-cols-2 gap-3">
@@ -492,7 +522,17 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
 
             {/* Metrics */}
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
-              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Metrics</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-banyan-text-default">Metrics</h2>
+                {sectionQualities.metrics && (
+                  <QualityBadge
+                    score={sectionQualities.metrics.overallScore}
+                    issues={sectionQualities.metrics.issues}
+                    suggestions={sectionQualities.metrics.suggestions}
+                    strengths={sectionQualities.metrics.strengths}
+                  />
+                )}
+              </div>
               {framework.metrics.map((metric, index) => (
                 <div key={index} className="mb-4 p-4 border border-banyan-border-default bg-banyan-bg-base rounded-lg">
                   <div className="grid grid-cols-3 gap-3">
@@ -556,8 +596,20 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
 
             {/* Tensions */}
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
-              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Tensions to Watch</h2>
-              <p className="text-sm text-banyan-text-subtle mb-4">Known contradictions or trade-offs in your strategy</p>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-bold text-banyan-text-default">Tensions to Watch</h2>
+                  <p className="text-sm text-banyan-text-subtle mt-1">Known contradictions or trade-offs in your strategy</p>
+                </div>
+                {sectionQualities.tensions && (
+                  <QualityBadge
+                    score={sectionQualities.tensions.overallScore}
+                    issues={sectionQualities.tensions.issues}
+                    suggestions={sectionQualities.tensions.suggestions}
+                    strengths={sectionQualities.tensions.strengths}
+                  />
+                )}
+              </div>
               {framework.tensions.map((tension, index) => (
                 <div key={index} className="mb-3">
                   <input
