@@ -77,6 +77,10 @@ npm run dev
 
 Navigate to [http://localhost:3000](http://localhost:3000)
 
+### Developer Tools
+
+Access all testing utilities and development tools at: [http://localhost:3000/dev-tools](http://localhost:3000/dev-tools)
+
 ## 🎮 Usage
 
 ### Quick Start with Test Data
@@ -155,10 +159,26 @@ Banyan/
 
 The project includes several testing utilities:
 
+### Production Testing
 - **Auto-Test Suite**: `/auto-test.html` - Automated testing
 - **YardBird Injector**: `/yardbird-injector.html` - Session storage testing
 - **Debug Tools**: `/debug-vision-framework.html` - Comprehensive debugging
 - **Session Storage Test**: `/test-session-storage.html` - Validation testing
+
+### Development Testing
+- **Scoring Test Tool**: `/test-scoring.html` - Test vision framework scoring directly
+  - Visual interface with example frameworks
+  - 93% cost savings vs full generation flow
+  - Perfect for iterating on scoring prompts
+  - [See SCORING_TEST_GUIDE.md for details](./SCORING_TEST_GUIDE.md)
+
+### Command-Line Testing
+```bash
+# Test scoring with different quality levels
+./test-scoring.sh good   # High-quality framework
+./test-scoring.sh poor   # Low-quality framework  
+./test-scoring.sh mixed  # Mixed-quality framework
+```
 
 ## 🎨 Design Philosophy
 
