@@ -356,6 +356,13 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               >
                 + Add Strategic Pillar
               </button>
+              <RefinementPanel
+                section="strategy"
+                content={framework.strategy}
+                onRefine={(feedback) => handleRefineSection('strategy', feedback)}
+                quality={sectionQualities.strategy}
+                isRefining={refiningSection === 'strategy'}
+              />
             </section>
 
             {/* Operating Principles */}
@@ -382,6 +389,13 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               >
                 + Add Principle
               </button>
+              <RefinementPanel
+                section="operating_principles"
+                content={framework.operating_principles}
+                onRefine={(feedback) => handleRefineSection('operating_principles', feedback)}
+                quality={sectionQualities.operating_principles}
+                isRefining={refiningSection === 'operating_principles'}
+              />
             </section>
 
             {/* Near-term Bets */}
@@ -452,6 +466,13 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               >
                 + Add Bet
               </button>
+              <RefinementPanel
+                section="near_term_bets"
+                content={framework.near_term_bets}
+                onRefine={(feedback) => handleRefineSection('near_term_bets', feedback)}
+                quality={sectionQualities.near_term_bets}
+                isRefining={refiningSection === 'near_term_bets'}
+              />
             </section>
 
             {/* Metrics */}
@@ -509,6 +530,13 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               >
                 + Add Metric
               </button>
+              <RefinementPanel
+                section="metrics"
+                content={framework.metrics}
+                onRefine={(feedback) => handleRefineSection('metrics', feedback)}
+                quality={sectionQualities.metrics}
+                isRefining={refiningSection === 'metrics'}
+              />
             </section>
 
             {/* Tensions */}
@@ -536,6 +564,13 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               >
                 + Add Tension
               </button>
+              <RefinementPanel
+                section="tensions"
+                content={framework.tensions}
+                onRefine={(feedback) => handleRefineSection('tensions', feedback)}
+                quality={sectionQualities.tensions}
+                isRefining={refiningSection === 'tensions'}
+              />
             </section>
           </div>
         )}
