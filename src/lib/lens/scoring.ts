@@ -5,8 +5,12 @@
 
 import OpenAI from 'openai';
 
+if (!process.env.OPENAI_API_KEY) {
+  console.error('❌ OPENAI_API_KEY is not set in environment variables');
+}
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'dummy-key-will-fail',
 });
 
 export interface LensScores {
@@ -155,26 +159,54 @@ export async function calculateLensScores(
   content: string,
   visionEmbedding?: number[]
 ): Promise<LensScores> {
-  // Run all scorers in parallel
-  const [clarity, actionability, alignment] = await Promise.all([
-    calculateClarity(content),
-    calculateActionability(content),
-    calculateAlignment(content, visionEmbedding)
-  ]);
+  console.log('🔍 Starting lens scoring with content length:', content.length);
+  
+  if (!content || content.trim().length === 0) {
+    console.warn('⚠️ Empty content provided for scoring');
+    throw new Error('Content cannot be empty');
+  }
 
-  const overall = (clarity.score + actionability.score + alignment.score) / 3;
+  try {
+    // Run all scorers in parallel with individual error handling
+    const [clarity, actionability, alignment] = await Promise.all([
+      calculateClarity(content).catch(err => {
+        console.error('Clarity scoring failed:', err);
+        return { score: 7, feedback: 'Clarity scoring unavailable' };
+      }),
+      calculateActionability(content).catch(err => {
+        console.error('Actionability scoring failed:', err);
+        return { score: 7, feedback: 'Actionability scoring unavailable' };
+      }),
+      calculateAlignment(content, visionEmbedding).catch(err => {
+        console.error('Alignment scoring failed:', err);
+        return { score: 7, feedback: 'Alignment scoring unavailable' };
+      })
+    ]);
 
-  return {
-    clarity: clarity.score,
-    alignment: alignment.score,
-    actionability: actionability.score,
-    overall: Math.round(overall * 10) / 10,
-    feedback: {
-      clarity: clarity.feedback,
-      alignment: alignment.feedback,
-      actionability: actionability.feedback
-    }
-  };
+    const overall = (clarity.score + actionability.score + alignment.score) / 3;
+
+    console.log('✅ All scorers completed:', {
+      clarity: clarity.score,
+      actionability: actionability.score,
+      alignment: alignment.score,
+      overall: overall.toFixed(1)
+    });
+
+    return {
+      clarity: clarity.score,
+      alignment: alignment.score,
+      actionability: actionability.score,
+      overall: Math.round(overall * 10) / 10,
+      feedback: {
+        clarity: clarity.feedback,
+        alignment: alignment.feedback,
+        actionability: actionability.feedback
+      }
+    };
+  } catch (error) {
+    console.error('❌ Fatal error in calculateLensScores:', error);
+    throw error;
+  }
 }
 
 /**
