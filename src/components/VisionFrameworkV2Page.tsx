@@ -147,8 +147,8 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Vision Framework...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-banyan-primary mx-auto mb-4"></div>
+          <p className="text-banyan-text-subtle">Loading Vision Framework...</p>
         </div>
       </div>
     );
@@ -158,13 +158,13 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">No Vision Framework Found</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-2xl font-bold text-banyan-text-default mb-4">No Vision Framework Found</h2>
+          <p className="text-banyan-text-subtle mb-6">
             Create a brief first, then generate your Vision Framework from there.
           </p>
           <a
             href="/new"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="btn-banyan-primary inline-block"
           >
             Create a Brief
           </a>
@@ -177,21 +177,21 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
     <>
       {/* Header - only show when not embedded */}
       {!embedded && (
-        <div className="bg-white border-b border-gray-200">
+        <div className="bg-banyan-bg-surface border-b border-banyan-border-default shadow-banyan-low">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <a href="/new" className="text-sm text-gray-500 hover:text-gray-700 mb-2 block">
+                <a href="/new" className="text-sm text-banyan-text-subtle hover:text-banyan-text-default mb-2 block transition-colors">
                   ← Back to Brief
                 </a>
-                <h1 className="text-2xl font-bold text-gray-900">Vision Framework</h1>
-                <p className="text-sm text-gray-500 mt-1">Your strategic operating system</p>
+                <h1 className="text-2xl font-bold text-banyan-text-default">Vision Framework</h1>
+                <p className="text-sm text-banyan-text-subtle mt-1">Your strategic operating system</p>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="btn-banyan-primary"
                 >
                   {saving ? 'Saving...' : 'Save'}
                 </button>
@@ -204,7 +204,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
       {/* Message */}
       {message && (
         <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4`}>
-          <div className={`rounded-lg p-4 ${message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+          <div className={`rounded-lg p-4 border ${message.type === 'success' ? 'bg-banyan-success/20 text-banyan-success border-banyan-success' : 'bg-banyan-error/20 text-banyan-error border-banyan-error'}`}>
             {message.text}
           </div>
         </div>
@@ -213,22 +213,22 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
       {/* Tabs - hide when editOnly */}
       {!editOnly && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex gap-2 border-b border-gray-200">
+          <div className="flex gap-2 border-b border-banyan-border-default">
             <button
               onClick={() => setActiveTab('edit')}
-              className={`px-4 py-2 font-medium ${activeTab === 'edit' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`px-4 py-2 font-medium transition-colors ${activeTab === 'edit' ? 'text-banyan-primary border-b-2 border-banyan-primary' : 'text-banyan-text-subtle hover:text-banyan-text-default'}`}
             >
               Framework
             </button>
             <button
               onClick={() => setActiveTab('onepager')}
-              className={`px-4 py-2 font-medium ${activeTab === 'onepager' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`px-4 py-2 font-medium transition-colors ${activeTab === 'onepager' ? 'text-banyan-primary border-b-2 border-banyan-primary' : 'text-banyan-text-subtle hover:text-banyan-text-default'}`}
             >
               Executive One-Pager
             </button>
             <button
               onClick={() => setActiveTab('qa')}
-            className={`px-4 py-2 font-medium ${activeTab === 'qa' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            className={`px-4 py-2 font-medium transition-colors ${activeTab === 'qa' ? 'text-banyan-primary border-b-2 border-banyan-primary' : 'text-banyan-text-subtle hover:text-banyan-text-default'}`}
           >
             QA Results
           </button>
@@ -238,8 +238,8 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
 
       {/* Title when editOnly (no tabs) */}
       {editOnly && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Vision Framework</h2>
+        <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6 mb-6">
+          <h2 className="text-2xl font-bold text-banyan-text-default">Vision Framework</h2>
         </div>
       )}
 
@@ -248,8 +248,8 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
         {activeTab === 'edit' && (
           <div className="space-y-8">
             {/* Vision */}
-            <section className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Vision</h2>
+            <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
+              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Vision</h2>
               <textarea
                 value={framework.vision}
                 onChange={(e) => setFramework({ ...framework, vision: e.target.value })}
@@ -260,8 +260,8 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
             </section>
 
             {/* Strategy */}
-            <section className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Strategy (How We Win)</h2>
+            <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
+              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Strategy (How We Win)</h2>
               {framework.strategy.map((pillar, index) => (
                 <div key={index} className="mb-3">
                   <input
@@ -279,15 +279,15 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               ))}
               <button
                 onClick={() => setFramework({ ...framework, strategy: [...framework.strategy, ''] })}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-banyan-primary hover:text-banyan-primary-hover text-sm font-medium transition-colors"
               >
                 + Add Strategic Pillar
               </button>
             </section>
 
             {/* Operating Principles */}
-            <section className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Operating Principles</h2>
+            <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
+              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Operating Principles</h2>
               {framework.operating_principles.map((principle, index) => (
                 <div key={index} className="mb-3">
                   <input
@@ -305,17 +305,17 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               ))}
               <button
                 onClick={() => setFramework({ ...framework, operating_principles: [...framework.operating_principles, ''] })}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-banyan-primary hover:text-banyan-primary-hover text-sm font-medium transition-colors"
               >
                 + Add Principle
               </button>
             </section>
 
             {/* Near-term Bets */}
-            <section className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Near-term Bets</h2>
+            <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
+              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Near-term Bets</h2>
               {framework.near_term_bets.map((bet, index) => (
-                <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg">
+                <div key={index} className="mb-4 p-4 border border-banyan-border-default bg-banyan-bg-base rounded-lg">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">Bet</label>
@@ -375,17 +375,17 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               ))}
               <button
                 onClick={addBet}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-banyan-primary hover:text-banyan-primary-hover text-sm font-medium transition-colors"
               >
                 + Add Bet
               </button>
             </section>
 
             {/* Metrics */}
-            <section className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Metrics</h2>
+            <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
+              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Metrics</h2>
               {framework.metrics.map((metric, index) => (
-                <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg">
+                <div key={index} className="mb-4 p-4 border border-banyan-border-default bg-banyan-bg-base rounded-lg">
                   <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Metric</label>
@@ -432,16 +432,16 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               ))}
               <button
                 onClick={addMetric}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-banyan-primary hover:text-banyan-primary-hover text-sm font-medium transition-colors"
               >
                 + Add Metric
               </button>
             </section>
 
             {/* Tensions */}
-            <section className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Tensions to Watch</h2>
-              <p className="text-sm text-gray-600 mb-4">Known contradictions or trade-offs in your strategy</p>
+            <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
+              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Tensions to Watch</h2>
+              <p className="text-sm text-banyan-text-subtle mb-4">Known contradictions or trade-offs in your strategy</p>
               {framework.tensions.map((tension, index) => (
                 <div key={index} className="mb-3">
                   <input
@@ -459,7 +459,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               ))}
               <button
                 onClick={() => setFramework({ ...framework, tensions: [...framework.tensions, ''] })}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-banyan-primary hover:text-banyan-primary-hover text-sm font-medium transition-colors"
               >
                 + Add Tension
               </button>
@@ -468,11 +468,11 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
         )}
 
         {activeTab === 'onepager' && (
-          <div className="bg-white rounded-lg shadow-sm p-8">
+          <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
             <div className="prose prose-sm max-w-none">
               {executiveOnePager ? (
                 <div 
-                  className="text-gray-800 leading-relaxed"
+                  className="text-banyan-text-default leading-relaxed"
                   dangerouslySetInnerHTML={{ 
                     __html: executiveOnePager
                       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
@@ -486,57 +486,57 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                   }}
                 />
               ) : (
-                <div className="text-gray-500">Executive one-pager will appear here after generation.</div>
+                <div className="text-banyan-text-subtle">Executive one-pager will appear here after generation.</div>
               )}
             </div>
           </div>
         )}
 
         {activeTab === 'qa' && (
-          <div className="bg-white rounded-lg shadow-sm p-8">
+          <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
             {qaResults ? (
               <div className="space-y-6">
-                <div className="pb-4 border-b border-gray-200">
-                  <h3 className="text-xl font-bold text-gray-900">Quality Assessment</h3>
-                  <p className="text-2xl font-bold text-blue-600 mt-2">{qaResults.overallScore}/10</p>
+                <div className="pb-4 border-b border-banyan-border-default">
+                  <h3 className="text-xl font-bold text-banyan-text-default">Quality Assessment</h3>
+                  <p className="text-2xl font-bold text-banyan-primary mt-2">{qaResults.overallScore}/10</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(qaResults).filter(([key]) => 
                     ['consistency', 'measurability', 'tensions', 'actionability', 'completeness'].includes(key)
                   ).map(([category, data]: [string, any]) => (
-                    <div key={category} className="p-4 border border-gray-200 rounded-lg">
+                    <div key={category} className="p-4 border border-banyan-border-default bg-banyan-bg-base rounded-lg">
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-gray-900 capitalize">{category}</h4>
+                        <h4 className="font-semibold text-banyan-text-default capitalize">{category}</h4>
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          data.pass ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                          data.pass ? 'bg-banyan-success/20 text-banyan-success' : 'bg-banyan-warning/20 text-banyan-warning'
                         }`}>
                           {data.pass ? 'Pass' : 'Review'}
                         </span>
                       </div>
                       {data.issues && data.issues.length > 0 && (
-                        <ul className="text-sm text-gray-600 space-y-1 mt-2">
+                        <ul className="text-sm text-banyan-text-subtle space-y-1 mt-2">
                           {data.issues.map((issue: string, i: number) => (
                             <li key={i} className="flex items-start gap-2">
-                              <span className="text-gray-400 mt-0.5">•</span>
+                              <span className="text-banyan-text-subtle mt-0.5">•</span>
                               <span>{issue}</span>
                             </li>
                           ))}
                         </ul>
                       )}
-                      {data.feedback && <p className="text-sm text-gray-600 mt-2">{data.feedback}</p>}
-                      {data.score && <p className="text-sm font-medium text-gray-700 mt-2">Score: {data.score}/10</p>}
+                      {data.feedback && <p className="text-sm text-banyan-text-subtle mt-2">{data.feedback}</p>}
+                      {data.score && <p className="text-sm font-medium text-banyan-text-default mt-2">Score: {data.score}/10</p>}
                     </div>
                   ))}
                 </div>
 
                 {qaResults.recommendations && qaResults.recommendations.length > 0 && (
-                  <div className="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-gray-900 mb-3">Recommendations</h4>
+                  <div className="mt-6 p-6 bg-banyan-bg-base rounded-lg border border-banyan-border-default">
+                    <h4 className="font-semibold text-banyan-text-default mb-3">Recommendations</h4>
                     <ul className="space-y-2">
                       {qaResults.recommendations.map((rec: string, i: number) => (
-                        <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
-                          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold mt-0.5">
+                        <li key={i} className="flex items-start gap-3 text-sm text-banyan-text-default">
+                          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-banyan-primary/20 text-banyan-primary flex items-center justify-center text-xs font-bold mt-0.5">
                             {i + 1}
                           </span>
                           <span>{rec}</span>
@@ -547,7 +547,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                 )}
               </div>
             ) : (
-              <p className="text-gray-600">QA results will appear here after generation.</p>
+              <p className="text-banyan-text-subtle">QA results will appear here after generation.</p>
             )}
           </div>
         )}
