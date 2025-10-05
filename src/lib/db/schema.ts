@@ -4,6 +4,11 @@ import { pgTable, uuid, text, timestamp, jsonb, boolean, pgEnum } from 'drizzle-
 export const authProviderEnum = pgEnum('auth_provider', ['email', 'google', 'anonymous']);
 export const documentTypeEnum = pgEnum('document_type', ['brief', 'vision_framework_v2', 'executive_onepager', 'vc_summary']);
 export const eventTypeEnum = pgEnum('event_type', ['created_brief', 'saved_brief', 'exported_doc', 'signed_up', 'upgraded_account']);
+export const lensEventTypeEnum = pgEnum('lens_event_type', [
+  'doc_created', 'doc_edited', 'doc_submitted', 
+  'lens_scored', 'score_viewed', 'reflection_viewed',
+  'regenerate_with_lens'
+]);
 
 // Users table
 export const users = pgTable('users', {
@@ -77,6 +82,38 @@ export const eventsAudit = pgTable('events_audit', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Founder's Lens Events (for pattern detection and analytics)
+export const lensEvents = pgTable('lens_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  anonymousId: text('anonymous_id'), // Track anonymous users
+  documentId: uuid('document_id').references(() => documents.id, { onDelete: 'cascade' }),
+  sessionId: text('session_id'),
+  eventType: lensEventTypeEnum('event_type').notNull(),
+  metadata: jsonb('metadata'), // Scores, edit counts, etc.
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Vision Embeddings (for alignment scoring)
+export const visionEmbeddings = pgTable('vision_embeddings', {
+  userId: uuid('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  summary: text('summary'), // Plain text summary of vision
+  embedding: text('embedding').notNull(), // JSON string of embedding vector
+  sourceDocuments: text('source_documents').array(), // Document IDs that contributed
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Lens Reflections (generated insights)
+export const lensReflections = pgTable('lens_reflections', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  reflectionText: text('reflection_text').notNull(),
+  averageScores: jsonb('average_scores'), // {clarity, alignment, actionability}
+  patterns: jsonb('patterns'), // Detected behavioral patterns
+  viewed: boolean('viewed').default(false),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Type exports for TypeScript
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -90,4 +127,10 @@ export type Export = typeof exports.$inferSelect;
 export type NewExport = typeof exports.$inferInsert;
 export type EventAudit = typeof eventsAudit.$inferSelect;
 export type NewEventAudit = typeof eventsAudit.$inferInsert;
+export type LensEvent = typeof lensEvents.$inferSelect;
+export type NewLensEvent = typeof lensEvents.$inferInsert;
+export type VisionEmbedding = typeof visionEmbeddings.$inferSelect;
+export type NewVisionEmbedding = typeof visionEmbeddings.$inferInsert;
+export type LensReflection = typeof lensReflections.$inferSelect;
+export type NewLensReflection = typeof lensReflections.$inferInsert;
 
