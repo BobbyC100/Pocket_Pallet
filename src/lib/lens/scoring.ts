@@ -46,7 +46,7 @@ If score is 8+, feedback can be omitted or brief.`;
 
   try {
     const result = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
       response_format: { type: "json_object" }
@@ -84,7 +84,7 @@ If score is 8+, feedback can be omitted or brief.`;
 
   try {
     const result = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
       response_format: { type: "json_object" }
