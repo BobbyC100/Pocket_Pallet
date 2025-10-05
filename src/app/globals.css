@@ -855,11 +855,19 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
   input[type="number"],
   input[type="url"],
   input[type="search"],
+  input,
   textarea,
   select {
     background-color: var(--banyan-bg-surface) !important;
     color: var(--banyan-text-default) !important;
     border-color: var(--banyan-border-default) !important;
+  }
+  
+  /* Override text-gray-900 on inputs/textareas specifically */
+  input.text-gray-900,
+  textarea.text-gray-900,
+  select.text-gray-900 {
+    color: var(--banyan-text-default) !important;
   }
   
   input::placeholder,
@@ -876,4 +884,31 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
     border-color: var(--banyan-primary) !important;
     box-shadow: 0 0 0 3px rgba(50, 150, 100, 0.1) !important;
   }
+}
+
+/* ===== CRITICAL FORM ELEMENT OVERRIDES (OUTSIDE LAYER) ===== */
+/* These must come AFTER @layer utilities to ensure maximum specificity */
+/* This fixes white input backgrounds in Vision Framework and other forms */
+
+input,
+textarea,
+select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="url"],
+input[type="search"] {
+  background-color: var(--banyan-bg-surface) !important;
+  color: var(--banyan-text-default) !important;
+  border-color: var(--banyan-border-default) !important;
+}
+
+/* Ensure placeholder text is visible */
+input::placeholder,
+textarea::placeholder,
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: var(--banyan-text-subtle) !important;
+  opacity: 0.65 !important;
 }
