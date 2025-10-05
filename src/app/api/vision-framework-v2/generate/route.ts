@@ -211,21 +211,30 @@ ${JSON.stringify(originalResponses, null, 2)}
 Rate each section on 1-10 scale:
 - **Specificity**: Generic (1) vs Concrete (10)
 - **Actionability**: Vague (1) vs Clear (10)
-- **Alignment**: Off-brand (1) vs On-brand (10)
-- **Measurability**: For bets/metrics only
+- **Alignment**: Off-brand (1) vs On-brand (10) **⭐ MOST CRITICAL - Weighted 2x**
+- **Measurability**: For bets/metrics only (1-10)
+
+**CRITICAL: Alignment is Weighted 2x in overallScore calculation**
+Alignment is the most important factor. The content must match the founder's authentic voice and strategic intent.
+
+**Calculate overallScore using weighted formula:**
+- For sections with measurability (near_term_bets, metrics): \`overallScore = (Specificity + Actionability + Alignment × 2 + Measurability) / 5\`
+- For other sections: \`overallScore = (Specificity + Actionability + Alignment × 2) / 4\`
 
 Return JSON with scores, issues, suggestions, and strengths for each section.
 
 \`\`\`json
 {
-  "vision": {"specificity": 8, "actionability": 7, "alignment": 9, "overallScore": 8, "issues": [], "suggestions": ["..."], "strengths": ["..."]},
-  "strategy": {"specificity": 6, "actionability": 7, "alignment": 8, "overallScore": 7, "issues": ["..."], "suggestions": ["..."], "strengths": ["..."]},
-  "operating_principles": {"specificity": 7, "actionability": 8, "alignment": 9, "overallScore": 8, "issues": [], "suggestions": ["..."], "strengths": ["..."]},
-  "near_term_bets": {"specificity": 5, "actionability": 6, "alignment": 7, "measurability": 4, "overallScore": 5.5, "issues": ["..."], "suggestions": ["..."], "strengths": ["..."]},
-  "metrics": {"specificity": 8, "actionability": 9, "alignment": 8, "measurability": 9, "overallScore": 8.5, "issues": [], "suggestions": ["..."], "strengths": ["..."]},
-  "tensions": {"specificity": 7, "actionability": 6, "alignment": 8, "overallScore": 7, "issues": ["..."], "suggestions": ["..."], "strengths": ["..."]}
+  "vision": {"specificity": 8, "actionability": 7, "alignment": 9, "overallScore": 8.25, "issues": [], "suggestions": ["..."], "strengths": ["..."]},
+  "strategy": {"specificity": 6, "actionability": 7, "alignment": 8, "overallScore": 7.25, "issues": ["..."], "suggestions": ["..."], "strengths": ["..."]},
+  "operating_principles": {"specificity": 7, "actionability": 8, "alignment": 9, "overallScore": 8.25, "issues": [], "suggestions": ["..."], "strengths": ["..."]},
+  "near_term_bets": {"specificity": 5, "actionability": 6, "alignment": 7, "measurability": 4, "overallScore": 5.8, "issues": ["..."], "suggestions": ["..."], "strengths": ["..."]},
+  "metrics": {"specificity": 8, "actionability": 9, "alignment": 8, "measurability": 9, "overallScore": 8.4, "issues": [], "suggestions": ["..."], "strengths": ["..."]},
+  "tensions": {"specificity": 7, "actionability": 6, "alignment": 8, "overallScore": 7.25, "issues": ["..."], "suggestions": ["..."], "strengths": ["..."]}
 }
-\`\`\``;
+\`\`\`
+
+Example: vision with (8, 7, 9) = (8 + 7 + 9×2) / 4 = 33/4 = 8.25`;
 
   try {
     const result = await openai.chat.completions.create({

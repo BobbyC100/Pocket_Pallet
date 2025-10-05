@@ -148,8 +148,15 @@ ${sectionGuidance[section] || ''}
 3. **Assess quality** - Rate the refined content on:
    - Specificity (1-10): Is it concrete or generic?
    - Actionability (1-10): Can someone act on this?
-   - Alignment (1-10): Does it match the founder's intent?
+   - Alignment (1-10): Does it match the founder's intent? **⭐ MOST CRITICAL**
    - Measurability (1-10): Only for bets/metrics sections - is success measurable?
+
+**IMPORTANT: Alignment is Weighted 2x**
+Alignment is the most critical factor. A misaligned framework (even if specific) is worse than a vague but on-brand one.
+
+**Calculate overallScore using this weighted formula:**
+- For sections with measurability: \`overallScore = (Specificity × 1 + Actionability × 1 + Alignment × 2 + Measurability × 1) / 5\`
+- For other sections: \`overallScore = (Specificity × 1 + Actionability × 1 + Alignment × 2) / 4\`
 
 **Return JSON:**
 
@@ -165,7 +172,7 @@ ${sectionGuidance[section] || ''}
     "actionability": 7,
     "alignment": 9,
     "measurability": ${section === 'near_term_bets' || section === 'metrics' ? '8' : '0'},
-    "overallScore": 8.0,
+    "overallScore": 8.25,
     "issues": [],
     "suggestions": ["What could still be improved?"],
     "strengths": ["What's particularly strong about this refined version?"]
@@ -173,7 +180,7 @@ ${sectionGuidance[section] || ''}
 }
 \`\`\`
 
-Note: overallScore should be the average of applicable criteria (specificity, actionability, alignment, and measurability if applicable).
+Example calculation for vision: \`(8 × 1 + 7 × 1 + 9 × 2) / 4 = 33 / 4 = 8.25\`
 
 **Important:**
 - If the feedback is vague, interpret it generously and make the content better
