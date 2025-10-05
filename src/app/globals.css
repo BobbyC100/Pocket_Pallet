@@ -7,6 +7,54 @@
   @apply font-semibold tracking-tight;
 }
 
+/* Force dark text in prose */
+.prose p,
+.prose li,
+.prose span,
+.prose div {
+  color: #374151 !important;
+}
+
+.prose h1 {
+  color: #111827 !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 1rem !important;
+  margin-top: 2rem !important;
+}
+
+.prose h2 {
+  color: #111827 !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.75rem !important;
+  margin-top: 1.5rem !important;
+}
+
+.prose h3 {
+  color: #111827 !important;
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.5rem !important;
+  margin-top: 1rem !important;
+}
+
+.prose strong {
+  color: #111827 !important;
+  font-weight: 600 !important;
+}
+
+.prose ul,
+.prose ol {
+  margin-top: 0.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.prose li {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
 /* ===== Banyan UI Tuning Pack =====
    Goals: vertical cadence, subtle motion, consistent contrast, gentle interactions
    Usage:
@@ -100,13 +148,19 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
 
 /* Hero sizing: belongs to the viewport, not floating above it */
 .hero {
-  min-height: clamp(60vh, 68vh, 72vh);
+  min-height: clamp(56vh, 64vh, 70vh);
   display: grid;
   place-items: center;
   text-align: left;
 }
 .hero .container { align-self: center; }
 .hero .kicker { color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; font-size: .8rem; }
+
+/* Slightly larger primary CTA in hero, tighter stack spacing */
+.hero .btn { letter-spacing: .01em; }
+@media (max-width: 520px) {
+  .hero .btn { display: block; width: 100%; text-align: center; }
+}
 
 /* ---------- Subtle motion primitives ---------- */
 .reveal {

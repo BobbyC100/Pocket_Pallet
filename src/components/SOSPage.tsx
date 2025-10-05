@@ -20,13 +20,21 @@ interface Document {
 
 export default function SOSPage() {
   // Check if we just created V2 framework and should show it
-  const [activeDoc, setActiveDoc] = useState<DocType>(() => {
+  const [activeDoc, setActiveDoc] = useState<DocType>('vision-v2');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Check for V2 framework data on mount
     if (typeof window !== 'undefined') {
       const hasV2 = sessionStorage.getItem('visionFrameworkV2Draft');
-      return hasV2 ? 'vision-v2' : 'founder-brief';
+      if (hasV2) {
+        setActiveDoc('vision-v2');
+      } else {
+        setActiveDoc('founder-brief');
+      }
     }
-    return 'vision-v2';
-  });
+  }, []);
 
   // Export handlers
   const handleExportCurrent = async () => {
@@ -217,6 +225,7 @@ export default function SOSPage() {
               <button 
                 onClick={handleExportCurrent}
                 className="btn btn--ghost"
+                style={{ color: '#374151', borderColor: '#d1d5db' }}
               >
                 Export Current
               </button>

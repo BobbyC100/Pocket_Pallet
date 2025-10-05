@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useUser, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
 interface SaveBarProps {
@@ -9,8 +10,13 @@ interface SaveBarProps {
 
 export function SaveBar({ onSave, hasUnsavedChanges = true }: SaveBarProps) {
   const { isLoaded } = useUser();
+  const [mounted, setMounted] = useState(false);
   
-  if (!isLoaded || !hasUnsavedChanges) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  if (!mounted || !isLoaded || !hasUnsavedChanges) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 backdrop-blur shadow-lg z-50">
