@@ -22,21 +22,26 @@ export async function POST(request: NextRequest) {
     // Get user's vision embedding for alignment scoring
     let visionEmbedding: number[] | undefined;
     if (userId) {
-      const embedding = await db
-        .select()
-        .from(visionEmbeddings)
-        .where(eq(visionEmbeddings.userId, userId))
-        .limit(1);
+      try {
+        const embedding = await db
+          .select()
+          .from(visionEmbeddings)
+          .where(eq(visionEmbeddings.userId, userId))
+          .limit(1);
 
-      if (embedding.length > 0) {
-        try {
-          visionEmbedding = JSON.parse(embedding[0].embedding);
-          console.log('✅ Vision embedding found for alignment scoring');
-        } catch (e) {
-          console.warn('⚠️ Failed to parse vision embedding');
+        if (embedding.length > 0) {
+          try {
+            visionEmbedding = JSON.parse(embedding[0].embedding);
+            console.log('✅ Vision embedding found for alignment scoring');
+          } catch (e) {
+            console.warn('⚠️ Failed to parse vision embedding');
+          }
+        } else {
+          console.log('ℹ️ No vision embedding found - using default alignment');
         }
-      } else {
-        console.log('ℹ️ No vision embedding found - using default alignment');
+      } catch (dbError) {
+        console.warn('⚠️ Database query failed, continuing without vision embedding:', dbError);
+        // Continue without vision embedding - alignment will use default score
       }
     }
 
@@ -86,10 +91,24 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ Lens scoring error:', error);
+    
+    // Provide helpful error message
+    let errorMessage = 'Failed to score document';
+    let errorDetails = error instanceof Error ? error.message : 'Unknown error';
+    
+    if (errorDetails.includes('API key')) {
+      errorMessage = 'OpenAI API key not configured';
+      errorDetails = 'Please set OPENAI_API_KEY in environment variables';
+    } else if (errorDetails.includes('database')) {
+      errorMessage = 'Database connection failed';
+      errorDetails = 'Database might not be configured. Scoring will work without it.';
+    }
+    
     return NextResponse.json(
       {
-        error: 'Failed to score document',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        error: errorMessage,
+        details: errorDetails,
+        stack: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : undefined) : undefined
       },
       { status: 500 }
     );
