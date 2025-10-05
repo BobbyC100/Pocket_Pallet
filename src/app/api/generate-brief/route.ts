@@ -45,6 +45,30 @@ export async function POST(request: NextRequest) {
     
     console.log('✅ Briefs generated');
 
+    // Score VC Summary if structured version exists
+    let vcSummaryScores = null;
+    if (vcSummaryStructured) {
+      try {
+        console.log('🔍 Scoring VC Summary...');
+        const scoreResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/vc-summary/score`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ vcSummary: vcSummaryStructured })
+        });
+        
+        if (scoreResponse.ok) {
+          const scoreResult = await scoreResponse.json();
+          vcSummaryScores = scoreResult.scores;
+          console.log('✅ VC Summary scored:', scoreResult.overallQuality);
+        } else {
+          console.warn('⚠️ VC Summary scoring failed, continuing without scores');
+        }
+      } catch (error) {
+        console.error('❌ VC Summary scoring error:', error);
+        // Continue without scores - scoring is optional
+      }
+    }
+
     // Calculate runway if available
     const runwayMonths = calculateRunway(responses);
 
@@ -52,6 +76,7 @@ export async function POST(request: NextRequest) {
       founderBriefMd,
       vcSummaryMd,
       vcSummaryStructured, // New structured format
+      vcSummaryScores, // Quality scores for each section
       runwayMonths,
       responses // Pass through for framework generation
     });

@@ -124,7 +124,7 @@ export default function SOSPage() {
     }
   ]);
 
-  const [briefContent, setBriefContent] = useState<{founderBrief?: string; vcSummary?: string; vcSummaryStructured?: VcSummary} | null>(null);
+  const [briefContent, setBriefContent] = useState<{founderBrief?: string; vcSummary?: string; vcSummaryStructured?: VcSummary; vcSummaryScores?: any} | null>(null);
   const [visionV2Content, setVisionV2Content] = useState<{executiveOnePager?: string; qaResults?: any} | null>(null);
 
   // Check for data in session storage to update document statuses and load content
@@ -154,10 +154,17 @@ export default function SOSPage() {
           }
         }
         
+        // Load VC Summary scores if available
+        const vcSummaryScores = parsed.vcSummaryScores;
+        if (vcSummaryScores) {
+          console.log('✅ VC Summary scores loaded');
+        }
+        
         setBriefContent({
           founderBrief: parsed.founderBriefMd,
           vcSummary: parsed.vcSummaryMd,
-          vcSummaryStructured
+          vcSummaryStructured,
+          vcSummaryScores
         });
       } catch (error) {
         console.error('Error parsing brief data:', error);
@@ -370,7 +377,10 @@ export default function SOSPage() {
                 </div>
                 {briefContent?.vcSummaryStructured ? (
                   <>
-                    <VcSummaryDisplay summary={briefContent.vcSummaryStructured} />
+                    <VcSummaryDisplay 
+                      summary={briefContent.vcSummaryStructured} 
+                      scores={briefContent.vcSummaryScores}
+                    />
                     <div className="mt-6 pt-6 border-t border-banyan-border-default">
                       <p className="text-sm text-banyan-text-subtle">
                         <strong>Purpose:</strong> Investor pitch deck companion / email intro
