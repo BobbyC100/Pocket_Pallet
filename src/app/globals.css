@@ -846,4 +846,34 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
     cursor: not-allowed !important;
     opacity: 0.5 !important;
   }
+  
+  /* ===== INPUT & TEXTAREA OVERRIDES ===== */
+  /* Force all inputs and textareas to use Banyan colors */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="url"],
+  input[type="search"],
+  textarea,
+  select {
+    background-color: var(--banyan-bg-surface) !important;
+    color: var(--banyan-text-default) !important;
+    border-color: var(--banyan-border-default) !important;
+  }
+  
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--banyan-text-subtle) !important;
+    opacity: 0.7 !important;
+  }
+  
+  /* Focus states for inputs */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none !important;
+    border-color: var(--banyan-primary) !important;
+    box-shadow: 0 0 0 3px rgba(50, 150, 100, 0.1) !important;
+  }
 }
