@@ -2,57 +2,437 @@
 @tailwind components;
 @tailwind utilities;
 
-/* prose tweaks for markdown */
-.prose :where(h1,h2,h3):not(:where(.not-prose *)) {
-  @apply font-semibold tracking-tight;
+/* ===== BANYAN DESIGN SYSTEM v1.0 ===== */
+
+@layer base {
+  /* Import fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+  
+  /* ===== DARK MODE (DEFAULT) ===== */
+  :root {
+    /* Banyan Color Tokens - Dark Mode is now default */
+    --banyan-primary: #2EAD7B;  /* Lighter green for dark backgrounds */
+    --banyan-primary-hover: #3ac48a;
+    --banyan-primary-contrast: #FFFFFF;  /* WHITE text on green buttons */
+    
+    --banyan-text-default: #F5F7FA;  /* Brighter white for better contrast */
+    --banyan-text-subtle: #B8C1CE;   /* Lighter gray for better visibility */
+    
+    --banyan-bg-base: #0A0C0E;       /* Darker base */
+    --banyan-bg-surface: #13151A;    /* Darker surface */
+    
+    --banyan-border-default: #2D3340; /* Slightly lighter border for visibility */
+    
+    --banyan-success: #4CD99B;       /* Brighter for better visibility */
+    --banyan-warning: #FFB64C;
+    --banyan-error: #FF7B7B;         /* Slightly brighter */
+    --banyan-info: #6BA9FF;          /* Brighter blue */
+    
+    --banyan-sand: #2A2520;
+    --banyan-mist: #1A2530;
+    
+    /* Banyan Spacing (8px rhythm) */
+    --banyan-space-xxs: 4px;
+    --banyan-space-xs: 8px;
+    --banyan-space-s: 12px;
+    --banyan-space-m: 16px;
+    --banyan-space-l: 24px;
+    --banyan-space-xl: 48px;
+    --banyan-space-xxl: 96px;
+    
+    /* Banyan Radius */
+    --banyan-radius-s: 4px;
+    --banyan-radius-m: 8px;
+    --banyan-radius-l: 12px;
+    --banyan-radius-xl: 20px;
+    
+    /* Banyan Shadows - Dark Mode */
+    --banyan-shadow-low: 0 1px 2px rgba(0,0,0,0.4);
+    --banyan-shadow-mid: 0 2px 4px rgba(0,0,0,0.5);
+    --banyan-shadow-high: 0 4px 12px rgba(0,0,0,0.6);
+    
+    /* Banyan Motion */
+    --banyan-duration-fast: 100ms;
+    --banyan-duration-base: 200ms;
+    --banyan-duration-slow: 300ms;
+    
+    --banyan-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --banyan-ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --banyan-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  }
+  
+  /* ===== LIGHT MODE (OVERRIDE) ===== */
+  @media (prefers-color-scheme: light) {
+    :root {
+      /* Banyan Color Tokens - Light Mode */
+      --banyan-primary: #1B4D3E;
+      --banyan-primary-hover: #153d32;
+      --banyan-primary-contrast: #FFFFFF;  /* WHITE text on green buttons */
+      
+      --banyan-text-default: #1E1E1E;
+      --banyan-text-subtle: #4A4A4A;
+      
+      --banyan-bg-base: #F9FAF9;
+      --banyan-bg-surface: #FFFFFF;
+      
+      --banyan-border-default: #E2E2E2;
+      
+      --banyan-success: #2FB57C;
+      --banyan-warning: #FFB64C;
+      --banyan-error: #E45757;
+      --banyan-info: #4B91F1;
+      
+      --banyan-sand: #F4EDE2;
+      --banyan-mist: #E5EEF5;
+      
+      /* Banyan Shadows - Light Mode */
+      --banyan-shadow-low: 0 1px 2px rgba(0,0,0,0.06);
+      --banyan-shadow-mid: 0 2px 4px rgba(0,0,0,0.08);
+      --banyan-shadow-high: 0 4px 12px rgba(0,0,0,0.10);
+    }
+  }
+  
+  /* Force dark mode with data attribute (for manual toggle) */
+  [data-theme="dark"] {
+    --banyan-primary: #2EAD7B;
+    --banyan-primary-hover: #3ac48a;
+    --banyan-primary-contrast: #FFFFFF;  /* WHITE text on green buttons */
+    
+    --banyan-text-default: #F5F7FA;
+    --banyan-text-subtle: #B8C1CE;
+    
+    --banyan-bg-base: #0A0C0E;
+    --banyan-bg-surface: #13151A;
+    
+    --banyan-border-default: #2D3340;
+    
+    --banyan-success: #4CD99B;
+    --banyan-warning: #FFB64C;
+    --banyan-error: #FF7B7B;
+    --banyan-info: #6BA9FF;
+    
+    --banyan-sand: #2A2520;
+    --banyan-mist: #1A2530;
+    
+    --banyan-shadow-low: 0 1px 2px rgba(0,0,0,0.4);
+    --banyan-shadow-mid: 0 2px 4px rgba(0,0,0,0.5);
+    --banyan-shadow-high: 0 4px 12px rgba(0,0,0,0.6);
+  }
+  
+  /* Force light mode with data attribute (for manual toggle) */
+  [data-theme="light"] {
+    --banyan-primary: #1B4D3E;
+    --banyan-primary-hover: #153d32;
+    --banyan-primary-contrast: #FFFFFF;
+    
+    --banyan-text-default: #1E1E1E;
+    --banyan-text-subtle: #4A4A4A;
+    
+    --banyan-bg-base: #F9FAF9;
+    --banyan-bg-surface: #FFFFFF;
+    
+    --banyan-border-default: #E2E2E2;
+    
+    --banyan-success: #2FB57C;
+    --banyan-warning: #FFB64C;
+    --banyan-error: #E45757;
+    --banyan-info: #4B91F1;
+    
+    --banyan-sand: #F4EDE2;
+    --banyan-mist: #E5EEF5;
+    
+    --banyan-shadow-low: 0 1px 2px rgba(0,0,0,0.06);
+    --banyan-shadow-mid: 0 2px 4px rgba(0,0,0,0.08);
+    --banyan-shadow-high: 0 4px 12px rgba(0,0,0,0.10);
+  }
+  
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply font-sans text-body;
+    color: var(--banyan-text-default) !important;
+    background-color: var(--banyan-bg-base) !important;
+    transition: background-color var(--banyan-duration-base) var(--banyan-ease),
+                color var(--banyan-duration-base) var(--banyan-ease);
+  }
+  
+  /* Set default border color */
+  * {
+    border-color: var(--banyan-border-default);
+  }
 }
 
-/* Force dark text in prose */
+@layer components {
+  /* ===== BANYAN BUTTON COMPONENTS ===== */
+  
+  .btn-banyan-primary {
+    @apply inline-flex items-center justify-center gap-xs;
+    @apply px-m py-s rounded-m;
+    @apply font-medium text-body;
+    @apply transition-all duration-base ease-banyan;
+    background-color: var(--banyan-primary) !important;
+    color: var(--banyan-primary-contrast) !important;
+    box-shadow: var(--banyan-shadow-low) !important;
+    border: none !important;
+  }
+  
+  .btn-banyan-primary:hover {
+    background-color: var(--banyan-primary-hover) !important;
+    box-shadow: var(--banyan-shadow-mid) !important;
+    transform: translateY(-1px) !important;
+    color: var(--banyan-primary-contrast) !important;
+  }
+  
+  .btn-banyan-primary:active {
+    transform: translateY(0) !important;
+    box-shadow: var(--banyan-shadow-low) !important;
+  }
+  
+  .btn-banyan-primary:focus-visible {
+    outline: 2px solid var(--banyan-primary) !important;
+    outline-offset: 2px !important;
+  }
+  
+  /* Force all children to inherit color */
+  .btn-banyan-primary * {
+    color: inherit !important;
+  }
+  
+  /* Override any conflicting button classes */
+  button.btn-banyan-primary,
+  a.btn-banyan-primary {
+    background-color: var(--banyan-primary) !important;
+    color: var(--banyan-primary-contrast) !important;
+  }
+  
+  button.btn-banyan-primary:hover,
+  a.btn-banyan-primary:hover {
+    background-color: var(--banyan-primary-hover) !important;
+    color: var(--banyan-primary-contrast) !important;
+  }
+  
+  .btn-banyan-secondary {
+    @apply inline-flex items-center justify-center gap-xs;
+    @apply px-m py-s rounded-m;
+    @apply font-medium text-body;
+    @apply transition-all duration-base ease-banyan;
+    background-color: var(--banyan-bg-surface);
+    color: var(--banyan-primary);
+    border: 1px solid var(--banyan-primary);
+    box-shadow: var(--banyan-shadow-low);
+  }
+  
+  .btn-banyan-secondary:hover {
+    background-color: var(--banyan-mist);
+    box-shadow: var(--banyan-shadow-mid);
+    transform: translateY(-1px);
+  }
+  
+  .btn-banyan-secondary:active {
+    transform: translateY(0);
+  }
+  
+  .btn-banyan-ghost {
+    @apply inline-flex items-center justify-center gap-xs;
+    @apply px-m py-s rounded-m;
+    @apply font-medium text-body;
+    @apply transition-all duration-base ease-banyan;
+    background-color: var(--banyan-bg-surface) !important;
+    border: 1px solid var(--banyan-border-default) !important;
+    color: var(--banyan-text-default) !important;
+  }
+  
+  .btn-banyan-ghost:hover {
+    background-color: var(--banyan-mist) !important;
+    border-color: var(--banyan-primary) !important;
+    color: var(--banyan-text-default) !important;
+  }
+  
+  /* Force all child elements to inherit color */
+  .btn-banyan-ghost * {
+    color: inherit !important;
+  }
+  
+  .btn-banyan-ghost svg {
+    color: inherit !important;
+    stroke: currentColor !important;
+  }
+  
+  /* ===== BANYAN CARD COMPONENT ===== */
+  
+  .card-banyan {
+    background-color: var(--banyan-bg-surface);
+    border-radius: var(--banyan-radius-l);
+    box-shadow: var(--banyan-shadow-low);
+    padding: var(--banyan-space-l);
+    transition: box-shadow var(--banyan-duration-base) var(--banyan-ease);
+  }
+  
+  .card-banyan:hover {
+    box-shadow: var(--banyan-shadow-mid);
+  }
+  
+  /* ===== BANYAN INPUT COMPONENT ===== */
+  
+  .input-banyan {
+    @apply w-full px-m py-s rounded-m;
+    @apply text-body;
+    @apply transition-all duration-base ease-banyan;
+    background-color: var(--banyan-bg-surface);
+    border: 1px solid var(--banyan-border-default);
+    color: var(--banyan-text-default);
+  }
+  
+  .input-banyan::placeholder {
+    color: var(--banyan-text-subtle);
+  }
+  
+  .input-banyan:focus {
+    outline: none;
+    border-color: var(--banyan-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--banyan-primary) 10%, transparent);
+  }
+  
+  /* ===== BANYAN ALERT COMPONENTS ===== */
+  
+  .alert-banyan {
+    @apply px-m py-s rounded-m;
+    @apply text-body font-medium;
+    display: flex;
+    align-items: center;
+    gap: var(--banyan-space-xs);
+  }
+  
+  .alert-banyan-success {
+    background-color: color-mix(in srgb, var(--banyan-success) 10%, white);
+    color: color-mix(in srgb, var(--banyan-success) 90%, black);
+    border-left: 4px solid var(--banyan-success);
+  }
+  
+  .alert-banyan-warning {
+    background-color: color-mix(in srgb, var(--banyan-warning) 10%, white);
+    color: color-mix(in srgb, var(--banyan-warning) 90%, black);
+    border-left: 4px solid var(--banyan-warning);
+  }
+  
+  .alert-banyan-error {
+    background-color: color-mix(in srgb, var(--banyan-error) 10%, white);
+    color: color-mix(in srgb, var(--banyan-error) 90%, black);
+    border-left: 4px solid var(--banyan-error);
+  }
+  
+  .alert-banyan-info {
+    background-color: color-mix(in srgb, var(--banyan-info) 10%, white);
+    color: color-mix(in srgb, var(--banyan-info) 90%, black);
+    border-left: 4px solid var(--banyan-info);
+  }
+  
+  /* ===== BANYAN CONTAINER ===== */
+  
+  .container-banyan {
+    width: min(1120px, 92vw);
+    margin-inline: auto;
+  }
+  
+  /* ===== BANYAN MOTION UTILITIES ===== */
+  
+  .motion-safe-banyan {
+    transition: opacity var(--banyan-duration-base) var(--banyan-ease),
+                transform var(--banyan-duration-base) var(--banyan-ease);
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .motion-safe-banyan {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
+}
+
+/* ===== PROSE TWEAKS FOR MARKDOWN ===== */
+/* Updated to use Banyan design tokens and adapt to theme */
+
+.prose :where(h1,h2,h3):not(:where(.not-prose *)) {
+  @apply font-semibold tracking-tight;
+  color: var(--banyan-text-default) !important;
+}
+
 .prose p,
 .prose li,
 .prose span,
 .prose div {
-  color: #374151 !important;
+  color: var(--banyan-text-default) !important;
+}
+
+.prose p {
+  margin-top: 0 !important;
+  margin-bottom: 0.75rem !important;
 }
 
 .prose h1 {
-  color: #111827 !important;
+  color: var(--banyan-text-default) !important;
   font-size: 1.5rem !important;
   font-weight: 700 !important;
-  margin-bottom: 1rem !important;
-  margin-top: 2rem !important;
+  margin-bottom: 0.125rem !important;
+  margin-top: 0 !important;
+}
+
+.prose h1:not(:first-child) {
+  margin-top: 1.25rem !important;
 }
 
 .prose h2 {
-  color: #111827 !important;
+  color: var(--banyan-text-default) !important;
   font-size: 1.25rem !important;
   font-weight: 600 !important;
-  margin-bottom: 0.75rem !important;
-  margin-top: 1.5rem !important;
+  margin-bottom: 0.125rem !important;
+  margin-top: 0.75rem !important;
 }
 
 .prose h3 {
-  color: #111827 !important;
+  color: var(--banyan-text-default) !important;
   font-size: 1.125rem !important;
   font-weight: 600 !important;
-  margin-bottom: 0.5rem !important;
-  margin-top: 1rem !important;
+  margin-bottom: 0.125rem !important;
+  margin-top: 0.75rem !important;
 }
 
 .prose strong {
-  color: #111827 !important;
+  color: var(--banyan-text-default) !important;
   font-weight: 600 !important;
 }
 
 .prose ul,
 .prose ol {
-  margin-top: 0.5rem !important;
-  margin-bottom: 1rem !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.75rem !important;
 }
 
 .prose li {
-  margin-top: 0.25rem !important;
-  margin-bottom: 0.25rem !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Prose colors for specific use cases (e.g., on dark cards) */
+.prose-light p,
+.prose-light li,
+.prose-light span,
+.prose-light div,
+.prose-light h1,
+.prose-light h2,
+.prose-light h3,
+.prose-light strong {
+  color: #f9fafb !important;
+}
+
+.prose-subtle p,
+.prose-subtle li,
+.prose-subtle span,
+.prose-subtle div {
+  color: var(--banyan-text-subtle) !important;
 }
 
 /* ===== Banyan UI Tuning Pack =====
@@ -66,9 +446,10 @@
    - Links: .link-underline for tasteful underline animation
 */
 
-/* ---------- Design tokens ---------- */
+/* ---------- Legacy Design tokens (for old components) ---------- */
+/* NOTE: These are mapped to Banyan tokens for consistency */
 :root {
-  /* Spacing scale (vertical rhythm) */
+  /* Spacing scale (vertical rhythm) - kept for backward compatibility */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -81,32 +462,27 @@
   --space-24: 6rem;
 
   /* Typography & max line length */
-  --measure: 68ch;           /* keeps copy readable */
+  --measure: 68ch;
   --radius: 1rem;
 
-  /* Color (adjust to your palette) */
-  --bg: #0d0f12;
-  --surface: #12151a;
-  --elev: #171b21;
-  --text: #e8ecf1;
-  --text-muted: #b3bcc7;
-  --divider: 1px solid color-mix(in oklab, #ffffff 10%, transparent);
-  --accent: #6aa5ff;         /* single accent to anchor contrast */
-  --accent-hi: #8bb9ff;
+  /* Legacy colors - now map to Banyan tokens */
+  --bg: var(--banyan-bg-base);
+  --surface: var(--banyan-bg-surface);
+  --elev: var(--banyan-bg-surface);
+  --text: var(--banyan-text-default);
+  --text-muted: var(--banyan-text-subtle);
+  --divider: 1px solid var(--banyan-border-default);
+  --accent: var(--banyan-primary);
+  --accent-hi: var(--banyan-primary-hover);
 
-  /* Motion */
-  --ease: cubic-bezier(.2,.7,.2,1);
-  --dur-1: 140ms;
-  --dur-2: 220ms;
+  /* Motion - kept for backward compatibility */
+  --ease: var(--banyan-ease);
+  --dur-1: var(--banyan-duration-fast);
+  --dur-2: var(--banyan-duration-base);
 }
 
 /* ---------- Base ---------- */
-html, body {
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+/* Removed - handled by body styles in @layer base above */
 
 .container {
   width: min(1120px, 92vw);
@@ -192,12 +568,12 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
   border-radius: calc(var(--radius) - .25rem);
   font-weight: 600;
   background: var(--accent);
-  color: #0a0c0f;
+  color: var(--banyan-primary-contrast);
   border: 1px solid color-mix(in oklab, var(--accent) 40%, #000 60%);
   box-shadow: 0 2px 0 0 rgba(0,0,0,.35);
   transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
 }
-.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -8px rgba(0,0,0,.6); background: var(--accent-hi); }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -8px rgba(0,0,0,.6); background: var(--accent-hi); color: var(--banyan-primary-contrast); }
 .btn:active { transform: translateY(0); box-shadow: 0 2px 0 0 rgba(0,0,0,.35); }
 
 .btn--ghost {
@@ -248,4 +624,226 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
 .parallax {
   will-change: transform;
   transition: transform var(--dur-2) var(--ease);
+}
+
+/* ===== BANYAN UTILITY OVERRIDES ===== */
+/* Force Banyan colors over Tailwind defaults */
+
+@layer utilities {
+  /* ===== BANYAN UTILITY CLASSES ===== */
+  
+  /* Text Colors */
+  .text-banyan-text-default {
+    color: var(--banyan-text-default) !important;
+  }
+  
+  .text-banyan-text-subtle {
+    color: var(--banyan-text-subtle) !important;
+  }
+  
+  .text-banyan-primary {
+    color: var(--banyan-primary) !important;
+  }
+  
+  .text-banyan-primary-contrast {
+    color: var(--banyan-primary-contrast) !important;
+  }
+  
+  .text-banyan-success {
+    color: var(--banyan-success) !important;
+  }
+  
+  .text-banyan-warning {
+    color: var(--banyan-warning) !important;
+  }
+  
+  .text-banyan-error {
+    color: var(--banyan-error) !important;
+  }
+  
+  /* Background Colors */
+  .bg-banyan-bg-base {
+    background-color: var(--banyan-bg-base) !important;
+  }
+  
+  .bg-banyan-bg-surface {
+    background-color: var(--banyan-bg-surface) !important;
+  }
+  
+  .bg-banyan-primary {
+    background-color: var(--banyan-primary) !important;
+  }
+  
+  .bg-banyan-success {
+    background-color: var(--banyan-success) !important;
+  }
+  
+  .bg-banyan-warning {
+    background-color: var(--banyan-warning) !important;
+  }
+  
+  .bg-banyan-error {
+    background-color: var(--banyan-error) !important;
+  }
+  
+  /* Border Colors */
+  .border-banyan-border-default {
+    border-color: var(--banyan-border-default) !important;
+  }
+  
+  .border-banyan-primary {
+    border-color: var(--banyan-primary) !important;
+  }
+  
+  /* Shadow Utilities */
+  .shadow-banyan-low {
+    box-shadow: var(--banyan-shadow-low) !important;
+  }
+  
+  .shadow-banyan-mid {
+    box-shadow: var(--banyan-shadow-mid) !important;
+  }
+  
+  .shadow-banyan-high {
+    box-shadow: var(--banyan-shadow-high) !important;
+  }
+  
+  /* ===== TAILWIND OVERRIDES ===== */
+  
+  .text-caption {
+    font-size: 14px !important;
+    line-height: 160% !important;
+  }
+  
+  /* Ensure all interactive elements use correct colors */
+  button:not([class*="bg-"]):not([class*="text-"]) {
+    color: var(--banyan-text-default) !important;
+  }
+  
+  /* Force SVG colors to inherit from parent */
+  svg:not([fill]):not([stroke]) {
+    color: currentColor !important;
+  }
+  
+  svg[stroke="currentColor"] {
+    stroke: currentColor !important;
+  }
+  
+  /* Override ALL Tailwind text color utilities */
+  /* Gray text shades - all map to default text */
+  .text-gray-300,
+  .text-gray-400,
+  .text-gray-500,
+  .text-gray-600,
+  .text-gray-700,
+  .text-gray-800,
+  .text-gray-900 {
+    color: var(--banyan-text-default) !important;
+  }
+  
+  /* Very light grays map to subtle text */
+  .text-gray-50,
+  .text-gray-100,
+  .text-gray-200 {
+    color: var(--banyan-text-subtle) !important;
+  }
+  
+  /* DO NOT override text-white and text-black - they might be intentionally used for contrast */
+  
+  /* Override Tailwind gray background utilities */
+  /* Light grays map to surface */
+  .bg-gray-50,
+  .bg-gray-100,
+  .bg-gray-200,
+  .bg-white {
+    background-color: var(--banyan-bg-surface) !important;
+  }
+  
+  /* Dark grays map to base (darker) */
+  .bg-gray-800,
+  .bg-gray-900 {
+    background-color: var(--banyan-bg-base) !important;
+  }
+  
+  /* Override blue text (used in many places) */
+  .text-blue-600,
+  .text-blue-700 {
+    color: var(--banyan-primary) !important;
+  }
+  
+  /* Override blue backgrounds */
+  .bg-blue-600,
+  .bg-blue-700 {
+    background-color: var(--banyan-primary) !important;
+  }
+  
+  /* Override ALL hover text states */
+  .hover\:text-gray-600:hover,
+  .hover\:text-gray-700:hover,
+  .hover\:text-gray-900:hover,
+  .hover\:text-white:hover {
+    color: var(--banyan-text-default) !important;
+  }
+  
+  .hover\:text-blue-300:hover,
+  .hover\:text-blue-700:hover {
+    color: var(--banyan-primary-hover) !important;
+  }
+  
+  .hover\:text-red-700:hover {
+    color: var(--banyan-error) !important;
+  }
+  
+  /* Override ALL hover background states */
+  .hover\:bg-blue-500:hover,
+  .hover\:bg-blue-700:hover {
+    background-color: var(--banyan-primary-hover) !important;
+  }
+  
+  .hover\:bg-gray-50:hover,
+  .hover\:bg-gray-600:hover,
+  .hover\:bg-gray-700:hover {
+    background-color: var(--banyan-mist) !important;
+  }
+  
+  .hover\:bg-green-700:hover {
+    background-color: var(--banyan-success-hover) !important;
+  }
+  
+  /* Override border colors */
+  .border-gray-200,
+  .border-gray-300,
+  .border-gray-400,
+  .border-gray-500,
+  .border-gray-600,
+  .border-gray-700 {
+    border-color: var(--banyan-border-default) !important;
+  }
+  
+  .border-blue-500,
+  .border-blue-600,
+  .border-blue-700 {
+    border-color: var(--banyan-primary) !important;
+  }
+  
+  /* Override ring colors */
+  .ring-blue-500,
+  .focus\:ring-blue-500:focus {
+    --tw-ring-color: var(--banyan-primary) !important;
+  }
+  
+  /* Override focus border colors */
+  .focus\:border-blue-500:focus,
+  .focus\:border-transparent:focus {
+    border-color: var(--banyan-primary) !important;
+  }
+  
+  /* Override disabled states */
+  .disabled\:bg-gray-400:disabled,
+  button:disabled {
+    background-color: var(--banyan-bg-muted) !important;
+    color: var(--banyan-text-muted) !important;
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+  }
 }

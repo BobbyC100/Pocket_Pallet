@@ -5,13 +5,13 @@ import BriefView from "./BriefView";
 export default function ResultTabs({ founderMd, vcMd }: { founderMd: string; vcMd: string }) {
   const [tab, setTab] = useState<"founder" | "vc">("founder");
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white">
-      <div className="flex items-center gap-2 border-b border-gray-200 p-4">
+    <section className="rounded-2xl border border-banyan-border-default bg-banyan-bg-surface shadow-banyan-mid">
+      <div className="flex items-center gap-2 border-b border-banyan-border-default p-4">
         <button
           className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 ${
             tab === "founder" 
-              ? "bg-blue-600 text-white" 
-              : "text-gray-600 hover:text-gray-900"
+              ? "bg-banyan-primary text-banyan-primary-contrast" 
+              : "text-banyan-text-subtle hover:text-banyan-text-default"
           }`}
           onClick={() => setTab("founder")}
         >
@@ -20,8 +20,8 @@ export default function ResultTabs({ founderMd, vcMd }: { founderMd: string; vcM
         <button
           className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 ${
             tab === "vc" 
-              ? "bg-blue-600 text-white" 
-              : "text-gray-600 hover:text-gray-900"
+              ? "bg-banyan-primary text-banyan-primary-contrast" 
+              : "text-banyan-text-subtle hover:text-banyan-text-default"
           }`}
           onClick={() => setTab("vc")}
         >

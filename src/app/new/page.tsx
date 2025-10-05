@@ -228,19 +228,19 @@ export default function NewPage() {
       ) : (
         <div className="space-y-6">
           {/* Save Status Bar */}
-          <div className="bg-white rounded-lg border-2 border-gray-200 p-4 flex items-center justify-between shadow-lg">
+          <div className="bg-banyan-bg-surface rounded-lg border-2 border-banyan-border-default p-4 flex items-center justify-between shadow-banyan-mid">
             <div className="flex items-center gap-3">
               {isSignedIn ? (
                 <>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-gray-700 font-medium">
-                    Signed in as <span className="text-gray-900 font-semibold">{user?.primaryEmailAddress?.emailAddress}</span>
+                  <div className="w-2 h-2 bg-banyan-success rounded-full animate-pulse"></div>
+                  <span className="text-sm text-banyan-text-subtle font-medium">
+                    Signed in as <span className="text-banyan-text-default font-semibold">{user?.primaryEmailAddress?.emailAddress}</span>
                   </span>
                 </>
               ) : (
                 <>
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-gray-700 font-medium">
+                  <div className="w-2 h-2 bg-banyan-warning rounded-full animate-pulse"></div>
+                  <span className="text-sm text-banyan-text-subtle font-medium">
                     💾 Draft auto-saved locally
                   </span>
                 </>
@@ -248,7 +248,7 @@ export default function NewPage() {
             </div>
             <button
               onClick={handleSave}
-              className="btn flex items-center gap-2"
+              className="btn-banyan-primary flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
@@ -263,13 +263,13 @@ export default function NewPage() {
           />
           
           {/* Create Vision Framework Section */}
-          <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+          <div className="bg-banyan-bg-surface rounded-xl border border-banyan-border-default p-6 shadow-banyan-mid">
             <div className="mb-4">
-              <h3 className="text-xl font-bold text-white mb-2">Ready for the Next Step?</h3>
-              <p className="text-gray-300">
+              <h3 className="text-xl font-bold text-banyan-text-default mb-2">Ready for the Next Step?</h3>
+              <p className="text-banyan-text-subtle">
                 Transform your brief into a comprehensive Vision Framework - your company's strategic foundation.
               </p>
-              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-blue-900/30 border border-blue-700 rounded-lg text-xs text-blue-200">
+              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-banyan-primary/20 border border-banyan-primary rounded-lg text-xs text-banyan-primary">
                 <span className="font-semibold">✨ NEW:</span> AI-generated bets, metrics, and tension detection
               </div>
             </div>
@@ -277,21 +277,21 @@ export default function NewPage() {
             <button
               onClick={() => handleCreateVisionFramework(true)}
               disabled={isCreatingFramework || !result?.responses}
-              className="w-full btn disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn-banyan-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isCreatingFramework ? 'Creating Vision Framework...' : 'Create Vision Framework'}
             </button>
             
-            <div className="mt-3 text-xs text-gray-400 text-center">
+            <div className="mt-3 text-xs text-banyan-text-subtle text-center">
               {!isSignedIn && (
-                <span className="text-yellow-400">🔒 Free account required • </span>
+                <span className="text-banyan-warning">🔒 Free account required • </span>
               )}
               Auto-generates: Vision • Strategy • Principles • Bets • Metrics • Tensions
             </div>
           </div>
 
           <div className="flex gap-3">
-            <a href="/dashboard" className="btn btn--ghost">Back to Dashboard</a>
+            <a href="/dashboard" className="btn-banyan-ghost">Back to Dashboard</a>
           </div>
         </div>
       )}

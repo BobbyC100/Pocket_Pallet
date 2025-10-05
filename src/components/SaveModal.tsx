@@ -38,17 +38,17 @@ export default function SaveModal({ isOpen, onClose, onSaveComplete }: SaveModal
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
         onClick={onClose}
       />
       
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative">
+        <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-high max-w-md w-full p-6 relative border border-banyan-border-default">
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            className="absolute top-4 right-4 text-banyan-text-subtle hover:text-banyan-text-default transition-colors"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -57,10 +57,10 @@ export default function SaveModal({ isOpen, onClose, onSaveComplete }: SaveModal
 
           {/* Header */}
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-banyan-text-default mb-2">
               Create a free account to keep this brief
             </h2>
-            <p className="text-gray-600 text-sm">
+            <p className="text-banyan-text-subtle text-sm">
               Save your progress and access it from anywhere. No spam, ever.
             </p>
           </div>
@@ -70,7 +70,7 @@ export default function SaveModal({ isOpen, onClose, onSaveComplete }: SaveModal
             {/* Email (Magic Link) */}
             <button
               onClick={handleEmailSignIn}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="w-full btn-banyan-primary flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -81,7 +81,7 @@ export default function SaveModal({ isOpen, onClose, onSaveComplete }: SaveModal
             {/* Google */}
             <button
               onClick={handleGoogleSignIn}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white text-gray-700 rounded-lg border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors font-medium"
+              className="w-full btn-banyan-ghost flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -94,7 +94,7 @@ export default function SaveModal({ isOpen, onClose, onSaveComplete }: SaveModal
           </div>
 
           {/* Fine print */}
-          <p className="text-xs text-gray-500 text-center mt-4">
+          <p className="text-xs text-banyan-text-subtle text-center mt-4">
             We only ask for Google when you export to Docs.
           </p>
         </div>

@@ -177,16 +177,16 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       {/* Progress Bar */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-300">
+          <span className="text-sm font-medium text-banyan-text-default">
             Step {currentStep + 1} of {PROMPT_STEPS.length}
           </span>
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-banyan-text-subtle">
             {Math.round(progress)}% Complete
           </span>
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-2">
+        <div className="w-full bg-banyan-border-default rounded-full h-2">
           <div 
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            className="bg-banyan-primary h-2 rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -196,22 +196,22 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       <div className="mb-6 text-center">
         <button
           onClick={loadTestData}
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
+          className="px-4 py-2 bg-banyan-success hover:bg-banyan-success/80 text-banyan-primary-contrast text-sm font-medium rounded-lg transition-colors duration-200"
         >
           🚀 Load Test Data (YardBird)
         </button>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-banyan-text-subtle mt-1">
           Auto-fills all fields with sample construction logistics startup data
         </p>
       </div>
 
       {/* Step Content */}
-      <div className="bg-gray-800 rounded-2xl border border-gray-700 p-8 mb-8">
+      <div className="bg-banyan-bg-surface rounded-2xl border border-banyan-border-default p-8 mb-8 shadow-banyan-mid">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-white mb-3">
+          <h2 className="text-3xl font-bold text-banyan-text-default mb-3">
             {currentPrompt.title}
           </h2>
-          <p className="text-gray-300 text-lg">
+          <p className="text-banyan-text-subtle text-lg">
             {currentPrompt.description}
           </p>
         </div>
@@ -220,7 +220,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
           value={responses[currentPrompt.field as keyof PromptInput] as string || ''}
           onChange={(e) => handleResponseChange(currentPrompt.field as keyof PromptInput, e.target.value)}
           placeholder={currentPrompt.placeholder}
-          className="w-full px-6 py-4 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none h-96 text-white placeholder-gray-400"
+          className="w-full px-6 py-4 bg-banyan-bg-base border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-banyan-primary focus:border-banyan-primary transition-colors duration-200 resize-none h-96 text-banyan-text-default placeholder:text-banyan-text-subtle"
         />
       </div>
 
@@ -229,7 +229,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         <button
           onClick={handleBack}
           disabled={currentStep === 0}
-          className="rounded-lg border border-gray-600 px-6 py-3 text-gray-300 hover:text-white hover:border-gray-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-banyan-ghost disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Back
         </button>
@@ -237,7 +237,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         {currentStep < PROMPT_STEPS.length - 1 ? (
           <button
             onClick={handleNext}
-            className="rounded-lg bg-blue-600 hover:bg-blue-700 px-6 py-3 text-white font-medium transition-colors duration-200"
+            className="btn-banyan-primary"
           >
             Next
           </button>
@@ -245,7 +245,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="rounded-lg bg-blue-600 hover:bg-blue-700 px-6 py-3 text-white font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-banyan-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Generating Brief...' : 'Generate Brief'}
           </button>

@@ -6,28 +6,94 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     extend: {
+      // Banyan Design System Colors
       colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
+        banyan: {
+          // Brand
+          primary: '#1B4D3E',
+          'primary-contrast': '#F9FAF9',
+          
+          // Text
+          'text-default': '#1E1E1E',
+          'text-subtle': '#4A4A4A',
+          
+          // Background
+          'bg-base': '#F9FAF9',
+          'bg-surface': '#FFFFFF',
+          
+          // Border
+          'border-default': '#E2E2E2',
+          
+          // State
+          success: '#2FB57C',
+          warning: '#FFB64C',
+          error: '#E45757',
+          info: '#4B91F1',
+          
+          // Accent
+          sand: '#F4EDE2',
+          mist: '#E5EEF5',
         },
-        gray: {
-          50: '#f9fafb',
-          100: '#f3f4f6',
-          200: '#e5e7eb',
-          300: '#d1d5db',
-          400: '#9ca3af',
-          500: '#6b7280',
-          600: '#4b5563',
-          700: '#374151',
-          800: '#1f2937',
-          900: '#111827',
-        }
+      },
+      
+      // Banyan Typography
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Publico', 'Georgia', 'serif'],
+      },
+      fontSize: {
+        'display': ['64px', { lineHeight: '110%', letterSpacing: '0%' }],
+        'h1': ['48px', { lineHeight: '110%', letterSpacing: '0%' }],
+        'h2': ['32px', { lineHeight: '130%', letterSpacing: '0%' }],
+        'h3': ['24px', { lineHeight: '130%', letterSpacing: '0%' }],
+        'body': ['18px', { lineHeight: '160%', letterSpacing: '0%' }],
+        'caption': ['14px', { lineHeight: '160%', letterSpacing: '0%' }],
+      },
+      fontWeight: {
+        regular: '400',
+        medium: '500',
+        semibold: '600',
+      },
+      
+      // Banyan Spacing (8px rhythm)
+      spacing: {
+        'xxs': '4px',
+        'xs': '8px',
+        's': '12px',
+        'm': '16px',
+        'l': '24px',
+        'xl': '48px',
+        'xxl': '96px',
+      },
+      
+      // Banyan Border Radius
+      borderRadius: {
+        's': '4px',
+        'm': '8px',
+        'l': '12px',
+        'xl': '20px',
+      },
+      
+      // Banyan Shadows
+      boxShadow: {
+        'surface-low': '0 1px 2px rgba(0,0,0,0.06)',
+        'surface-mid': '0 2px 4px rgba(0,0,0,0.08)',
+        'surface-high': '0 4px 12px rgba(0,0,0,0.10)',
+      },
+      
+      // Banyan Motion
+      transitionDuration: {
+        'fast': '100ms',
+        'base': '200ms',
+        'slow': '300ms',
+      },
+      transitionTimingFunction: {
+        'banyan': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'banyan-in': 'cubic-bezier(0.4, 0, 1, 1)',
+        'banyan-out': 'cubic-bezier(0, 0, 0.2, 1)',
       },
     },
   },

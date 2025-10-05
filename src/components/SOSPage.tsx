@@ -199,39 +199,38 @@ export default function SOSPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'complete': return 'bg-green-100 text-green-800';
-      case 'draft': return 'bg-yellow-100 text-yellow-800';
-      case 'empty': return 'bg-gray-100 text-gray-600';
-      default: return 'bg-gray-100 text-gray-600';
+      case 'complete': return 'bg-banyan-success/20 text-banyan-success';
+      case 'draft': return 'bg-banyan-warning/20 text-banyan-warning';
+      case 'empty': return 'bg-banyan-bg-base text-banyan-text-subtle';
+      default: return 'bg-banyan-bg-base text-banyan-text-subtle';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-banyan-bg-base">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-banyan-bg-surface border-b border-banyan-border-default sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-banyan-text-default">
                 Strategic Operating System
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-banyan-text-subtle mt-1">
                 Your living documentation hub
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-500">Last updated: Today</span>
+              <span className="text-sm text-banyan-text-subtle">Last updated: Today</span>
               <button 
                 onClick={handleExportCurrent}
-                className="btn btn--ghost"
-                style={{ color: '#374151', borderColor: '#d1d5db' }}
+                className="btn-banyan-ghost"
               >
                 Export Current
               </button>
               <button 
                 onClick={handleExportAll}
-                className="btn"
+                className="btn-banyan-primary"
               >
                 Export All
               </button>
@@ -245,8 +244,8 @@ export default function SOSPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sticky top-24">
-              <h2 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+            <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-4 sticky top-24">
+              <h2 className="text-sm font-semibold text-banyan-text-default mb-3 uppercase tracking-wide">
                 Documents
               </h2>
               <nav className="space-y-2">
@@ -256,8 +255,8 @@ export default function SOSPage() {
                     onClick={() => setActiveDoc(doc.id)}
                     className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
                       activeDoc === doc.id
-                        ? 'bg-blue-50 border-2 border-blue-500 text-blue-900'
-                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                        ? 'bg-banyan-primary/10 border-2 border-banyan-primary text-banyan-primary'
+                        : 'bg-banyan-bg-base border border-banyan-border-default text-banyan-text-default hover:bg-banyan-mist'
                     }`}
                   >
                     <div className="flex items-start justify-between">
@@ -266,7 +265,7 @@ export default function SOSPage() {
                         <div>
                           <div className="font-medium text-sm">{doc.title}</div>
                           {doc.lastUpdated && (
-                            <div className="text-xs text-gray-500 mt-0.5">
+                            <div className="text-xs text-banyan-text-subtle mt-0.5">
                               {doc.lastUpdated}
                             </div>
                           )}
@@ -277,7 +276,7 @@ export default function SOSPage() {
                           {doc.status}
                         </span>
                         {doc.completionPercent !== undefined && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-banyan-text-subtle">
                             {doc.completionPercent}%
                           </span>
                         )}
@@ -296,15 +295,15 @@ export default function SOSPage() {
             )}
             
             {activeDoc === 'executive-onepager' && (
-              <div className="bg-white rounded-lg shadow-sm p-8">
+              <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Executive One-Pager</h2>
+                  <h2 className="text-2xl font-bold text-banyan-text-default">Executive One-Pager</h2>
                 </div>
                 {visionV2Content?.executiveOnePager ? (
                   <>
                     <div className="prose prose-sm max-w-none">
                       <div 
-                        className="whitespace-pre-wrap text-gray-700 leading-relaxed text-sm"
+                        className="whitespace-pre-wrap text-banyan-text-default leading-relaxed text-sm"
                         dangerouslySetInnerHTML={{ 
                           __html: visionV2Content.executiveOnePager
                            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -316,15 +315,15 @@ export default function SOSPage() {
                         }}
                       />
                     </div>
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                      <p className="text-sm text-gray-500">
+                    <div className="mt-6 pt-6 border-t border-banyan-border-default">
+                      <p className="text-sm text-banyan-text-subtle">
                         <strong>Purpose:</strong> Quick reference for team / board / advisors
                       </p>
                     </div>
                   </>
                 ) : (
                   <div className="prose prose-sm max-w-none">
-                    <p className="text-gray-600">
+                    <p className="text-banyan-text-subtle">
                       Your executive one-pager will appear here. Generate a Vision Framework first.
                     </p>
                   </div>
@@ -333,28 +332,28 @@ export default function SOSPage() {
             )}
             
             {activeDoc === 'founder-brief' && (
-              <div className="bg-white rounded-lg shadow-sm p-8">
+              <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Founder Brief</h2>
+                  <h2 className="text-2xl font-bold text-banyan-text-default">Founder Brief</h2>
                 </div>
                 {briefContent?.founderBrief ? (
                   <>
                     <div className="prose prose-sm max-w-none">
-                      <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                      <div className="whitespace-pre-wrap text-banyan-text-default leading-relaxed">
                         <ReactMarkdown>{briefContent.founderBrief}</ReactMarkdown>
                       </div>
                     </div>
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                      <p className="text-sm text-gray-500">
+                    <div className="mt-6 pt-6 border-t border-banyan-border-default">
+                      <p className="text-sm text-banyan-text-subtle">
                         <strong>Purpose:</strong> Internal narrative for founders, team, and advisors
                       </p>
                     </div>
                   </>
                 ) : (
                   <div className="prose prose-sm max-w-none">
-                    <p className="text-gray-600">
+                    <p className="text-banyan-text-subtle">
                       Your founder brief will appear here. Generate a brief from the{' '}
-                      <a href="/new" className="link-underline text-blue-600">
+                      <a href="/new" className="link-underline text-banyan-primary">
                         Create Brief
                       </a>{' '}
                       page.
@@ -365,15 +364,15 @@ export default function SOSPage() {
             )}
             
             {activeDoc === 'vc-summary' && (
-              <div className="bg-white rounded-lg shadow-sm p-8">
+              <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">VC Summary</h2>
+                  <h2 className="text-2xl font-bold text-banyan-text-default">VC Summary</h2>
                 </div>
                 {briefContent?.vcSummaryStructured ? (
                   <>
                     <VcSummaryDisplay summary={briefContent.vcSummaryStructured} />
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                      <p className="text-sm text-gray-500">
+                    <div className="mt-6 pt-6 border-t border-banyan-border-default">
+                      <p className="text-sm text-banyan-text-subtle">
                         <strong>Purpose:</strong> Investor pitch deck companion / email intro
                       </p>
                     </div>
@@ -381,24 +380,24 @@ export default function SOSPage() {
                 ) : briefContent?.vcSummary ? (
                   <>
                     <div className="prose prose-sm max-w-none">
-                      <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                      <div className="whitespace-pre-wrap text-banyan-text-default leading-relaxed">
                         <ReactMarkdown>{briefContent.vcSummary}</ReactMarkdown>
                       </div>
                     </div>
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                      <p className="text-sm text-gray-500">
+                    <div className="mt-6 pt-6 border-t border-banyan-border-default">
+                      <p className="text-sm text-banyan-text-subtle">
                         <strong>Purpose:</strong> Investor pitch deck companion / email intro
                       </p>
-                      <p className="text-xs text-gray-400 mt-2">
+                      <p className="text-xs text-banyan-text-subtle mt-2">
                         Note: Using fallback markdown format. Generate a new brief for structured format.
                       </p>
                     </div>
                   </>
                 ) : (
                   <div className="prose prose-sm max-w-none">
-                    <p className="text-gray-600">
+                    <p className="text-banyan-text-subtle">
                       Your VC summary will appear here. Generate a brief from the{' '}
-                      <a href="/new" className="link-underline text-blue-600">
+                      <a href="/new" className="link-underline text-banyan-primary">
                         Create Brief
                       </a>{' '}
                       page.
@@ -409,34 +408,34 @@ export default function SOSPage() {
             )}
             
             {activeDoc === 'qa-results' && (
-              <div className="bg-white rounded-lg shadow-sm p-8">
+              <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">QA Results</h2>
+                  <h2 className="text-2xl font-bold text-banyan-text-default">QA Results</h2>
                 </div>
                 {visionV2Content?.qaResults ? (
                   <div className="space-y-6">
                     {/* Overall Score */}
-                    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <div className="bg-banyan-bg-base rounded-lg p-6 border border-banyan-border-default">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl font-semibold text-gray-900">Overall Quality</h3>
-                        <span className="text-3xl font-bold text-green-600">
+                        <h3 className="text-xl font-semibold text-banyan-text-default">Overall Quality</h3>
+                        <span className="text-3xl font-bold text-banyan-success">
                           {visionV2Content.qaResults.overallScore || 'N/A'}%
                         </span>
                       </div>
                       {visionV2Content.qaResults.summary && (
-                        <p className="text-gray-700">{visionV2Content.qaResults.summary}</p>
+                        <p className="text-banyan-text-default">{visionV2Content.qaResults.summary}</p>
                       )}
                     </div>
 
                     {/* Issues Found */}
                     {visionV2Content.qaResults.issues && visionV2Content.qaResults.issues.length > 0 && (
-                      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Issues Found</h3>
+                      <div className="bg-banyan-bg-base rounded-lg p-6 border border-banyan-border-default">
+                        <h3 className="text-xl font-semibold text-banyan-text-default mb-4">Issues Found</h3>
                         <div className="space-y-3">
                           {visionV2Content.qaResults.issues.map((issue: any, idx: number) => (
-                            <div key={idx} className="border-l-4 border-yellow-500 pl-4 py-2 bg-white rounded">
-                              <p className="text-sm font-medium text-yellow-700">{issue.severity || 'Warning'}</p>
-                              <p className="text-gray-700 mt-1">{issue.description || issue}</p>
+                            <div key={idx} className="border-l-4 border-banyan-warning pl-4 py-2 bg-banyan-bg-surface rounded">
+                              <p className="text-sm font-medium text-banyan-warning">{issue.severity || 'Warning'}</p>
+                              <p className="text-banyan-text-default mt-1">{issue.description || issue}</p>
                             </div>
                           ))}
                         </div>
@@ -445,12 +444,12 @@ export default function SOSPage() {
 
                     {/* Recommendations */}
                     {visionV2Content.qaResults.recommendations && visionV2Content.qaResults.recommendations.length > 0 && (
-                      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Recommendations</h3>
+                      <div className="bg-banyan-bg-base rounded-lg p-6 border border-banyan-border-default">
+                        <h3 className="text-xl font-semibold text-banyan-text-default mb-4">Recommendations</h3>
                         <div className="space-y-3">
                           {visionV2Content.qaResults.recommendations.map((rec: any, idx: number) => (
-                            <div key={idx} className="border-l-4 border-blue-500 pl-4 py-2 bg-white rounded">
-                              <p className="text-gray-700">{rec.text || rec}</p>
+                            <div key={idx} className="border-l-4 border-banyan-primary pl-4 py-2 bg-banyan-bg-surface rounded">
+                              <p className="text-banyan-text-default">{rec.text || rec}</p>
                             </div>
                           ))}
                         </div>
@@ -459,7 +458,7 @@ export default function SOSPage() {
                   </div>
                 ) : (
                   <div className="prose prose-sm max-w-none">
-                    <p className="text-gray-600">
+                    <p className="text-banyan-text-subtle">
                       QA results will appear here. Generate a Vision Framework first.
                     </p>
                   </div>

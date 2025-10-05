@@ -6,10 +6,10 @@ interface TopNavProps {
 
 export default function TopNav({ showDashboard = false }: TopNavProps) {
   return (
-    <nav className="bg-white border-b border-gray-200">
+    <nav className="bg-banyan-bg-surface border-b border-banyan-border-default">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="text-xl font-bold text-primary-600">
+          <Link href="/" className="text-xl font-bold text-banyan-primary">
             Banyan
           </Link>
           
@@ -17,14 +17,14 @@ export default function TopNav({ showDashboard = false }: TopNavProps) {
             {showDashboard && (
               <Link 
                 href="/dashboard" 
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-banyan-text-subtle hover:text-banyan-text-default transition-colors"
               >
                 Dashboard
               </Link>
             )}
             <Link 
               href="/new" 
-              className="btn-primary text-sm"
+              className="btn-banyan-primary text-sm"
             >
               New Brief
             </Link>

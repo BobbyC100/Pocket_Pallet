@@ -12,28 +12,28 @@ export function AppHeader() {
   }, []);
 
   return (
-    <header style={{ background: 'var(--surface)', borderBottom: 'var(--divider)' }}>
+    <header className="bg-banyan-bg-surface border-b border-banyan-border-default">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link href="/" className="text-xl font-bold link-underline" style={{ color: 'var(--text)' }}>
+        <Link href="/" className="text-xl font-bold link-underline text-banyan-text-default">
           Banyan
         </Link>
 
         <nav className="flex items-center gap-4">
-          <Link href="/new" className="link-underline" style={{ padding: '0.5rem 0.75rem', color: 'var(--text)' }}>
+          <Link href="/new" className="link-underline px-3 py-2 text-banyan-text-default">
             New Brief
           </Link>
           
           {mounted && (
             <>
               <SignedIn>
-                <Link href="/sos" className="link-underline" style={{ padding: '0.5rem 0.75rem', color: 'var(--text)' }}>
+                <Link href="/sos" className="link-underline px-3 py-2 text-banyan-text-default">
                   Documents
                 </Link>
               </SignedIn>
             </>
           )}
           
-          <Link href="/showcase" className="link-underline" style={{ padding: '0.5rem 0.75rem', color: 'var(--text)' }}>
+          <Link href="/showcase" className="link-underline px-3 py-2 text-banyan-text-default">
             Examples
           </Link>
 
@@ -41,12 +41,12 @@ export function AppHeader() {
             <>
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="btn btn--ghost" style={{ padding: '0.6rem 1rem', fontSize: '0.9rem' }}>
+                  <button className="btn-banyan-ghost">
                     Sign in
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button className="btn" style={{ padding: '0.6rem 1rem', fontSize: '0.9rem' }}>
+                  <button className="btn-banyan-primary">
                     Sign up
                   </button>
                 </SignUpButton>
