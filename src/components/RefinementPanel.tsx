@@ -125,7 +125,7 @@ export default function RefinementPanel({
               disabled={isRefining}
               className="px-4 py-2 text-sm bg-banyan-warning/10 hover:bg-banyan-warning/20 text-banyan-warning rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-2 border-banyan-warning/40 hover:border-banyan-warning font-medium"
             >
-              ⚠️ Regenerate from Scratch
+              Regenerate from Scratch
             </button>
             <p className="text-xs text-banyan-text-subtle mt-1 italic">
               Completely rewrites this section. Use only if current version misses the mark.

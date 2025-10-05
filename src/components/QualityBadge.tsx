@@ -15,9 +15,9 @@ export default function QualityBadge({ score, alignment, issues = [], suggestion
   }
 
   const getQualityLevel = () => {
-    if (score >= 8) return { level: 'Excellent', color: 'bg-banyan-success', textColor: 'text-banyan-success', emoji: '✨' };
-    if (score >= 6) return { level: 'Good', color: 'bg-banyan-warning', textColor: 'text-banyan-warning', emoji: '⚠️' };
-    return { level: 'Needs Work', color: 'bg-banyan-error', textColor: 'text-banyan-error', emoji: '🔴' };
+    if (score >= 8) return { level: 'Excellent', color: 'bg-banyan-success', textColor: 'text-banyan-success' };
+    if (score >= 6) return { level: 'Good', color: 'bg-banyan-warning', textColor: 'text-banyan-warning' };
+    return { level: 'Needs Work', color: 'bg-banyan-error', textColor: 'text-banyan-error' };
   };
 
   const quality = getQualityLevel();
@@ -68,7 +68,7 @@ export default function QualityBadge({ score, alignment, issues = [], suggestion
       {suggestions.length > 0 && (
         <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-banyan-primary/10">
           <span className="text-xs text-banyan-primary">
-            💡 {suggestions.length} {suggestions.length === 1 ? 'suggestion' : 'suggestions'}
+            {suggestions.length} {suggestions.length === 1 ? 'suggestion' : 'suggestions'}
           </span>
         </div>
       )}

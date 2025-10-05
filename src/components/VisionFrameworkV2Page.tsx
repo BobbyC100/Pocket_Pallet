@@ -84,7 +84,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
         throw new Error(error.error || 'Failed to save');
       }
 
-      setMessage({ type: 'success', text: '✅ Vision Framework saved!' });
+      setMessage({ type: 'success', text: 'Vision Framework saved!' });
       
       // Analytics: Track save event
       try {
@@ -211,7 +211,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
       // Show success message
       setMessage({
         type: 'success',
-        text: `✨ ${section.charAt(0).toUpperCase() + section.slice(1)} refined successfully!`
+        text: `${section.charAt(0).toUpperCase() + section.slice(1)} refined successfully!`
       });
 
       // Clear message after 3 seconds

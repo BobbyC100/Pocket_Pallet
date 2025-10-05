@@ -314,17 +314,17 @@
 </head>
 <body>
   <div class="container">
-    <h1>🎯 Vision Framework Scoring Test</h1>
+    <h1>Vision Framework Scoring Test</h1>
     <p class="subtitle">Test the scoring API directly without generating a full framework. Perfect for iterating on scoring prompts.</p>
     
     <div class="info-box">
-      💡 <strong>Quick Start:</strong> Click a preset below to load sample data, or paste your own framework JSON and responses. Then hit "Run Scoring Test" to see quality assessment.
+      <strong>Quick Start:</strong> Click a preset below to load sample data, or paste your own framework JSON and responses. Then hit "Run Scoring Test" to see quality assessment.
     </div>
     
     <div class="layout">
       <!-- Input Panel -->
       <div class="panel">
-        <h2>📝 Framework JSON</h2>
+        <h2>Framework JSON</h2>
         <div class="preset-buttons">
           <button class="btn-preset" onclick="loadGoodExample()">Load Good Example</button>
           <button class="btn-preset" onclick="loadPoorExample()">Load Poor Example</button>
@@ -333,26 +333,26 @@
         </div>
         <textarea id="frameworkInput" placeholder='Paste Vision Framework JSON here...'></textarea>
         
-        <h2 style="margin-top: 20px;">💬 Original Responses (Optional)</h2>
+        <h2 style="margin-top: 20px;">Original Responses (Optional)</h2>
         <textarea id="responsesInput" style="min-height: 200px;" placeholder='Paste original founder responses JSON here (for alignment scoring)...'></textarea>
       </div>
       
       <!-- Results Panel -->
       <div class="panel">
-        <h2>📊 Scoring Results</h2>
+        <h2>Scoring Results</h2>
         <div id="results" style="color: #999;">Results will appear here after scoring...</div>
       </div>
     </div>
     
     <div class="button-group">
       <button class="btn-primary" onclick="runScoring()" id="scoreBtn">
-        🚀 Run Scoring Test
+        Run Scoring Test
       </button>
       <button class="btn-secondary" onclick="copyResults()">
-        📋 Copy Results
+        Copy Results
       </button>
       <button class="btn-success" onclick="validateFramework()">
-        ✓ Validate JSON
+        Validate JSON
       </button>
     </div>
   </div>
@@ -543,13 +543,13 @@
         const missing = required.filter(field => !framework[field]);
         
         if (missing.length > 0) {
-          alert(`❌ Missing required fields: ${missing.join(', ')}`);
+          alert(`Missing required fields: ${missing.join(', ')}`);
           return;
         }
         
-        alert('✅ Valid JSON structure! Ready to score.');
+        alert('Valid JSON structure! Ready to score.');
       } catch (error) {
-        alert(`❌ Invalid JSON: ${error.message}`);
+        alert(`Invalid JSON: ${error.message}`);
       }
     }
 
@@ -573,7 +573,7 @@
         // Update button
         btn.disabled = true;
         btn.innerHTML = '<span class="loading"></span>Scoring...';
-        results.innerHTML = '<div style="color: #999; text-align: center; padding: 40px;">🔍 Analyzing framework quality...</div>';
+        results.innerHTML = '<div style="color: #999; text-align: center; padding: 40px;">Analyzing framework quality...</div>';
         
         // Call scoring API
         const startTime = Date.now();
@@ -603,12 +603,12 @@
       } catch (error) {
         results.innerHTML = `
           <div class="error-message">
-            <strong>❌ Error:</strong> ${error.message}
+            <strong>Error:</strong> ${error.message}
           </div>
         `;
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '🚀 Run Scoring Test';
+        btn.innerHTML = 'Run Scoring Test';
       }
     }
 
@@ -623,7 +623,7 @@
           <div style="opacity: 0.8; font-size: 13px;">Completed in ${duration}s</div>
           ${weakSections && weakSections.length > 0 ? `
             <div class="weak-sections">
-              <div class="weak-sections-title">⚠️ Sections needing attention:</div>
+              <div class="weak-sections-title">Sections needing attention:</div>
               <div class="weak-sections-list">
                 ${weakSections.map(s => `<span class="weak-tag">${s.replace('_', ' ')}</span>`).join('')}
               </div>
@@ -669,7 +669,7 @@
             
             ${data.issues && data.issues.length > 0 ? `
               <div class="feedback-section">
-                <div class="feedback-title">❌ Issues</div>
+                <div class="feedback-title">Issues</div>
                 <ul class="feedback-list issues">
                   ${data.issues.map(issue => `<li>${issue}</li>`).join('')}
                 </ul>
@@ -678,7 +678,7 @@
             
             ${data.suggestions && data.suggestions.length > 0 ? `
               <div class="feedback-section">
-                <div class="feedback-title">💡 Suggestions</div>
+                <div class="feedback-title">Suggestions</div>
                 <ul class="feedback-list suggestions">
                   ${data.suggestions.map(sug => `<li>${sug}</li>`).join('')}
                 </ul>
@@ -687,7 +687,7 @@
             
             ${data.strengths && data.strengths.length > 0 ? `
               <div class="feedback-section">
-                <div class="feedback-title">✅ Strengths</div>
+                <div class="feedback-title">Strengths</div>
                 <ul class="feedback-list strengths">
                   ${data.strengths.map(str => `<li>${str}</li>`).join('')}
                 </ul>
@@ -705,9 +705,9 @@
       const text = results.innerText;
       
       navigator.clipboard.writeText(text).then(() => {
-        alert('✅ Results copied to clipboard!');
+        alert('Results copied to clipboard!');
       }).catch(err => {
-        alert('❌ Failed to copy: ' + err.message);
+        alert('Failed to copy: ' + err.message);
       });
     }
 

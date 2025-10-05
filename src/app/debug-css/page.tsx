@@ -47,7 +47,7 @@ export default function DebugCSSPage() {
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'monospace' }}>
-      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>🔍 CSS Debug Page</h1>
+      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>CSS Debug Page</h1>
       
       <div style={{ marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Current Theme</h2>

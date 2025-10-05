@@ -225,7 +225,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
           onClick={loadTestData}
           className="px-4 py-2 bg-banyan-success hover:bg-banyan-success/80 text-banyan-primary-contrast text-sm font-medium rounded-lg transition-colors duration-200"
         >
-          🚀 Load Test Data (YardBird)
+          Load Test Data (YardBird)
         </button>
         <p className="text-xs text-banyan-text-subtle mt-1">
           Auto-fills all fields with sample construction logistics startup data

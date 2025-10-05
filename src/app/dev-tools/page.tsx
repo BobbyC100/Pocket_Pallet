@@ -20,7 +20,7 @@ export default function DevToolsPage() {
       category: 'Vision Framework Testing',
       items: [
         {
-          title: '🎯 Scoring Test Tool',
+          title: 'Scoring Test Tool',
           description: 'Test vision framework scoring directly without generating full frameworks. 93% cost savings.',
           href: '/test-scoring.html',
           badge: 'New',
@@ -32,22 +32,22 @@ export default function DevToolsPage() {
       category: 'Production Testing',
       items: [
         {
-          title: '🧪 Auto-Test Suite',
+          title: 'Auto-Test Suite',
           description: 'Automated testing suite for end-to-end validation',
           href: '/auto-test.html'
         },
         {
-          title: '🐦 YardBird Injector',
+          title: 'YardBird Injector',
           description: 'Session storage testing with sample construction startup data',
           href: '/yardbird-injector.html'
         },
         {
-          title: '🔍 Debug Vision Framework',
+          title: 'Debug Vision Framework',
           description: 'Comprehensive debugging tools for vision framework generation',
           href: '/debug-vision-framework.html'
         },
         {
-          title: '💾 Session Storage Test',
+          title: 'Session Storage Test',
           description: 'Validation testing for session storage persistence',
           href: '/test-session-storage.html'
         }
@@ -57,29 +57,29 @@ export default function DevToolsPage() {
       category: 'Application Pages',
       items: [
         {
-          title: '🏠 Landing Page',
+          title: 'Landing Page',
           description: 'Main landing page with product overview',
           href: '/'
         },
         {
-          title: '📝 Create Brief',
+          title: 'Create Brief',
           description: 'Six-step wizard to generate investor briefs',
           href: '/new'
         },
         {
-          title: '🎯 Vision Framework V2',
+          title: 'Vision Framework V2',
           description: 'New vision framework editor with refinement',
           href: '/vision-framework-v2',
           badge: 'V2',
           badgeColor: 'bg-blue-100 text-blue-800'
         },
         {
-          title: '📊 Dashboard',
+          title: 'Dashboard',
           description: 'View and manage your saved briefs',
           href: '/dashboard'
         },
         {
-          title: '🎨 Design System Demo',
+          title: 'Design System Demo',
           description: 'Component library and design token showcase',
           href: '/design-system-demo'
         }
@@ -107,7 +107,7 @@ export default function DevToolsPage() {
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            🛠️ Developer Tools
+            Developer Tools
           </h1>
           <p className="text-lg text-gray-600">
             Testing utilities, debug tools, and quick access to all application pages
@@ -169,7 +169,7 @@ export default function DevToolsPage() {
 
         {/* Quick Stats */}
         <div className="mt-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 text-white">
-          <h3 className="text-2xl font-bold mb-4">💡 Quick Tips</h3>
+          <h3 className="text-2xl font-bold mb-4">Quick Tips</h3>
           <div className="grid md:grid-cols-3 gap-6">
             <div>
               <div className="text-3xl font-bold mb-2">93%</div>
