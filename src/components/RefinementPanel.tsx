@@ -87,35 +87,35 @@ export default function RefinementPanel({
             disabled={isRefining}
             className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            🎯 More Specific
+            More Specific
           </button>
           <button
             onClick={() => handleQuickAction('more_concise')}
             disabled={isRefining}
             className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            ✂️ More Concise
+            More Concise
           </button>
           <button
             onClick={() => handleQuickAction('different_angle')}
             disabled={isRefining}
             className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            🔄 Different Angle
+            Different Angle
           </button>
           <button
             onClick={() => handleQuickAction('add_detail')}
             disabled={isRefining}
             className="px-3 py-1.5 text-xs bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            ➕ Add Detail
+            Add Detail
           </button>
           <button
             onClick={() => handleQuickAction('regenerate')}
             disabled={isRefining}
             className="px-3 py-1.5 text-xs bg-banyan-warning/20 hover:bg-banyan-warning/30 text-banyan-warning rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            🔃 Regenerate
+            Regenerate
           </button>
         </div>
       )}
