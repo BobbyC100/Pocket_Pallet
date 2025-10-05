@@ -38,7 +38,6 @@ export default function QualityBadge({ score, alignment, issues = [], suggestion
       {/* Voice Misalignment Badge - PRIORITY FLAG */}
       {hasLowAlignment && (
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-banyan-error/20 border-2 border-banyan-error animate-pulse">
-          <span className="text-sm">🚨</span>
           <span className="text-xs font-bold text-banyan-error">
             Voice Misalignment
           </span>
@@ -49,7 +48,7 @@ export default function QualityBadge({ score, alignment, issues = [], suggestion
       {score < 6 && !hasLowAlignment && (
         <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-banyan-warning/10 border border-banyan-warning">
           <span className="text-xs font-medium text-banyan-warning">
-            👀 Needs Attention
+            Needs Attention
           </span>
         </div>
       )}
