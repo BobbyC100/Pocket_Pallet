@@ -149,6 +149,7 @@ ${sectionGuidance[section] || ''}
    - Specificity (1-10): Is it concrete or generic?
    - Actionability (1-10): Can someone act on this?
    - Alignment (1-10): Does it match the founder's intent?
+   - Measurability (1-10): Only for bets/metrics sections - is success measurable?
 
 **Return JSON:**
 
@@ -163,10 +164,16 @@ ${sectionGuidance[section] || ''}
     "specificity": 8,
     "actionability": 7,
     "alignment": 9,
-    "summary": "Brief explanation of what changed and why it's better"
+    "measurability": ${section === 'near_term_bets' || section === 'metrics' ? '8' : '0'},
+    "overallScore": 8.0,
+    "issues": [],
+    "suggestions": ["What could still be improved?"],
+    "strengths": ["What's particularly strong about this refined version?"]
   }
 }
 \`\`\`
+
+Note: overallScore should be the average of applicable criteria (specificity, actionability, alignment, and measurability if applicable).
 
 **Important:**
 - If the feedback is vague, interpret it generously and make the content better

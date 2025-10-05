@@ -123,6 +123,9 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
 
       const result = await response.json();
       
+      console.log('🔍 Refinement API response:', result);
+      console.log('🔍 Quality data:', result.quality);
+      
       // Update the framework with refined content
       setFramework({
         ...framework,
@@ -131,10 +134,17 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
 
       // Store quality scores
       if (result.quality) {
-        setSectionQualities(prev => ({
-          ...prev,
-          [section]: result.quality
-        }));
+        console.log('✅ Updating quality scores for section:', section, result.quality);
+        setSectionQualities(prev => {
+          const updated = {
+            ...prev,
+            [section]: result.quality
+          };
+          console.log('📊 All section qualities:', updated);
+          return updated;
+        });
+      } else {
+        console.warn('⚠️ No quality data returned from refinement API');
       }
 
       // Show success message
