@@ -203,6 +203,8 @@ For each section, rate on a scale of 1-10:
 \`\`\`
 
 **Be honest:** A score of 8-9 means "this gets a meeting". 6-7 means "needs work but interesting". Below 6 means "pass". Most first drafts score 5-7.
+
+**IMPORTANT:** Do NOT include emojis in the issues, suggestions, or strengths arrays. Use plain text only.
 `;
 
   try {
