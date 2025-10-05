@@ -464,7 +464,7 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-400">Loading vision framework...</div>
+        <div className="text-banyan-text-subtle">Loading vision framework...</div>
       </div>
     );
   }
@@ -472,7 +472,7 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
   if (!framework) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-400">Failed to load vision framework</div>
+        <div className="text-banyan-text-subtle">Failed to load vision framework</div>
       </div>
     );
   }
@@ -481,33 +481,33 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
     <div className="max-w-7xl mx-auto p-6">
       {/* Breadcrumb */}
       {fromBrief && (
-        <div className="mb-4 flex items-center text-sm text-gray-400">
-          <a href="/new" className="hover:text-white transition-colors">← Back to Brief</a>
+        <div className="mb-4 flex items-center text-sm text-banyan-text-subtle">
+          <a href="/new" className="hover:text-banyan-text-default transition-colors">← Back to Brief</a>
           <span className="mx-2">•</span>
-          <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">From Brief</span>
+          <span className="bg-banyan-primary text-banyan-primary-contrast px-2 py-1 rounded text-xs">From Brief</span>
         </div>
       )}
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Vision Framework</h1>
-        <p className="text-gray-300">
+        <h1 className="text-3xl font-bold text-banyan-text-default mb-2">Vision Framework</h1>
+        <p className="text-banyan-text-subtle">
           The foundational story and principles that guide all company operations.
         </p>
         
         {/* Progress Bar */}
         <div className="mt-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-300">Completion Progress</span>
-            <span className="text-sm text-gray-400">{completionProgress}%</span>
+            <span className="text-sm font-medium text-banyan-text-default">Completion Progress</span>
+            <span className="text-sm text-banyan-text-subtle">{completionProgress}%</span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-banyan-border-default rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-banyan-primary h-2 rounded-full transition-all duration-300"
               style={{ width: `${completionProgress}%` }}
             />
           </div>
           {completionProgress < 100 && (
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-banyan-text-subtle mt-1">
               Complete the required fields to finish your Vision Framework
             </p>
           )}
@@ -516,10 +516,10 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
 
       {/* Alignment Warnings */}
       {alignmentWarnings.length > 0 && (
-        <div className="mb-6 p-4 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+        <div className="mb-6 p-4 bg-banyan-warning/20 border border-banyan-warning rounded-lg">
           <div className="flex items-center">
-            <div className="text-yellow-400 mr-2">⚠️</div>
-            <div className="text-yellow-200">
+            <div className="text-banyan-warning mr-2">⚠️</div>
+            <div className="text-banyan-text-default">
               {alignmentWarnings.map((warning, index) => (
                 <div key={index}>{warning}</div>
               ))}
@@ -530,10 +530,10 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
 
       {/* Validation Errors */}
       {validationErrors.length > 0 && (
-        <div className="mb-6 p-4 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+        <div className="mb-6 p-4 bg-banyan-warning/20 border border-banyan-warning rounded-lg">
           <div className="flex items-center">
-            <div className="text-yellow-400 mr-2">⚠️</div>
-            <div className="text-yellow-200">
+            <div className="text-banyan-warning mr-2">⚠️</div>
+            <div className="text-banyan-text-default">
               <div className="font-semibold mb-2">Complete these fields to finish your Vision Framework:</div>
               {validationErrors.map((error, index) => (
                 <div key={index} className="text-sm">• {error}</div>
@@ -546,42 +546,42 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Left Sidebar - Navigation */}
         <div className="lg:col-span-1">
-          <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 sticky top-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Sections</h2>
+          <div className="bg-banyan-bg-surface rounded-2xl border border-banyan-border-default p-6 sticky top-6 shadow-banyan-mid">
+            <h2 className="text-lg font-semibold text-banyan-text-default mb-4">Sections</h2>
             
             <div className="space-y-2">
-              <div className="text-sm text-gray-400 mb-2">Roots</div>
+              <div className="text-sm text-banyan-text-subtle mb-2">Roots</div>
               {['vision', 'mission', 'principles'].map((section) => (
                 <button
                   key={section}
                   onClick={() => setActiveSection(section)}
                   className={`w-full text-left px-3 py-2 rounded-lg font-medium transition-colors flex items-center justify-between ${
                     activeSection === section
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-700'
+                      ? 'bg-banyan-primary text-banyan-primary-contrast'
+                      : 'text-banyan-text-subtle hover:bg-banyan-bg-base'
                   }`}
                 >
                   <span>{section.charAt(0).toUpperCase() + section.slice(1)}</span>
                   {autoFilledFields.some(f => f.startsWith(section === 'principles' ? 'operatingPrinciples' : section + '.')) && (
-                    <span className="text-xs bg-green-600 text-white px-1 py-0.5 rounded">Auto</span>
+                    <span className="text-xs bg-banyan-success text-banyan-primary-contrast px-1 py-0.5 rounded">Auto</span>
                   )}
                 </button>
               ))}
               
-              <div className="text-sm text-gray-400 mb-2 mt-4">Trunk</div>
+              <div className="text-sm text-banyan-text-subtle mb-2 mt-4">Trunk</div>
               {['objectives', 'brand'].map((section) => (
                 <button
                   key={section}
                   onClick={() => setActiveSection(section)}
                   className={`w-full text-left px-3 py-2 rounded-lg font-medium transition-colors flex items-center justify-between ${
                     activeSection === section
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-700'
+                      ? 'bg-banyan-primary text-banyan-primary-contrast'
+                      : 'text-banyan-text-subtle hover:bg-banyan-bg-base'
                   }`}
                 >
                   <span>{section.charAt(0).toUpperCase() + section.slice(1)}</span>
                   {autoFilledFields.some(f => f.startsWith(section === 'brand' ? 'brandBrief' : section + '.')) && (
-                    <span className="text-xs bg-green-600 text-white px-1 py-0.5 rounded">Auto</span>
+                    <span className="text-xs bg-banyan-success text-banyan-primary-contrast px-1 py-0.5 rounded">Auto</span>
                   )}
                 </button>
               ))}
@@ -590,10 +590,10 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
             {/* Edit History */}
             {editHistory.length > 0 && (
               <div className="mt-6">
-                <h3 className="text-sm font-semibold text-gray-300 mb-2">Recent Changes</h3>
+                <h3 className="text-sm font-semibold text-banyan-text-default mb-2">Recent Changes</h3>
                 <div className="space-y-1">
                   {editHistory.slice(0, 5).map((entry, index) => (
-                    <div key={index} className="text-xs text-gray-400">
+                    <div key={index} className="text-xs text-banyan-text-subtle">
                       <div className="font-medium">{entry.section}</div>
                       <div>{new Date(entry.timestamp).toLocaleDateString()}</div>
                     </div>
@@ -606,29 +606,29 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
 
         {/* Right Pane - Content Editor */}
         <div className="lg:col-span-3">
-          <div className="bg-gray-800 rounded-2xl border border-gray-700 p-8">
+          <div className="bg-banyan-bg-surface rounded-2xl border border-banyan-border-default p-8 shadow-banyan-mid">
             {/* Section Header with Export Options */}
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-white capitalize">
+              <h2 className="text-2xl font-bold text-banyan-text-default capitalize">
                 {activeSection}
               </h2>
               <div className="flex space-x-2">
                 <button
                   onClick={() => setShowCompleteView(!showCompleteView)}
-                  className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors"
+                  className="px-3 py-1 bg-banyan-success hover:bg-banyan-success/80 text-banyan-primary-contrast text-sm rounded-lg transition-colors"
                 >
                   {showCompleteView ? 'Edit Mode' : 'View Complete'}
                 </button>
                 <button
                   onClick={handleExportMarkdown}
-                  className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+                  className="px-3 py-1 bg-banyan-bg-base hover:bg-banyan-mist text-banyan-text-default text-sm rounded-lg transition-colors"
                 >
                   Export MD
                 </button>
                 <button
                   onClick={handleExportPDF}
                   disabled={isExporting}
-                  className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-banyan-text-default text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isExporting ? 'Exporting...' : 'Export PDF'}
                 </button>
@@ -637,44 +637,44 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
 
             {/* Complete Framework View */}
             {showCompleteView && framework && (
-              <div className="mb-8 p-6 bg-gray-900 rounded-xl border border-gray-600">
-                <h3 className="text-xl font-bold text-white mb-4">Complete Vision Framework</h3>
+                <div className="mb-8 p-6 bg-banyan-bg-base rounded-xl border border-banyan-border-default">
+                <h3 className="text-xl font-bold text-banyan-text-default mb-4">Complete Vision Framework</h3>
                 <div className="prose prose-invert max-w-none">
                   <div className="space-y-6">
                     {/* Vision */}
                     <div>
-                      <h4 className="text-lg font-semibold text-blue-400 mb-2">Vision</h4>
+                      <h4 className="text-lg font-semibold text-banyan-primary mb-2">Vision</h4>
                       <div className="space-y-2">
                         <div>
-                          <span className="text-gray-400 text-sm">Purpose:</span>
-                          <p className="text-white">{framework.vision.purpose}</p>
+                          <span className="text-banyan-text-subtle text-sm">Purpose:</span>
+                          <p className="text-banyan-text-default">{framework.vision.purpose}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400 text-sm">End State:</span>
-                          <p className="text-white">{framework.vision.endState}</p>
+                          <span className="text-banyan-text-subtle text-sm">End State:</span>
+                          <p className="text-banyan-text-default">{framework.vision.endState}</p>
                         </div>
                       </div>
                     </div>
 
                     {/* Mission */}
                     <div>
-                      <h4 className="text-lg font-semibold text-blue-400 mb-2">Mission</h4>
+                      <h4 className="text-lg font-semibold text-banyan-primary mb-2">Mission</h4>
                       <div className="space-y-2">
                         <div>
-                          <span className="text-gray-400 text-sm">What We Do:</span>
-                          <p className="text-white">{framework.mission.whatWeDo}</p>
+                          <span className="text-banyan-text-subtle text-sm">What We Do:</span>
+                          <p className="text-banyan-text-default">{framework.mission.whatWeDo}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400 text-sm">Who For:</span>
-                          <p className="text-white">{framework.mission.whoFor}</p>
+                          <span className="text-banyan-text-subtle text-sm">Who For:</span>
+                          <p className="text-banyan-text-default">{framework.mission.whoFor}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400 text-sm">How We Win:</span>
-                          <p className="text-white">{framework.mission.howWeWin}</p>
+                          <span className="text-banyan-text-subtle text-sm">How We Win:</span>
+                          <p className="text-banyan-text-default">{framework.mission.howWeWin}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400 text-sm">Success Signals:</span>
-                          <ul className="text-white list-disc list-inside">
+                          <span className="text-banyan-text-subtle text-sm">Success Signals:</span>
+                          <ul className="text-banyan-text-default list-disc list-inside">
                             {framework.mission.successSignals.map((signal, index) => (
                               <li key={index}>{signal}</li>
                             ))}
@@ -685,24 +685,24 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
 
                     {/* Operating Principles */}
                     <div>
-                      <h4 className="text-lg font-semibold text-blue-400 mb-2">Operating Principles</h4>
+                      <h4 className="text-lg font-semibold text-banyan-primary mb-2">Operating Principles</h4>
                       <div className="space-y-4">
                         {framework.operatingPrinciples.map((principle, index) => (
-                          <div key={index} className="border-l-2 border-gray-600 pl-4">
-                            <h5 className="text-white font-medium">{principle.name}</h5>
-                            <p className="text-gray-300 text-sm mb-2">{principle.description}</p>
+                          <div key={index} className="border-l-2 border-banyan-border-default pl-4">
+                            <h5 className="text-banyan-text-default font-medium">{principle.name}</h5>
+                            <p className="text-banyan-text-default text-sm mb-2">{principle.description}</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                               <div>
-                                <span className="text-green-400">✓ Behaviors:</span>
-                                <ul className="text-gray-300 list-disc list-inside">
+                                <span className="text-banyan-success">✓ Behaviors:</span>
+                                <ul className="text-banyan-text-default list-disc list-inside">
                                   {principle.behaviors.map((behavior, i) => (
                                     <li key={i}>{behavior}</li>
                                   ))}
                                 </ul>
                               </div>
                               <div>
-                                <span className="text-red-400">✗ Anti-Behaviors:</span>
-                                <ul className="text-gray-300 list-disc list-inside">
+                                <span className="text-banyan-error">✗ Anti-Behaviors:</span>
+                                <ul className="text-banyan-text-default list-disc list-inside">
                                   {principle.antiBehaviors.map((antiBehavior, i) => (
                                     <li key={i}>{antiBehavior}</li>
                                   ))}
@@ -716,18 +716,18 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
 
                     {/* Objectives */}
                     <div>
-                      <h4 className="text-lg font-semibold text-blue-400 mb-2">Objectives</h4>
+                      <h4 className="text-lg font-semibold text-banyan-primary mb-2">Objectives</h4>
                       <div className="space-y-4">
                         {framework.objectives.map((objective, index) => (
-                          <div key={index} className="border border-gray-600 rounded-lg p-4">
+                          <div key={index} className="border border-banyan-border-default rounded-lg p-4">
                             <div className="flex justify-between items-start mb-2">
-                              <h5 className="text-white font-medium">{objective.statement}</h5>
-                              <span className="text-gray-400 text-sm">{objective.timespan}</span>
+                              <h5 className="text-banyan-text-default font-medium">{objective.statement}</h5>
+                              <span className="text-banyan-text-subtle text-sm">{objective.timespan}</span>
                             </div>
-                            <div className="text-gray-400 text-sm mb-2">Owner: {objective.owner}</div>
+                            <div className="text-banyan-text-subtle text-sm mb-2">Owner: {objective.owner}</div>
                             <div>
-                              <span className="text-gray-400 text-sm">Key Results:</span>
-                              <ul className="text-white list-disc list-inside mt-1">
+                              <span className="text-banyan-text-subtle text-sm">Key Results:</span>
+                              <ul className="text-banyan-text-default list-disc list-inside mt-1">
                                 {objective.keyResults.map((kr, i) => (
                                   <li key={i}>{kr.metric}: {kr.target}</li>
                                 ))}
@@ -740,31 +740,31 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
 
                     {/* Brand Brief */}
                     <div>
-                      <h4 className="text-lg font-semibold text-blue-400 mb-2">Brand Brief</h4>
+                      <h4 className="text-lg font-semibold text-banyan-primary mb-2">Brand Brief</h4>
                       <div className="space-y-2">
                         <div>
-                          <span className="text-gray-400 text-sm">One Liner:</span>
-                          <p className="text-white">{framework.brandBrief.oneLiner}</p>
+                          <span className="text-banyan-text-subtle text-sm">One Liner:</span>
+                          <p className="text-banyan-text-default">{framework.brandBrief.oneLiner}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400 text-sm">Positioning:</span>
-                          <p className="text-white">{framework.brandBrief.positioning}</p>
+                          <span className="text-banyan-text-subtle text-sm">Positioning:</span>
+                          <p className="text-banyan-text-default">{framework.brandBrief.positioning}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400 text-sm">Audience:</span>
-                          <p className="text-white">{framework.brandBrief.audience}</p>
+                          <span className="text-banyan-text-subtle text-sm">Audience:</span>
+                          <p className="text-banyan-text-default">{framework.brandBrief.audience}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400 text-sm">Tone:</span>
-                          <p className="text-white">{framework.brandBrief.tone.join(', ')}</p>
+                          <span className="text-banyan-text-subtle text-sm">Tone:</span>
+                          <p className="text-banyan-text-default">{framework.brandBrief.tone.join(', ')}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400 text-sm">Story:</span>
-                          <p className="text-white">{framework.brandBrief.story}</p>
+                          <span className="text-banyan-text-subtle text-sm">Story:</span>
+                          <p className="text-banyan-text-default">{framework.brandBrief.story}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400 text-sm">Visual Cues:</span>
-                          <p className="text-white">{framework.brandBrief.visualCues.join(', ')}</p>
+                          <span className="text-banyan-text-subtle text-sm">Visual Cues:</span>
+                          <p className="text-banyan-text-default">{framework.brandBrief.visualCues.join(', ')}</p>
                         </div>
                       </div>
                     </div>
@@ -780,7 +780,7 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                 {activeSection === 'vision' && (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     Purpose (Why we exist)
                   </label>
                   <textarea
@@ -789,16 +789,16 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       vision: { ...framework.vision, purpose: e.target.value }
                     })}
                     placeholder="1-2 sentences describing why your company exists..."
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
                     style={{ color: '#f3f4f6' }}
                   />
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: About page, onboarding, OKRs
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     End State (World we're creating)
                   </label>
                   <textarea
@@ -807,10 +807,10 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       vision: { ...framework.vision, endState: e.target.value }
                     })}
                     placeholder="2-3 vivid sentences describing the world you're creating..."
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-32"
+                    className="w-full px-4 py-3 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-32"
                     style={{ color: '#f3f4f6' }}
                   />
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: Strategic planning, investor presentations
                   </div>
                 </div>
@@ -821,7 +821,7 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
             {activeSection === 'mission' && (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     What We Do
                   </label>
                   <textarea
@@ -830,16 +830,16 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       mission: { ...framework.mission, whatWeDo: e.target.value }
                     })}
                     placeholder="Product/service in plain English..."
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
                     style={{ color: '#f3f4f6' }}
                   />
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: Product descriptions, marketing copy
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     Who For
                   </label>
                   <textarea
@@ -848,16 +848,16 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       mission: { ...framework.mission, whoFor: e.target.value }
                     })}
                     placeholder="Primary audience/users..."
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
                     style={{ color: '#f3f4f6' }}
                   />
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: Customer personas, targeting
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     How We Win
                   </label>
                   <textarea
@@ -866,16 +866,16 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       mission: { ...framework.mission, howWeWin: e.target.value }
                     })}
                     placeholder="Unique approach/edge..."
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
                     style={{ color: '#f3f4f6' }}
                   />
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: Competitive positioning, sales materials
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     Success Signals
                   </label>
                   <div className="space-y-2">
@@ -891,7 +891,7 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                           });
                         }}
                         placeholder={`Success signal ${index + 1}...`}
-                        className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
+                        className="w-full px-4 py-2 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
                         style={{ color: '#f3f4f6' }}
                       />
                     ))}
@@ -899,12 +899,12 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       onClick={() => updateSpine({
                         mission: { ...framework.mission, successSignals: [...framework.mission.successSignals, ''] }
                       })}
-                      className="text-blue-400 hover:text-blue-300 text-sm"
+                      className="text-banyan-primary hover:text-blue-300 text-sm"
                     >
                       + Add Success Signal
                     </button>
                   </div>
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: KPI tracking, progress reviews
                   </div>
                 </div>
@@ -915,10 +915,10 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
             {activeSection === 'principles' && (
               <div className="space-y-6">
                 {framework.operatingPrinciples.map((principle, index) => (
-                  <div key={index} className="bg-gray-900 rounded-lg p-6 border border-gray-600">
+                  <div key={index} className="bg-banyan-bg-base rounded-lg p-6 border border-banyan-border-default">
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-banyan-text-default mb-2">
                           Principle Name
                         </label>
                         <input
@@ -929,13 +929,13 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                             updateSpine({ operatingPrinciples: updated });
                           }}
                           placeholder="e.g., Default to Action"
-                          className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
+                          className="w-full px-4 py-2 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
                           style={{ color: '#f3f4f6' }}
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-banyan-text-default mb-2">
                           Description
                         </label>
                         <textarea
@@ -946,13 +946,13 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                             updateSpine({ operatingPrinciples: updated });
                           }}
                           placeholder="1-2 sentences describing this principle..."
-                          className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 h-20"
+                          className="w-full px-4 py-2 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-banyan-text-default placeholder-gray-400 h-20"
                         />
                       </div>
                     </div>
                   </div>
                 ))}
-                <div className="text-xs text-gray-400">
+                <div className="text-xs text-banyan-text-subtle">
                   Used in: Hiring criteria, performance reviews, decision frameworks
                 </div>
               </div>
@@ -962,11 +962,11 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
             {activeSection === 'objectives' && (
               <div className="space-y-6">
                 {framework.objectives.map((objective, index) => (
-                  <div key={objective.id} className="bg-gray-900 rounded-lg p-6 border border-gray-600">
+                  <div key={objective.id} className="bg-banyan-bg-base rounded-lg p-6 border border-banyan-border-default">
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                          <label className="block text-sm font-medium text-banyan-text-default mb-2">
                             Timespan
                           </label>
                           <select
@@ -976,7 +976,7 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                               updated[index] = { ...updated[index], timespan: e.target.value as any };
                               updateSpine({ objectives: updated });
                             }}
-                            className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white"
+                            className="w-full px-4 py-2 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-banyan-text-default"
                           >
                             <option value="Q1">Q1</option>
                             <option value="Q2">Q2</option>
@@ -987,7 +987,7 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                          <label className="block text-sm font-medium text-banyan-text-default mb-2">
                             Owner
                           </label>
                           <input
@@ -998,14 +998,14 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                               updateSpine({ objectives: updated });
                             }}
                             placeholder="e.g., CEO, VP Engineering"
-                            className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
+                            className="w-full px-4 py-2 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
                           style={{ color: '#f3f4f6' }}
                           />
                         </div>
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-banyan-text-default mb-2">
                           Statement
                         </label>
                         <textarea
@@ -1016,13 +1016,13 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                             updateSpine({ objectives: updated });
                           }}
                           placeholder="Outcome-based statement (e.g., Ship v1 and get 10 design partners)..."
-                          className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 h-20"
+                          className="w-full px-4 py-2 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-banyan-text-default placeholder-gray-400 h-20"
                         />
                       </div>
                     </div>
                   </div>
                 ))}
-                <div className="text-xs text-gray-400">
+                <div className="text-xs text-banyan-text-subtle">
                   Used in: Quarterly planning, progress tracking, team alignment
                 </div>
               </div>
@@ -1032,7 +1032,7 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
             {activeSection === 'brand' && (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     One Liner
                   </label>
                   <input
@@ -1041,16 +1041,16 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       brandBrief: { ...framework.brandBrief, oneLiner: e.target.value }
                     })}
                     placeholder="Tagline/value proposition..."
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
                     style={{ color: '#f3f4f6' }}
                   />
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: Website headers, elevator pitches
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     Positioning
                   </label>
                   <textarea
@@ -1059,16 +1059,16 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       brandBrief: { ...framework.brandBrief, positioning: e.target.value }
                     })}
                     placeholder="Frame of reference + why different..."
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
                     style={{ color: '#f3f4f6' }}
                   />
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: Marketing materials, competitive analysis
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     Audience
                   </label>
                   <textarea
@@ -1077,16 +1077,16 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       brandBrief: { ...framework.brandBrief, audience: e.target.value }
                     })}
                     placeholder="Ideal Customer Profile in a sentence..."
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
+                    className="w-full px-4 py-3 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-24"
                     style={{ color: '#f3f4f6' }}
                   />
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: Customer personas, targeting strategies
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     Tone
                   </label>
                   <div className="space-y-2">
@@ -1102,7 +1102,7 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                           });
                         }}
                         placeholder={`Tone word ${index + 1}...`}
-                        className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
+                        className="w-full px-4 py-2 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500"
                         style={{ color: '#f3f4f6' }}
                       />
                     ))}
@@ -1110,18 +1110,18 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       onClick={() => updateSpine({
                         brandBrief: { ...framework.brandBrief, tone: [...framework.brandBrief.tone, ''] }
                       })}
-                      className="text-blue-400 hover:text-blue-300 text-sm"
+                      className="text-banyan-primary hover:text-blue-300 text-sm"
                     >
                       + Add Tone Word
                     </button>
                   </div>
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: Content guidelines, communication style
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-banyan-text-default mb-2">
                     Story
                   </label>
                   <textarea
@@ -1130,10 +1130,10 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                       brandBrief: { ...framework.brandBrief, story: e.target.value }
                     })}
                     placeholder="Short founding narrative..."
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-32"
+                    className="w-full px-4 py-3 bg-gray-800 border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-100 placeholder-gray-500 h-32"
                     style={{ color: '#f3f4f6' }}
                   />
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-banyan-text-subtle mt-1">
                     Used in: About page, investor presentations
                   </div>
                 </div>
@@ -1148,7 +1148,7 @@ export default function VisionFrameworkPage({ companyId }: VisionFrameworkPagePr
                 <button
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+                  className="px-6 py-3 bg-banyan-primary hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-banyan-text-default font-medium rounded-lg transition-colors"
                 >
                   {isSaving ? 'Saving...' : 'Save Vision Framework'}
                 </button>
