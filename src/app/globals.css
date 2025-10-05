@@ -6,3 +6,192 @@
 .prose :where(h1,h2,h3):not(:where(.not-prose *)) {
   @apply font-semibold tracking-tight;
 }
+
+/* ===== Banyan UI Tuning Pack =====
+   Goals: vertical cadence, subtle motion, consistent contrast, gentle interactions
+   Usage:
+   - Wrap sections with .section (or .section--tight / .section--loose)
+   - Apply .container to bound line length
+   - Hero: add .hero to the header/hero section
+   - Add .reveal to things that should fade-in on scroll
+   - Buttons: .btn (primary), .btn--ghost (secondary)
+   - Links: .link-underline for tasteful underline animation
+*/
+
+/* ---------- Design tokens ---------- */
+:root {
+  /* Spacing scale (vertical rhythm) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Typography & max line length */
+  --measure: 68ch;           /* keeps copy readable */
+  --radius: 1rem;
+
+  /* Color (adjust to your palette) */
+  --bg: #0d0f12;
+  --surface: #12151a;
+  --elev: #171b21;
+  --text: #e8ecf1;
+  --text-muted: #b3bcc7;
+  --divider: 1px solid color-mix(in oklab, #ffffff 10%, transparent);
+  --accent: #6aa5ff;         /* single accent to anchor contrast */
+  --accent-hi: #8bb9ff;
+
+  /* Motion */
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --dur-1: 140ms;
+  --dur-2: 220ms;
+}
+
+/* ---------- Base ---------- */
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.container {
+  width: min(1120px, 92vw);
+  margin-inline: auto;
+}
+
+.prose {
+  max-width: var(--measure);
+}
+
+/* Headings: consistent contrast + spacing */
+h1, h2, h3 {
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-block: 0;
+}
+h1 { font-size: clamp(2rem, 5vw, 3rem); margin-block-end: var(--space-6); }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); margin-block: var(--space-10) var(--space-4); }
+p  { color: var(--text-muted); margin-block: var(--space-4); }
+
+/* Dividers */
+.hr { border-top: var(--divider); margin-block: var(--space-12); }
+
+/* ---------- Vertical cadence ---------- */
+.section {
+  padding-block: clamp(var(--space-12), 8vw, var(--space-24));
+  background: transparent;
+}
+.section--tight { padding-block: clamp(var(--space-8), 6vw, var(--space-16)); }
+.section--loose { padding-block: clamp(var(--space-16), 10vw, calc(var(--space-24) + var(--space-8))); }
+
+/* "Breather" band to separate heavy sections */
+.band {
+  background: var(--surface);
+  padding-block: clamp(var(--space-6), 4vw, var(--space-10));
+  border-block: var(--divider);
+}
+
+/* Hero sizing: belongs to the viewport, not floating above it */
+.hero {
+  min-height: clamp(60vh, 68vh, 72vh);
+  display: grid;
+  place-items: center;
+  text-align: left;
+}
+.hero .container { align-self: center; }
+.hero .kicker { color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; font-size: .8rem; }
+
+/* ---------- Subtle motion primitives ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Stagger helper */
+.reveal[data-delay="1"] { transition-delay: 60ms; }
+.reveal[data-delay="2"] { transition-delay: 120ms; }
+.reveal[data-delay="3"] { transition-delay: 180ms; }
+
+/* Prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .btn, .link-underline { transition: none !important; transform: none !important; }
+}
+
+/* ---------- Interactive touches ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .6ch;
+  padding: .85rem 1.1rem;
+  border-radius: calc(var(--radius) - .25rem);
+  font-weight: 600;
+  background: var(--accent);
+  color: #0a0c0f;
+  border: 1px solid color-mix(in oklab, var(--accent) 40%, #000 60%);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,.35);
+  transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -8px rgba(0,0,0,.6); background: var(--accent-hi); }
+.btn:active { transform: translateY(0); box-shadow: 0 2px 0 0 rgba(0,0,0,.35); }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid color-mix(in oklab, var(--text) 18%, transparent);
+}
+.btn--ghost:hover {
+  background: color-mix(in oklab, var(--text) 6%, transparent);
+}
+
+/* Focus visibility (keyboard) */
+:where(a, button, .btn):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: calc(var(--radius) - .25rem);
+}
+
+/* Links with refined underline */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: color-mix(in oklab, var(--text) 45%, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-1) var(--ease);
+}
+.link-underline:hover::after { transform: scaleX(1); }
+
+/* Cards / surfaces for contrast consistency */
+.card {
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, #fff 10%, transparent);
+  border-radius: var(--radius);
+  padding: clamp(var(--space-6), 3.5vw, var(--space-10));
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 12px 30px -20px rgba(0,0,0,.6);
+}
+
+/* Optional: light parallax on hero art (pair with tiny JS below) */
+.parallax {
+  will-change: transform;
+  transition: transform var(--dur-2) var(--ease);
+}

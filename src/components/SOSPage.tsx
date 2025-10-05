@@ -216,13 +216,13 @@ export default function SOSPage() {
               <span className="text-sm text-gray-500">Last updated: Today</span>
               <button 
                 onClick={handleExportCurrent}
-                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="btn btn--ghost"
               >
                 Export Current
               </button>
               <button 
                 onClick={handleExportAll}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="btn"
               >
                 Export All
               </button>
@@ -345,7 +345,7 @@ export default function SOSPage() {
                   <div className="prose prose-sm max-w-none">
                     <p className="text-gray-600">
                       Your founder brief will appear here. Generate a brief from the{' '}
-                      <a href="/new" className="text-blue-600 hover:text-blue-700">
+                      <a href="/new" className="link-underline text-blue-600">
                         Create Brief
                       </a>{' '}
                       page.
@@ -389,7 +389,7 @@ export default function SOSPage() {
                   <div className="prose prose-sm max-w-none">
                     <p className="text-gray-600">
                       Your VC summary will appear here. Generate a brief from the{' '}
-                      <a href="/new" className="text-blue-600 hover:text-blue-700">
+                      <a href="/new" className="link-underline text-blue-600">
                         Create Brief
                       </a>{' '}
                       page.

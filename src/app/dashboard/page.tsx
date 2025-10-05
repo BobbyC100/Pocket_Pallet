@@ -13,13 +13,13 @@ export default function Dashboard() {
           <h1 className="text-xl font-semibold">Your Briefs</h1>
           <p className="text-sm text-zinc-600">Update or create a new one anytime.</p>
         </div>
-        <a href="/new" className="rounded-lg bg-black px-4 py-2 text-white">New Brief</a>
+        <a href="/new" className="btn">New Brief</a>
       </div>
 
       {briefs.length === 0 ? (
         <div className="rounded-2xl border p-6 text-center">
           <p>No briefs yet. Create your first one in 10 minutes.</p>
-          <a href="/new" className="mt-3 inline-block underline">Create Your Brief</a>
+          <a href="/new" className="btn mt-3 inline-block">Create Your Brief</a>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
@@ -30,8 +30,8 @@ export default function Dashboard() {
                 Stage: {b.stage} • Updated: {new Date(b.updatedAt).toLocaleDateString()}
               </div>
               <div className="mt-4 flex gap-2">
-                <a href={`/brief/${b.id}`} className="rounded-lg border px-3 py-1.5 text-sm">View</a>
-                <a href={`/new?prefill=${b.id}`} className="rounded-lg border px-3 py-1.5 text-sm">Update</a>
+                <a href={`/brief/${b.id}`} className="btn btn--ghost" style={{ padding: '0.5rem 0.75rem', fontSize: '0.875rem' }}>View</a>
+                <a href={`/new?prefill=${b.id}`} className="btn btn--ghost" style={{ padding: '0.5rem 0.75rem', fontSize: '0.875rem' }}>Update</a>
               </div>
             </div>
           ))}

@@ -248,7 +248,7 @@ export default function NewPage() {
             </div>
             <button
               onClick={handleSave}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 flex items-center gap-2"
+              className="btn flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
@@ -277,7 +277,7 @@ export default function NewPage() {
             <button
               onClick={() => handleCreateVisionFramework(true)}
               disabled={isCreatingFramework || !result?.responses}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isCreatingFramework ? 'Creating Vision Framework...' : 'Create Vision Framework'}
             </button>
@@ -291,7 +291,7 @@ export default function NewPage() {
           </div>
 
           <div className="flex gap-3">
-            <a href="/dashboard" className="rounded-lg border px-4 py-2">Back to Dashboard</a>
+            <a href="/dashboard" className="btn btn--ghost">Back to Dashboard</a>
           </div>
         </div>
       )}

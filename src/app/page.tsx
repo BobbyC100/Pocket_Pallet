@@ -15,16 +15,10 @@ export default function Landing() {
 
           {/* CTAs */}
           <div className="mt-8 flex justify-center gap-4">
-            <a
-              href="/new"
-              className="rounded-lg bg-blue-600 px-6 py-3 text-white font-semibold hover:bg-blue-500"
-            >
+            <a href="/new" className="btn">
               Create Your Brief
             </a>
-            <a
-              href="/showcase"
-              className="rounded-lg border border-gray-600 px-6 py-3 text-gray-300 hover:bg-gray-800"
-            >
+            <a href="/showcase" className="btn btn--ghost">
               See Examples
             </a>
           </div>
@@ -33,43 +27,43 @@ export default function Landing() {
         {/* Feature Cards */}
         <div className="grid gap-6 md:grid-cols-3 mt-7">
           {/* Polished Drafts */}
-          <div className="rounded-lg bg-gray-900 p-6 text-center">
+          <div className="card">
             <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-blue-600">
               {/* Icon */}
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold">Polished Drafts</h3>
-            <p className="mt-2 text-sm text-gray-400">
+            <h3 className="text-lg font-semibold text-center">Polished Drafts</h3>
+            <p className="mt-2 text-sm text-gray-400 text-center">
               Refine rough notes into clear, structured documents that drive action.
             </p>
           </div>
 
           {/* Actionable Docs */}
-          <div className="rounded-lg bg-gray-900 p-6 text-center">
+          <div className="card">
             <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-blue-600">
               {/* Icon */}
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold">Actionable Docs</h3>
-            <p className="mt-2 text-sm text-gray-400">
+            <h3 className="text-lg font-semibold text-center">Actionable Docs</h3>
+            <p className="mt-2 text-sm text-gray-400 text-center">
               Turn your ideas into polished documents you can put to work right away.
             </p>
           </div>
 
           {/* Strategic Outputs */}
-          <div className="rounded-lg bg-gray-900 p-6 text-center">
+          <div className="card">
             <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-blue-600">
               {/* Icon */}
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold">Strategic Outputs</h3>
-            <p className="mt-2 text-sm text-gray-400">
+            <h3 className="text-lg font-semibold text-center">Strategic Outputs</h3>
+            <p className="mt-2 text-sm text-gray-400 text-center">
               Generate documents designed to help you communicate, plan, and move forward.
             </p>
           </div>

@@ -231,7 +231,7 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
             </div>
             <a
               href="/"
-              className="px-4 py-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="btn btn--ghost"
             >
               ← Back to Home
             </a>
