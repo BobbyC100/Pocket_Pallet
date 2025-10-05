@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import VisionFrameworkV2Page from '@/components/VisionFrameworkV2Page';
 import VcSummaryDisplay from '@/components/VcSummaryDisplay';
 import LensBadge from '@/components/LensBadge';
+import LensDashboardWidget from '@/components/LensDashboardWidget';
 import { VcSummary, validateVcSummary } from '@/lib/vc-summary-schema';
 import { exportToPDF, exportToMarkdown } from '@/lib/pdf-export';
 
@@ -126,7 +127,7 @@ export default function SOSPage() {
   ]);
 
   const [briefContent, setBriefContent] = useState<{founderBrief?: string; vcSummary?: string; vcSummaryStructured?: VcSummary; vcSummaryScores?: any; vcLensScores?: any} | null>(null);
-  const [visionV2Content, setVisionV2Content] = useState<{executiveOnePager?: string; qaResults?: any} | null>(null);
+  const [visionV2Content, setVisionV2Content] = useState<{executiveOnePager?: string; qaResults?: any; lensScores?: any} | null>(null);
   const [scoringVcLens, setScoringVcLens] = useState(false);
 
   // Check for data in session storage to update document statuses and load content
@@ -188,11 +189,13 @@ export default function SOSPage() {
         const parsed = JSON.parse(visionV2Data);
         console.log('🎯 Loaded Vision V2 data:', {
           hasOnePager: !!parsed.executiveOnePager,
-          hasQA: !!parsed.metadata?.qaChecks
+          hasQA: !!parsed.metadata?.qaChecks,
+          hasLensScores: !!parsed.lensScores
         });
         setVisionV2Content({
           executiveOnePager: parsed.executiveOnePager,
-          qaResults: parsed.metadata?.qaChecks
+          qaResults: parsed.metadata?.qaChecks,
+          lensScores: parsed.lensScores
         });
       } catch (error) {
         console.error('Error parsing Vision V2 data:', error);
@@ -324,6 +327,12 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
 
       {/* Main Layout */}
       <div className="max-w-7xl mx-auto px-6 py-6">
+        {/* Lens Dashboard Widget */}
+        <LensDashboardWidget 
+          visionLensScores={visionV2Content?.lensScores}
+          vcLensScores={briefContent?.vcLensScores}
+        />
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1">
