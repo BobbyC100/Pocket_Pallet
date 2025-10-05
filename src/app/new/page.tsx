@@ -183,14 +183,26 @@ export default function NewPage() {
       
       updateFrameworkStepStatus('qa', 'complete');
       
+      // Extract quality scores from metadata for easy access
+      const qualityScores = frameworkData.metadata?.qualityScores || {};
+      console.log('📊 Extracted quality scores:', qualityScores);
+      console.log('📊 Quality scores keys:', Object.keys(qualityScores));
+      
       // Store in session storage for the vision framework page
       sessionStorage.setItem(storageKey, JSON.stringify({
         framework: frameworkData.framework,
         executiveOnePager: frameworkData.executiveOnePager,
         metadata: frameworkData.metadata,
+        qualityScores: qualityScores, // Store at top level for easy access
+        originalResponses: result.responses, // Store for refinement
         fromBrief: true,
-        autoFilledFields: ['all']
+        autoFilledFields: ['all'],
+        generatedAt: new Date().toISOString(),
+        refinementHistory: [] // Initialize empty history
       }));
+      
+      console.log('✅ Framework saved to session storage with quality scores');
+      console.log('✅ Quality scores available:', Object.keys(qualityScores).length > 0);
 
       // Navigate to vision framework page
       console.log('🚀 Navigating to:', targetPage);
