@@ -103,6 +103,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
     if (!framework) return;
     
     setRefiningSection(section);
+    const startTime = Date.now();
     
     try {
       const response = await fetch('/api/vision-framework-v2/refine', {
@@ -122,9 +123,42 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
       }
 
       const result = await response.json();
+      const duration = Date.now() - startTime;
       
       console.log('🔍 Refinement API response:', result);
       console.log('🔍 Quality data:', result.quality);
+      console.log(`⏱️ Refinement took ${(duration / 1000).toFixed(1)}s`);
+      
+      // Store refinement in history
+      const historyEntry = {
+        section,
+        timestamp: new Date().toISOString(),
+        feedback,
+        previousContent: (framework as any)[section],
+        refinedContent: result.refinedContent,
+        previousQuality: sectionQualities[section]?.overallScore || null,
+        newQuality: result.quality?.overallScore || null,
+        duration
+      };
+      
+      // Update refinement history in session storage
+      try {
+        const existingDraft = sessionStorage.getItem('visionFrameworkV2Draft');
+        if (existingDraft) {
+          const draftData = JSON.parse(existingDraft);
+          const history = draftData.refinementHistory || [];
+          history.push(historyEntry);
+          
+          draftData.refinementHistory = history;
+          draftData.lastRefinedAt = new Date().toISOString();
+          draftData.totalRefinements = history.length;
+          
+          sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(draftData));
+          console.log('📝 Refinement history updated:', history.length, 'refinements');
+        }
+      } catch (storageError) {
+        console.warn('⚠️ Failed to update refinement history:', storageError);
+      }
       
       // Update the framework with refined content
       setFramework({
