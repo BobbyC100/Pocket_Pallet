@@ -441,33 +441,56 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
       {/* Tabs - hide when editOnly */}
       {!editOnly && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex gap-2 border-b border-banyan-border-default">
-            <button
-              onClick={() => setActiveTab('edit')}
-              className={`px-4 py-2 font-medium transition-colors ${activeTab === 'edit' ? 'text-banyan-primary border-b-2 border-banyan-primary' : 'text-banyan-text-subtle hover:text-banyan-text-default'}`}
-            >
-              Framework
-            </button>
-            <button
-              onClick={() => setActiveTab('onepager')}
-              className={`px-4 py-2 font-medium transition-colors ${activeTab === 'onepager' ? 'text-banyan-primary border-b-2 border-banyan-primary' : 'text-banyan-text-subtle hover:text-banyan-text-default'}`}
-            >
-              Executive One-Pager
-            </button>
-            <button
-              onClick={() => setActiveTab('qa')}
-            className={`px-4 py-2 font-medium transition-colors ${activeTab === 'qa' ? 'text-banyan-primary border-b-2 border-banyan-primary' : 'text-banyan-text-subtle hover:text-banyan-text-default'}`}
-          >
-            QA Results
-          </button>
-        </div>
+          <div className="flex items-center justify-between border-b border-banyan-border-default">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('edit')}
+                className={`px-4 py-2 font-medium transition-colors ${activeTab === 'edit' ? 'text-banyan-primary border-b-2 border-banyan-primary' : 'text-banyan-text-subtle hover:text-banyan-text-default'}`}
+              >
+                Framework
+              </button>
+              <button
+                onClick={() => setActiveTab('onepager')}
+                className={`px-4 py-2 font-medium transition-colors ${activeTab === 'onepager' ? 'text-banyan-primary border-b-2 border-banyan-primary' : 'text-banyan-text-subtle hover:text-banyan-text-default'}`}
+              >
+                Executive One-Pager
+              </button>
+              <button
+                onClick={() => setActiveTab('qa')}
+                className={`px-4 py-2 font-medium transition-colors ${activeTab === 'qa' ? 'text-banyan-primary border-b-2 border-banyan-primary' : 'text-banyan-text-subtle hover:text-banyan-text-default'}`}
+              >
+                QA Results
+              </button>
+            </div>
+            {/* Score button - show in embedded view */}
+            {embedded && (
+              <button
+                onClick={handleLensScore}
+                disabled={scoringLens}
+                className="btn-banyan-ghost text-sm mb-2"
+                title="Score with Founder's Lens"
+              >
+                {scoringLens ? 'Scoring...' : 'Score with Lens'}
+              </button>
+            )}
+          </div>
         </div>
       )}
 
       {/* Title when editOnly (no tabs) */}
       {editOnly && (
         <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6 mb-6">
-          <h2 className="text-2xl font-bold text-banyan-text-default">Vision Framework</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-banyan-text-default">Vision Framework</h2>
+            <button
+              onClick={handleLensScore}
+              disabled={scoringLens}
+              className="btn-banyan-ghost"
+              title="Score with Founder's Lens"
+            >
+              {scoringLens ? 'Scoring...' : 'Score with Lens'}
+            </button>
+          </div>
         </div>
       )}
 
