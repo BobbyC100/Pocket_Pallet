@@ -2,12 +2,13 @@
 
 interface QualityBadgeProps {
   score?: number;
+  alignment?: number; // The alignment score specifically
   issues?: string[];
   suggestions?: string[];
   strengths?: string[];
 }
 
-export default function QualityBadge({ score, issues = [], suggestions = [], strengths = [] }: QualityBadgeProps) {
+export default function QualityBadge({ score, alignment, issues = [], suggestions = [], strengths = [] }: QualityBadgeProps) {
   // Don't render if no score is available
   if (score === undefined || score === null) {
     return null;
@@ -20,9 +21,10 @@ export default function QualityBadge({ score, issues = [], suggestions = [], str
   };
 
   const quality = getQualityLevel();
+  const hasLowAlignment = alignment !== undefined && alignment < 7;
 
   return (
-    <div className="inline-flex items-center gap-2">
+    <div className="inline-flex items-center gap-2 flex-wrap">
       {/* Score Badge */}
       <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${quality.color}/20 border border-${quality.color}`}>
         <span className="text-sm">{quality.emoji}</span>
@@ -34,8 +36,18 @@ export default function QualityBadge({ score, issues = [], suggestions = [], str
         </span>
       </div>
 
+      {/* Voice Misalignment Badge - PRIORITY FLAG */}
+      {hasLowAlignment && (
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-banyan-error/20 border-2 border-banyan-error animate-pulse">
+          <span className="text-sm">🚨</span>
+          <span className="text-xs font-bold text-banyan-error">
+            Voice Misalignment
+          </span>
+        </div>
+      )}
+
       {/* Needs Attention Badge */}
-      {score < 6 && (
+      {score < 6 && !hasLowAlignment && (
         <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-banyan-warning/10 border border-banyan-warning">
           <span className="text-xs font-medium text-banyan-warning">
             👀 Needs Attention

@@ -335,6 +335,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                 {sectionQualities.vision && sectionQualities.vision.overallScore && (
                   <QualityBadge
                     score={sectionQualities.vision.overallScore}
+                    alignment={sectionQualities.vision.alignment}
                     issues={sectionQualities.vision.issues || []}
                     suggestions={sectionQualities.vision.suggestions || []}
                     strengths={sectionQualities.vision.strengths || []}
@@ -364,6 +365,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                 {sectionQualities.strategy && sectionQualities.strategy.overallScore && (
                   <QualityBadge
                     score={sectionQualities.strategy.overallScore}
+                    alignment={sectionQualities.strategy.alignment}
                     issues={sectionQualities.strategy.issues || []}
                     suggestions={sectionQualities.strategy.suggestions || []}
                     strengths={sectionQualities.strategy.strengths || []}
@@ -407,6 +409,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                 {sectionQualities.operating_principles && sectionQualities.operating_principles.overallScore && (
                   <QualityBadge
                     score={sectionQualities.operating_principles.overallScore}
+                    alignment={sectionQualities.operating_principles.alignment}
                     issues={sectionQualities.operating_principles.issues || []}
                     suggestions={sectionQualities.operating_principles.suggestions || []}
                     strengths={sectionQualities.operating_principles.strengths || []}
@@ -450,6 +453,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                 {sectionQualities.near_term_bets && sectionQualities.near_term_bets.overallScore && (
                   <QualityBadge
                     score={sectionQualities.near_term_bets.overallScore}
+                    alignment={sectionQualities.near_term_bets.alignment}
                     issues={sectionQualities.near_term_bets.issues || []}
                     suggestions={sectionQualities.near_term_bets.suggestions || []}
                     strengths={sectionQualities.near_term_bets.strengths || []}
@@ -537,6 +541,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                 {sectionQualities.metrics && sectionQualities.metrics.overallScore && (
                   <QualityBadge
                     score={sectionQualities.metrics.overallScore}
+                    alignment={sectionQualities.metrics.alignment}
                     issues={sectionQualities.metrics.issues || []}
                     suggestions={sectionQualities.metrics.suggestions || []}
                     strengths={sectionQualities.metrics.strengths || []}
@@ -614,6 +619,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
                 {sectionQualities.tensions && sectionQualities.tensions.overallScore && (
                   <QualityBadge
                     score={sectionQualities.tensions.overallScore}
+                    alignment={sectionQualities.tensions.alignment}
                     issues={sectionQualities.tensions.issues || []}
                     suggestions={sectionQualities.tensions.suggestions || []}
                     strengths={sectionQualities.tensions.strengths || []}
