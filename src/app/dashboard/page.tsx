@@ -10,28 +10,28 @@ export default function Dashboard() {
     <main className="mx-auto max-w-4xl px-6 py-12">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Your Briefs</h1>
-          <p className="text-sm text-zinc-600">Update or create a new one anytime.</p>
+          <h1 className="text-xl font-semibold text-banyan-text-default">Your Briefs</h1>
+          <p className="text-sm text-banyan-text-subtle">Update or create a new one anytime.</p>
         </div>
-        <a href="/new" className="btn">New Brief</a>
+        <a href="/new" className="btn-banyan-primary">New Brief</a>
       </div>
 
       {briefs.length === 0 ? (
-        <div className="rounded-2xl border p-6 text-center">
-          <p>No briefs yet. Create your first one in 10 minutes.</p>
-          <a href="/new" className="btn mt-3 inline-block">Create Your Brief</a>
+        <div className="rounded-2xl border border-banyan-border-default bg-banyan-bg-surface p-6 text-center shadow-banyan-mid">
+          <p className="text-banyan-text-default">No briefs yet. Create your first one in 10 minutes.</p>
+          <a href="/new" className="btn-banyan-primary mt-3 inline-block">Create Your Brief</a>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {briefs.map(b => (
-            <div key={b.id} className="rounded-2xl border p-5">
-              <div className="font-medium">{b.name}</div>
-              <div className="mt-1 text-sm text-zinc-600">
+            <div key={b.id} className="rounded-2xl border border-banyan-border-default bg-banyan-bg-surface p-5 shadow-banyan-mid">
+              <div className="font-medium text-banyan-text-default">{b.name}</div>
+              <div className="mt-1 text-sm text-banyan-text-subtle">
                 Stage: {b.stage} • Updated: {new Date(b.updatedAt).toLocaleDateString()}
               </div>
               <div className="mt-4 flex gap-2">
-                <a href={`/brief/${b.id}`} className="btn btn--ghost" style={{ padding: '0.5rem 0.75rem', fontSize: '0.875rem' }}>View</a>
-                <a href={`/new?prefill=${b.id}`} className="btn btn--ghost" style={{ padding: '0.5rem 0.75rem', fontSize: '0.875rem' }}>Update</a>
+                <a href={`/brief/${b.id}`} className="btn-banyan-ghost" style={{ padding: '0.5rem 0.75rem', fontSize: '0.875rem' }}>View</a>
+                <a href={`/new?prefill=${b.id}`} className="btn-banyan-ghost" style={{ padding: '0.5rem 0.75rem', fontSize: '0.875rem' }}>Update</a>
               </div>
             </div>
           ))}
