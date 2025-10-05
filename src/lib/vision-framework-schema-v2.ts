@@ -168,7 +168,7 @@ Create a complete Vision Framework in JSON format with these sections:
 4. **near_term_bets** (array of 2-8 objects): Create concrete commitments from their responses. Each bet needs:
    - \`bet\`: What they're committing to (specific, 10-30 words)
    - \`owner\`: Role/person responsible (CEO, CTO, etc.)
-   - \`horizon\`: Timeframe (Q1, Q2, H1, 6mo, 12mo)
+   - \`horizon\`: Timeframe - MUST be exactly one of: "Q1", "Q2", "Q3", "Q4", "H1", "H2", "6mo", or "12mo" (no other values allowed)
    - \`measure\`: How success is measured (specific metric or milestone)
 
 5. **metrics** (array of 3-12 objects): Extract what they should track. Each needs:
@@ -198,9 +198,11 @@ Return ONLY valid JSON matching this structure:
   "strategy": ["string", "string", ...],
   "operating_principles": ["string", "string", ...],
   "near_term_bets": [
-    {"bet": "string", "owner": "string", "horizon": "Q1", "measure": "string"},
+    {"bet": "string", "owner": "CEO", "horizon": "Q2", "measure": "string"},
+    {"bet": "string", "owner": "CTO", "horizon": "6mo", "measure": "string"},
     ...
   ],
+  "IMPORTANT_HORIZON": "horizon must be exactly: Q1, Q2, Q3, Q4, H1, H2, 6mo, or 12mo",
   "metrics": [
     {"name": "string", "target": "string", "cadence": "monthly"},
     {"name": "string", "target": "string", "cadence": "quarterly"},
