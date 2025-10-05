@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { VisionFrameworkV2, NearTermBet, Metric } from '@/lib/vision-framework-schema-v2';
 import RefinementPanel from './RefinementPanel';
+import QualityBadge from './QualityBadge';
 
 interface VisionFrameworkV2PageProps {
   companyId?: string;
@@ -51,6 +52,10 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
         if (parsed.originalResponses) {
           setOriginalResponses(parsed.originalResponses);
           console.log('✅ Original responses captured for refinement');
+        }
+        if (parsed.qualityScores) {
+          setSectionQualities(parsed.qualityScores);
+          console.log('✅ Quality scores loaded:', Object.keys(parsed.qualityScores));
         }
         console.log('✅ Loaded Vision Framework V2 from session');
       } catch (error) {
@@ -315,7 +320,17 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
           <div className="space-y-8">
             {/* Vision */}
             <section className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6">
-              <h2 className="text-xl font-bold text-banyan-text-default mb-4">Vision</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-banyan-text-default">Vision</h2>
+                {sectionQualities.vision && (
+                  <QualityBadge
+                    score={sectionQualities.vision.overallScore}
+                    issues={sectionQualities.vision.issues}
+                    suggestions={sectionQualities.vision.suggestions}
+                    strengths={sectionQualities.vision.strengths}
+                  />
+                )}
+              </div>
               <textarea
                 value={framework.vision}
                 onChange={(e) => setFramework({ ...framework, vision: e.target.value })}

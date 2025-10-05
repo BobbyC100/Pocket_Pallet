@@ -136,12 +136,13 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
           framework: frameworkResult.framework,
           executiveOnePager: frameworkResult.executiveOnePager,
           metadata: frameworkResult.metadata,
+          qualityScores: frameworkResult.metadata?.qualityScores || {},
           fromBrief: true,
           autoFilledFields: Object.keys(frameworkResult.framework),
           originalResponses: responses // Store for refinement
         };
         sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(frameworkDraftData));
-        console.log('✅ Framework saved to session storage with original responses');
+        console.log('✅ Framework saved to session storage with quality scores');
       }
       
       // Store brief data for SOS page

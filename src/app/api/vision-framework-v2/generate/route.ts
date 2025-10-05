@@ -123,6 +123,11 @@ export async function POST(request: NextRequest) {
     const qaResults = await performQAChecks(openai, completeFramework);
     console.log('✅ QA checks complete');
 
+    // Step 5: Quality scoring for each section
+    console.log('Step 5: Scoring section quality...');
+    const qualityScores = await scoreFrameworkQuality(openai, completeFramework, responses);
+    console.log('✅ Quality scoring complete');
+
     return NextResponse.json({
       status: 'success',
       framework: completeFramework,
@@ -130,6 +135,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         modelsUsed: ['gpt-4-turbo-preview'],
         qaChecks: qaResults,
+        qualityScores: qualityScores,
         generatedAt: new Date().toISOString()
       }
     });
@@ -187,6 +193,60 @@ ${JSON.stringify(framework, null, 2)}
   } catch (error) {
     console.error('QA check error:', error);
     return { error: 'QA checks failed', details: error instanceof Error ? error.message : 'Unknown' };
+  }
+}
+
+/**
+ * Quality scoring for each framework section
+ */
+async function scoreFrameworkQuality(openai: OpenAI, framework: VisionFrameworkV2, originalResponses: any) {
+  const scoringPrompt = `Assess the quality of this Vision Framework. Rate each section on key criteria.
+
+**Framework:**
+${JSON.stringify(framework, null, 2)}
+
+**Original Founder Responses:**
+${JSON.stringify(originalResponses, null, 2)}
+
+Rate each section on 1-10 scale:
+- **Specificity**: Generic (1) vs Concrete (10)
+- **Actionability**: Vague (1) vs Clear (10)
+- **Alignment**: Off-brand (1) vs On-brand (10)
+- **Measurability**: For bets/metrics only
+
+Return JSON with scores, issues, suggestions, and strengths for each section.
+
+\`\`\`json
+{
+  "vision": {"specificity": 8, "actionability": 7, "alignment": 9, "overallScore": 8, "issues": [], "suggestions": ["..."], "strengths": ["..."]},
+  "strategy": {"specificity": 6, "actionability": 7, "alignment": 8, "overallScore": 7, "issues": ["..."], "suggestions": ["..."], "strengths": ["..."]},
+  "operating_principles": {"specificity": 7, "actionability": 8, "alignment": 9, "overallScore": 8, "issues": [], "suggestions": ["..."], "strengths": ["..."]},
+  "near_term_bets": {"specificity": 5, "actionability": 6, "alignment": 7, "measurability": 4, "overallScore": 5.5, "issues": ["..."], "suggestions": ["..."], "strengths": ["..."]},
+  "metrics": {"specificity": 8, "actionability": 9, "alignment": 8, "measurability": 9, "overallScore": 8.5, "issues": [], "suggestions": ["..."], "strengths": ["..."]},
+  "tensions": {"specificity": 7, "actionability": 6, "alignment": 8, "overallScore": 7, "issues": ["..."], "suggestions": ["..."], "strengths": ["..."]}
+}
+\`\`\``;
+
+  try {
+    const result = await openai.chat.completions.create({
+      model: "gpt-4-turbo-preview",
+      messages: [{ role: "user", content: scoringPrompt }],
+      temperature: 0.3,
+      response_format: { type: "json_object" }
+    });
+    const text = result.choices[0]?.message?.content || '{}';
+    return JSON.parse(text);
+  } catch (error) {
+    console.error('Quality scoring error:', error);
+    // Return neutral scores on error
+    return {
+      vision: { specificity: 7, actionability: 7, alignment: 7, overallScore: 7, issues: [], suggestions: [], strengths: [] },
+      strategy: { specificity: 7, actionability: 7, alignment: 7, overallScore: 7, issues: [], suggestions: [], strengths: [] },
+      operating_principles: { specificity: 7, actionability: 7, alignment: 7, overallScore: 7, issues: [], suggestions: [], strengths: [] },
+      near_term_bets: { specificity: 7, actionability: 7, alignment: 7, measurability: 7, overallScore: 7, issues: [], suggestions: [], strengths: [] },
+      metrics: { specificity: 7, actionability: 7, alignment: 7, measurability: 7, overallScore: 7, issues: [], suggestions: [], strengths: [] },
+      tensions: { specificity: 7, actionability: 7, alignment: 7, overallScore: 7, issues: [], suggestions: [], strengths: [] }
+    };
   }
 }
 
