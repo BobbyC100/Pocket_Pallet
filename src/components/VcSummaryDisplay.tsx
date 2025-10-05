@@ -38,10 +38,10 @@ export default function VcSummaryDisplay({ summary }: VcSummaryDisplayProps) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h3 className="text-sm font-semibold tracking-wide text-gray-500 uppercase mb-2">
+      <h3 className="text-sm font-semibold tracking-wide text-banyan-text-subtle uppercase mb-2">
         {title}
       </h3>
-      <p className="text-gray-700 leading-relaxed">{children}</p>
+      <p className="text-banyan-text-default leading-relaxed">{children}</p>
     </section>
   );
 }
@@ -49,10 +49,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Bullets({ title, items }: { title: string; items: string[] }) {
   return (
     <section>
-      <h3 className="text-sm font-semibold tracking-wide text-gray-500 uppercase mb-2">
+      <h3 className="text-sm font-semibold tracking-wide text-banyan-text-subtle uppercase mb-2">
         {title}
       </h3>
-      <ul className="list-disc pl-5 space-y-1 text-gray-700">
+      <ul className="list-disc pl-5 space-y-1 text-banyan-text-default">
         {items.map((item, idx) => (
           <li key={idx}>{item}</li>
         ))}
@@ -67,15 +67,15 @@ function Metrics({ title, items }: {
 }) {
   return (
     <section>
-      <h3 className="text-sm font-semibold tracking-wide text-gray-500 uppercase mb-2">
+      <h3 className="text-sm font-semibold tracking-wide text-banyan-text-subtle uppercase mb-2">
         {title}
       </h3>
       <div className="space-y-2">
         {items.map((m, i) => (
           <div key={i} className="grid grid-cols-3 gap-3 text-sm">
-            <span className="font-medium text-gray-900">{m.metric}</span>
-            <span className="text-gray-700">{m.value}</span>
-            <span className="text-gray-500">{m.timeframe}</span>
+            <span className="font-medium text-banyan-text-default">{m.metric}</span>
+            <span className="text-banyan-text-default">{m.value}</span>
+            <span className="text-banyan-text-subtle">{m.timeframe}</span>
           </div>
         ))}
       </div>
@@ -89,16 +89,16 @@ function Pairs({ title, items }: {
 }) {
   return (
     <section>
-      <h3 className="text-sm font-semibold tracking-wide text-gray-500 uppercase mb-2">
+      <h3 className="text-sm font-semibold tracking-wide text-banyan-text-subtle uppercase mb-2">
         {title}
       </h3>
       <div className="space-y-3">
         {items.map((p, i) => (
-          <div key={i} className="pl-4 border-l-2 border-yellow-400">
-            <div className="text-sm font-medium text-gray-900 mb-1">Risk:</div>
-            <div className="text-sm text-gray-700 mb-2">{p.risk}</div>
-            <div className="text-sm font-medium text-gray-900 mb-1">Mitigation:</div>
-            <div className="text-sm text-gray-700">{p.mitigation}</div>
+          <div key={i} className="pl-4 border-l-2 border-banyan-warning">
+            <div className="text-sm font-medium text-banyan-text-default mb-1">Risk:</div>
+            <div className="text-sm text-banyan-text-default mb-2">{p.risk}</div>
+            <div className="text-sm font-medium text-banyan-text-default mb-1">Mitigation:</div>
+            <div className="text-sm text-banyan-text-default">{p.mitigation}</div>
           </div>
         ))}
       </div>
