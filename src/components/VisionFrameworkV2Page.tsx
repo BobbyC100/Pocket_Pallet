@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { VisionFrameworkV2, NearTermBet, Metric } from '@/lib/vision-framework-schema-v2';
 import RefinementPanel from './RefinementPanel';
 import QualityBadge from './QualityBadge';
+import LensBadge from './LensBadge';
 
 interface VisionFrameworkV2PageProps {
   companyId?: string;
@@ -23,6 +24,8 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
   const [refiningSection, setRefiningSection] = useState<string | null>(null);
   const [originalResponses, setOriginalResponses] = useState<any>(null);
   const [sectionQualities, setSectionQualities] = useState<Record<string, any>>({});
+  const [lensScores, setLensScores] = useState<any>(null);
+  const [scoringLens, setScoringLens] = useState(false);
 
   // Load framework from session storage on mount
   useEffect(() => {
@@ -57,6 +60,10 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
           setSectionQualities(parsed.qualityScores);
           console.log('✅ Quality scores loaded:', Object.keys(parsed.qualityScores));
         }
+        if (parsed.lensScores) {
+          setLensScores(parsed.lensScores);
+          console.log('✅ Lens scores loaded');
+        }
         console.log('✅ Loaded Vision Framework V2 from session');
       } catch (error) {
         console.error('❌ Failed to parse draft data:', error);
@@ -65,6 +72,62 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
       console.log('⚠️ No visionFrameworkV2Draft in session storage');
     }
   }, []);
+
+  const handleLensScore = async () => {
+    if (!framework) return;
+    
+    setScoringLens(true);
+    
+    try {
+      // Combine all framework content for scoring
+      const content = `
+Vision: ${framework.vision}
+
+Strategy:
+${framework.strategy?.map((s: string, i: number) => `${i + 1}. ${s}`).join('\n')}
+
+Operating Principles:
+${framework.operating_principles?.map((p: string, i: number) => `${i + 1}. ${p}`).join('\n')}
+
+Near-Term Bets:
+${framework.near_term_bets?.map((b: any, i: number) => `${i + 1}. ${b.bet} (Owner: ${b.owner}, Timeline: ${b.horizon}, Measure: ${b.measure})`).join('\n')}
+
+Metrics:
+${framework.metrics?.map((m: any, i: number) => `${i + 1}. ${m.name}: ${m.target} (${m.cadence})`).join('\n')}
+
+Tensions:
+${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')}
+      `.trim();
+
+      const response = await fetch('/api/lens/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content,
+          documentId: framework.companyId,
+          documentType: 'vision_framework_v2'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to score document');
+      }
+
+      const result = await response.json();
+      setLensScores(result);
+      
+      // Store in session storage
+      const draftData = JSON.parse(sessionStorage.getItem('visionFrameworkV2Draft') || '{}');
+      draftData.lensScores = result;
+      sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(draftData));
+      
+      console.log('✅ Lens scored:', result);
+    } catch (error) {
+      console.error('❌ Lens scoring failed:', error);
+    } finally {
+      setScoringLens(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!framework) return;
@@ -331,6 +394,14 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
               </div>
               <div className="flex gap-2">
                 <button
+                  onClick={handleLensScore}
+                  disabled={scoringLens}
+                  className="btn-banyan-ghost"
+                  title="Score with Founder's Lens"
+                >
+                  {scoringLens ? 'Scoring...' : 'Score with Lens'}
+                </button>
+                <button
                   onClick={handleSave}
                   disabled={saving}
                   className="btn-banyan-primary"
@@ -349,6 +420,21 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
           <div className={`rounded-lg p-4 border ${message.type === 'success' ? 'bg-banyan-success/20 text-banyan-success border-banyan-success' : 'bg-banyan-error/20 text-banyan-error border-banyan-error'}`}>
             {message.text}
           </div>
+        </div>
+      )}
+
+      {/* Lens Badge */}
+      {lensScores && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <LensBadge
+            clarity={lensScores.scores?.clarity}
+            alignment={lensScores.scores?.alignment}
+            actionability={lensScores.scores?.actionability}
+            overall={lensScores.scores?.overall}
+            badge={lensScores.badge}
+            message={lensScores.message}
+            feedback={lensScores.scores?.feedback}
+          />
         </div>
       )}
 
