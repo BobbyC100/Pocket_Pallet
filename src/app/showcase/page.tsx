@@ -220,18 +220,18 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
 - Transparency about delays vs perception of system reliability`;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-banyan-bg-base">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-banyan-bg-surface border-b border-banyan-border-default shadow-banyan-low">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Document Showcase</h1>
-              <p className="text-gray-600 mt-1">Example Documents</p>
+              <h1 className="text-3xl font-bold text-banyan-text-default">Document Showcase</h1>
+              <p className="text-banyan-text-subtle mt-1">Example Documents</p>
             </div>
             <a
               href="/"
-              className="btn btn--ghost"
+              className="btn-banyan-ghost"
             >
               ← Back to Home
             </a>
@@ -241,23 +241,23 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
 
       {/* Toggle */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex gap-4 border-b border-gray-200">
+        <div className="flex gap-4 border-b border-banyan-border-default">
           <button
             onClick={() => setActiveDoc('brief')}
-            className={`px-6 py-3 font-semibold ${
+            className={`px-6 py-3 font-semibold transition-colors ${
               activeDoc === 'brief'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'text-banyan-primary border-b-2 border-banyan-primary'
+                : 'text-banyan-text-subtle hover:text-banyan-text-default'
             }`}
           >
             Founder Brief
           </button>
           <button
             onClick={() => setActiveDoc('framework')}
-            className={`px-6 py-3 font-semibold ${
+            className={`px-6 py-3 font-semibold transition-colors ${
               activeDoc === 'framework'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'text-banyan-primary border-b-2 border-banyan-primary'
+                : 'text-banyan-text-subtle hover:text-banyan-text-default'
             }`}
           >
             Vision Framework V2
@@ -270,40 +270,40 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
         {activeDoc === 'brief' ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Founder Brief */}
-            <div className="bg-white rounded-lg shadow-sm p-8">
+            <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Founder Brief</h2>
+                <h2 className="text-2xl font-bold text-banyan-text-default">Founder Brief</h2>
               </div>
               <div className="prose prose-sm max-w-none">
-                <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                <div className="whitespace-pre-wrap text-banyan-text-default leading-relaxed">
                   {founderBrief}
                 </div>
               </div>
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-sm text-gray-500">
+              <div className="mt-6 pt-6 border-t border-banyan-border-default">
+                <p className="text-sm text-banyan-text-subtle">
                   <strong>Purpose:</strong> Internal narrative for founders, team, and advisors
                 </p>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-banyan-text-subtle mt-2">
                   <strong>Length:</strong> ~1,200 words • <strong>Reading time:</strong> 5 minutes
                 </p>
               </div>
             </div>
 
             {/* VC Summary */}
-            <div className="bg-white rounded-lg shadow-sm p-8">
+            <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">VC Summary</h2>
+                <h2 className="text-2xl font-bold text-banyan-text-default">VC Summary</h2>
               </div>
               <div className="prose prose-sm max-w-none">
-                <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                <div className="whitespace-pre-wrap text-banyan-text-default leading-relaxed">
                   {vcSummary}
                 </div>
               </div>
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-sm text-gray-500">
+              <div className="mt-6 pt-6 border-t border-banyan-border-default">
+                <p className="text-sm text-banyan-text-subtle">
                   <strong>Purpose:</strong> Investor pitch deck companion / email intro
                 </p>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-banyan-text-subtle mt-2">
                   <strong>Length:</strong> ~600 words • <strong>Reading time:</strong> 2-3 minutes
                 </p>
               </div>
@@ -312,22 +312,22 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Vision Framework - Full */}
-            <div className="bg-white rounded-lg shadow-sm p-8">
+            <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Full Framework</h2>
+                <h2 className="text-2xl font-bold text-banyan-text-default">Full Framework</h2>
               </div>
               
               <div className="space-y-6">
                 {/* Vision */}
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">Vision</h3>
-                  <p className="text-gray-700">{visionFramework.vision}</p>
+                  <h3 className="font-bold text-lg text-banyan-text-default mb-2">Vision</h3>
+                  <p className="text-banyan-text-default">{visionFramework.vision}</p>
                 </div>
 
                 {/* Strategy */}
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">Strategy</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <h3 className="font-bold text-lg text-banyan-text-default mb-2">Strategy</h3>
+                  <ul className="list-disc list-inside space-y-1 text-banyan-text-default">
                     {visionFramework.strategy.map((item, i) => (
                       <li key={i} className="text-sm">{item}</li>
                     ))}
@@ -336,8 +336,8 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
 
                 {/* Operating Principles */}
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">Operating Principles</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <h3 className="font-bold text-lg text-banyan-text-default mb-2">Operating Principles</h3>
+                  <ul className="list-disc list-inside space-y-1 text-banyan-text-default">
                     {visionFramework.operating_principles.map((item, i) => (
                       <li key={i} className="text-sm">{item}</li>
                     ))}
@@ -346,16 +346,16 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
 
                 {/* Near-term Bets */}
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">Near-term Bets</h3>
+                  <h3 className="font-bold text-lg text-banyan-text-default mb-2">Near-term Bets</h3>
                   <div className="space-y-3">
                     {visionFramework.near_term_bets.map((bet, i) => (
-                      <div key={i} className="p-3 bg-gray-50 rounded-lg">
-                        <p className="text-sm font-medium text-gray-900">{bet.bet}</p>
-                        <div className="flex gap-4 mt-2 text-xs text-gray-600">
+                      <div key={i} className="p-3 bg-banyan-bg-base rounded-lg border border-banyan-border-default">
+                        <p className="text-sm font-medium text-banyan-text-default">{bet.bet}</p>
+                        <div className="flex gap-4 mt-2 text-xs text-banyan-text-subtle">
                           <span>Owner: {bet.owner}</span>
                           <span>Horizon: {bet.horizon}</span>
                         </div>
-                        <p className="text-xs text-gray-600 mt-1">Measure: {bet.measure}</p>
+                        <p className="text-xs text-banyan-text-subtle mt-1">Measure: {bet.measure}</p>
                       </div>
                     ))}
                   </div>
@@ -363,12 +363,12 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
 
                 {/* Metrics */}
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">Key Metrics</h3>
+                  <h3 className="font-bold text-lg text-banyan-text-default mb-2">Key Metrics</h3>
                   <div className="space-y-2">
                     {visionFramework.metrics.slice(0, 5).map((metric, i) => (
                       <div key={i} className="flex justify-between text-sm">
-                        <span className="text-gray-700">{metric.name}</span>
-                        <span className="text-gray-600">{metric.target}</span>
+                        <span className="text-banyan-text-default">{metric.name}</span>
+                        <span className="text-banyan-text-subtle">{metric.target}</span>
                       </div>
                     ))}
                   </div>
@@ -376,10 +376,10 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
 
                 {/* Tensions */}
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">Tensions to Watch</h3>
+                  <h3 className="font-bold text-lg text-banyan-text-default mb-2">Tensions to Watch</h3>
                   <ul className="space-y-2">
                     {visionFramework.tensions.slice(0, 4).map((tension, i) => (
-                      <li key={i} className="text-sm text-gray-700 pl-4 border-l-2 border-yellow-400">
+                      <li key={i} className="text-sm text-banyan-text-default pl-4 border-l-2 border-banyan-warning">
                         {tension}
                       </li>
                     ))}
@@ -387,31 +387,31 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-sm text-gray-500">
+              <div className="mt-6 pt-6 border-t border-banyan-border-default">
+                <p className="text-sm text-banyan-text-subtle">
                   <strong>Purpose:</strong> Living strategic operating system
                 </p>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-banyan-text-subtle mt-2">
                   <strong>Features:</strong> Editable, version-controlled, alignment checks
                 </p>
               </div>
             </div>
 
             {/* Executive One-Pager */}
-            <div className="bg-white rounded-lg shadow-sm p-8">
+            <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Executive One-Pager</h2>
+                <h2 className="text-2xl font-bold text-banyan-text-default">Executive One-Pager</h2>
               </div>
               <div className="prose prose-sm max-w-none">
-                <div className="whitespace-pre-wrap text-gray-700 leading-relaxed text-sm">
+                <div className="whitespace-pre-wrap text-banyan-text-default leading-relaxed text-sm">
                   {executiveOnePager}
                 </div>
               </div>
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-sm text-gray-500">
+              <div className="mt-6 pt-6 border-t border-banyan-border-default">
+                <p className="text-sm text-banyan-text-subtle">
                   <strong>Purpose:</strong> Quick reference for team / board / advisors
                 </p>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-banyan-text-subtle mt-2">
                   <strong>Length:</strong> 300-400 words • <strong>Reading time:</strong> 90 seconds
                 </p>
               </div>
