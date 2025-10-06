@@ -13,7 +13,10 @@
     "db:studio": "drizzle-kit studio",
     "test:scoring": "./test-scoring.sh good",
     "test:scoring:poor": "./test-scoring.sh poor",
-    "test:scoring:mixed": "./test-scoring.sh mixed"
+    "test:scoring:mixed": "./test-scoring.sh mixed",
+    "ingest-research": "npx tsx scripts/bulk-ingest-research.ts",
+    "rgrs-stats": "npx tsx scripts/rgrs-stats.ts",
+    "rgrs-test": "npx tsx test-rgrs.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",
@@ -24,11 +27,13 @@
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.5",
     "drizzle-orm": "^0.44.6",
+    "framer-motion": "^12.23.22",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.3",
     "lucide-react": "^0.294.0",
     "next": "^14.2.33",
     "openai": "^6.1.0",
+    "pdf-parse": "^2.1.7",
     "postgres": "^3.4.7",
     "react": "^18",
     "react-dom": "^18",

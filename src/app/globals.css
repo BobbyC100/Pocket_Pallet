@@ -729,8 +729,10 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
     stroke: currentColor !important;
   }
   
-  /* Override ALL Tailwind text color utilities */
-  /* Gray text shades - all map to default text */
+  /* COMMENTED OUT - These overrides break Tailwind's dark: prefix system */
+  /* Use dark: prefix in components instead, or use banyan-* color classes */
+  
+  /*
   .text-gray-300,
   .text-gray-400,
   .text-gray-500,
@@ -741,17 +743,12 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
     color: var(--banyan-text-default) !important;
   }
   
-  /* Very light grays map to subtle text */
   .text-gray-50,
   .text-gray-100,
   .text-gray-200 {
     color: var(--banyan-text-subtle) !important;
   }
   
-  /* DO NOT override text-white and text-black - they might be intentionally used for contrast */
-  
-  /* Override Tailwind gray background utilities */
-  /* Light grays map to surface */
   .bg-gray-50,
   .bg-gray-100,
   .bg-gray-200,
@@ -759,25 +756,21 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
     background-color: var(--banyan-bg-surface) !important;
   }
   
-  /* Dark grays map to base (darker) */
   .bg-gray-800,
   .bg-gray-900 {
     background-color: var(--banyan-bg-base) !important;
   }
   
-  /* Override blue text (used in many places) */
   .text-blue-600,
   .text-blue-700 {
     color: var(--banyan-primary) !important;
   }
   
-  /* Override blue backgrounds */
   .bg-blue-600,
   .bg-blue-700 {
     background-color: var(--banyan-primary) !important;
   }
   
-  /* Override ALL hover text states */
   .hover\:text-gray-600:hover,
   .hover\:text-gray-700:hover,
   .hover\:text-gray-900:hover,
@@ -794,7 +787,6 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
     color: var(--banyan-error) !important;
   }
   
-  /* Override ALL hover background states */
   .hover\:bg-blue-500:hover,
   .hover\:bg-blue-700:hover {
     background-color: var(--banyan-primary-hover) !important;
@@ -810,7 +802,6 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
     background-color: var(--banyan-success-hover) !important;
   }
   
-  /* Override border colors */
   .border-gray-200,
   .border-gray-300,
   .border-gray-400,
@@ -826,19 +817,16 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
     border-color: var(--banyan-primary) !important;
   }
   
-  /* Override ring colors */
   .ring-blue-500,
   .focus\:ring-blue-500:focus {
     --tw-ring-color: var(--banyan-primary) !important;
   }
   
-  /* Override focus border colors */
   .focus\:border-blue-500:focus,
   .focus\:border-transparent:focus {
     border-color: var(--banyan-primary) !important;
   }
   
-  /* Override disabled states */
   .disabled\:bg-gray-400:disabled,
   button:disabled {
     background-color: var(--banyan-bg-muted) !important;
@@ -846,6 +834,7 @@ p  { color: var(--text-muted); margin-block: var(--space-4); }
     cursor: not-allowed !important;
     opacity: 0.5 !important;
   }
+  */
   
   /* ===== INPUT & TEXTAREA OVERRIDES ===== */
   /* Force all inputs and textareas to use Banyan colors */
@@ -911,4 +900,28 @@ input::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
   color: var(--banyan-text-subtle) !important;
   opacity: 0.65 !important;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .btn-banyan-primary,
+  .btn-banyan-ghost,
+  [role="tablist"],
+  a[href]:after {
+    display: none !important;
+  }
+  
+  .shadow-banyan-mid,
+  .shadow-banyan-low {
+    box-shadow: none !important;
+  }
+  
+  body {
+    background: white !important;
+  }
+  
+  .prose,
+  .print\\:prose {
+    max-width: none !important;
+  }
 }
