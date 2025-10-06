@@ -3,17 +3,15 @@ import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import PromptWizard from "@/components/PromptWizard";
 import ResultTabs from "@/components/ResultTabs";
-import GenerationProgressModal from "@/components/GenerationProgressModal";
+import GenerationProgressModal, { GenerationStep } from "@/components/GenerationProgressModal";
 import SaveModal from "@/components/SaveModal";
 import { SaveBar } from "@/components/SaveBar";
+import { AutoSaveIndicator } from "@/components/AutoSaveIndicator";
 import { saveDraft, getAllDrafts, getAnonymousId } from "@/lib/anonymous-session";
+import { useAutoSave } from "@/hooks/useAutoSave";
+import { exportBriefToPDF } from "@/lib/pdf-export-v2";
 
-interface GenerationStep {
-  id: string;
-  label: string;
-  status: 'pending' | 'active' | 'complete';
-  estimatedSeconds: number;
-}
+// Removed local interface - now using the one from GenerationProgressModal
 
 export default function NewPage() {
   const { isSignedIn, user } = useUser();
@@ -28,18 +26,18 @@ export default function NewPage() {
   const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [frameworkSteps, setFrameworkSteps] = useState<GenerationStep[]>([
-    { id: 'mapping', label: 'Mapping strategic questions to framework', status: 'pending', estimatedSeconds: 10 },
-    { id: 'tensions', label: 'Detecting contradictions and tensions', status: 'pending', estimatedSeconds: 8 },
-    { id: 'onepager', label: 'Generating executive one-pager', status: 'pending', estimatedSeconds: 6 },
-    { id: 'qa', label: 'Running quality checks', status: 'pending', estimatedSeconds: 6 }
+    { id: 'mapping', label: 'Mapping strategic questions to framework', status: 'pending' },
+    { id: 'tensions', label: 'Detecting contradictions and tensions', status: 'pending' },
+    { id: 'onepager', label: 'Generating executive one-pager', status: 'pending' },
+    { id: 'qa', label: 'Running quality checks', status: 'pending' }
   ]);
   const [activeFrameworkStep, setActiveFrameworkStep] = useState('');
 
-  const updateFrameworkStepStatus = (stepId: string, status: 'pending' | 'active' | 'complete') => {
+  const updateFrameworkStepStatus = (stepId: string, status: 'pending' | 'in_progress' | 'complete' | 'error') => {
     setFrameworkSteps(prev => prev.map(step => 
       step.id === stepId ? { ...step, status } : step
     ));
-    if (status === 'active') {
+    if (status === 'in_progress') {
       setActiveFrameworkStep(stepId);
     }
   };
@@ -63,21 +61,43 @@ export default function NewPage() {
     }
   }, []);
 
-  // Auto-save to localStorage when result changes
-  useEffect(() => {
-    if (result) {
-      console.log('💾 Auto-saving draft to localStorage...');
-      const draft = saveDraft({
-        type: 'brief',
-        title: 'Founder Brief',
-        contentJson: result,
-        metadata: { autoSaved: true, timestamp: new Date().toISOString() }
-      });
-      setCurrentDraftId(draft.id);
+  // Enhanced auto-save with debouncing
+  const autoSave = useAutoSave(result, {
+    debounceMs: 3000, // Save 3 seconds after last change
+    enabled: true,
+    onSave: (draftId) => {
+      setCurrentDraftId(draftId);
       setHasUnsavedChanges(true);
-      console.log('✅ Draft saved:', draft.id);
+    },
+    onError: (error) => {
+      console.error('Auto-save failed:', error);
     }
-  }, [result]);
+  });
+
+  // Update draft ID when auto-save creates one
+  useEffect(() => {
+    if (autoSave.draftId && autoSave.draftId !== currentDraftId) {
+      setCurrentDraftId(autoSave.draftId);
+    }
+  }, [autoSave.draftId]);
+
+  // Keyboard shortcut: Cmd+S / Ctrl+S to save
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        e.stopPropagation();
+        if (result) {
+          autoSave.saveNow(); // Force immediate save
+          console.log('💾 Manual save triggered via keyboard shortcut');
+        }
+      }
+    };
+
+    // Add listener in capture phase to intercept before browser
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
+  }, [result, autoSave]);
 
   // Handle save button click
   const handleSave = () => {
@@ -118,6 +138,41 @@ export default function NewPage() {
     }
   };
 
+  const handleExportPDF = () => {
+    if (!result) return;
+    
+    console.log('📄 Exporting to PDF...');
+    try {
+      // Convert markdown to plain text for PDF (remove markdown syntax)
+      const cleanText = (md: string) => {
+        return md
+          .replace(/#{1,6}\s/g, '') // Remove headers
+          .replace(/\*\*(.+?)\*\*/g, '$1') // Remove bold
+          .replace(/\*(.+?)\*/g, '$1') // Remove italic
+          .replace(/\[(.+?)\]\(.+?\)/g, '$1') // Remove links
+          .trim();
+      };
+
+      exportBriefToPDF({
+        problem: cleanText(result.founderBriefMd.split('## Problem')[1]?.split('##')[0] || ''),
+        solution: cleanText(result.founderBriefMd.split('## Solution')[1]?.split('##')[0] || ''),
+        market: cleanText(result.founderBriefMd.split('## Market')[1]?.split('##')[0] || ''),
+        uniqueValue: cleanText(result.founderBriefMd.split('## What Makes Us Different')[1]?.split('##')[0] || ''),
+        targetCustomer: cleanText(result.founderBriefMd.split('## Target Customer')[1]?.split('##')[0] || ''),
+        businessModel: cleanText(result.founderBriefMd.split('## Business Model')[1]?.split('##')[0] || ''),
+        traction: cleanText(result.founderBriefMd.split('## Current Traction')[1]?.split('##')[0] || ''),
+        team: cleanText(result.founderBriefMd.split('## Team')[1]?.split('##')[0] || ''),
+        competition: cleanText(result.founderBriefMd.split('## Competition')[1]?.split('##')[0] || ''),
+        name: 'Founder Brief',
+        createdAt: new Date().toISOString()
+      });
+      console.log('✅ PDF exported successfully');
+    } catch (error) {
+      console.error('❌ PDF export failed:', error);
+      alert('Failed to export PDF. Please try again.');
+    }
+  };
+
   const handleCreateVisionFramework = async (useV2: boolean = true) => {
     if (!result?.responses) {
       alert('No brief data available. Please complete the wizard first.');
@@ -134,10 +189,10 @@ export default function NewPage() {
     
     // Reset steps
     setFrameworkSteps([
-      { id: 'mapping', label: 'Mapping strategic questions to framework', status: 'pending', estimatedSeconds: 10 },
-      { id: 'tensions', label: 'Detecting contradictions and tensions', status: 'pending', estimatedSeconds: 8 },
-      { id: 'onepager', label: 'Generating executive one-pager', status: 'pending', estimatedSeconds: 6 },
-      { id: 'qa', label: 'Running quality checks', status: 'pending', estimatedSeconds: 6 }
+      { id: 'mapping', label: 'Mapping strategic questions to framework', status: 'pending' },
+      { id: 'tensions', label: 'Detecting contradictions and tensions', status: 'pending' },
+      { id: 'onepager', label: 'Generating executive one-pager', status: 'pending' },
+      { id: 'qa', label: 'Running quality checks', status: 'pending' }
     ]);
     
     try {
@@ -146,7 +201,7 @@ export default function NewPage() {
       const targetPage = '/sos'; // Always redirect to SOS hub
 
       // Simulate progress through steps (since the API is a single call)
-      updateFrameworkStepStatus('mapping', 'active');
+      updateFrameworkStepStatus('mapping', 'in_progress');
       await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UX
       
       // Call the generation API with wizard responses
@@ -168,17 +223,17 @@ export default function NewPage() {
 
       // Update progress as we process the response
       updateFrameworkStepStatus('mapping', 'complete');
-      updateFrameworkStepStatus('tensions', 'active');
+      updateFrameworkStepStatus('tensions', 'in_progress');
       await new Promise(resolve => setTimeout(resolve, 800));
       
       const frameworkData = await response.json();
       
       updateFrameworkStepStatus('tensions', 'complete');
-      updateFrameworkStepStatus('onepager', 'active');
+      updateFrameworkStepStatus('onepager', 'in_progress');
       await new Promise(resolve => setTimeout(resolve, 800));
       
       updateFrameworkStepStatus('onepager', 'complete');
-      updateFrameworkStepStatus('qa', 'active');
+      updateFrameworkStepStatus('qa', 'in_progress');
       await new Promise(resolve => setTimeout(resolve, 800));
       
       updateFrameworkStepStatus('qa', 'complete');
@@ -241,32 +296,42 @@ export default function NewPage() {
         <div className="space-y-6">
           {/* Save Status Bar */}
           <div className="bg-banyan-bg-surface rounded-lg border-2 border-banyan-border-default p-4 flex items-center justify-between shadow-banyan-mid">
-            <div className="flex items-center gap-3">
-              {isSignedIn ? (
-                <>
+            <div className="flex items-center gap-6">
+              {isSignedIn && (
+                <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-banyan-success rounded-full animate-pulse"></div>
                   <span className="text-sm text-banyan-text-subtle font-medium">
                     Signed in as <span className="text-banyan-text-default font-semibold">{user?.primaryEmailAddress?.emailAddress}</span>
                   </span>
-                </>
-              ) : (
-                <>
-                  <div className="w-2 h-2 bg-banyan-warning rounded-full animate-pulse"></div>
-                  <span className="text-sm text-banyan-text-subtle font-medium">
-                    💾 Draft auto-saved locally
-                  </span>
-                </>
+                </div>
               )}
+              <AutoSaveIndicator 
+                status={autoSave.status.status}
+                lastSaved={autoSave.status.lastSaved}
+                error={autoSave.status.error}
+              />
             </div>
-            <button
-              onClick={handleSave}
-              className="btn-banyan-primary flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-              </svg>
-              {isSignedIn ? 'Save to Cloud' : 'Save Progress'}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleExportPDF}
+                className="btn-banyan-ghost flex items-center gap-2"
+                title="Download as PDF"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                Export PDF
+              </button>
+              <button
+                onClick={handleSave}
+                className="btn-banyan-primary flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                {isSignedIn ? 'Save to Cloud' : 'Save Progress'}
+              </button>
+            </div>
           </div>
 
           <ResultTabs

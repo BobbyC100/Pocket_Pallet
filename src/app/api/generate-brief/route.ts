@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createStructuredVcSummaryPrompt, validateVcSummary } from '@/lib/vc-summary-schema';
+import { checkRateLimit, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limiter';
+import { calculateCost, trackCost } from '@/lib/cost-tracker';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -10,20 +12,45 @@ const openai = new OpenAI({
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  const requestId = request.headers.get('X-Request-ID') || 'unknown';
+  
   try {
     // Parse request body with error handling
     let body;
     try {
       body = await request.json();
     } catch (parseError) {
-      console.error('❌ JSON parse error:', parseError);
+      console.error(`[${requestId}] ❌ JSON parse error:`, parseError);
       return NextResponse.json(
         { error: 'Invalid JSON in request body', details: parseError instanceof Error ? parseError.message : 'Unknown error' },
         { status: 400 }
       );
     }
 
-    const { responses } = body;
+    const { responses, userId, anonymousId } = body;
+    
+    // Rate limiting (skip in development if flag is set)
+    if (process.env.DISABLE_RATE_LIMIT !== 'true') {
+      const identifier = userId || anonymousId || request.ip || 'unknown';
+      const rateLimit = checkRateLimit(identifier, RATE_LIMITS.AI_GENERATION);
+      
+      if (!rateLimit.allowed) {
+        console.warn(`[${requestId}] ⚠️  Rate limit exceeded for ${identifier}`);
+        return NextResponse.json(
+          rateLimitResponse(rateLimit),
+          { 
+            status: 429,
+            headers: {
+              'X-RateLimit-Remaining': '0',
+              'X-RateLimit-Reset': String(rateLimit.retryAfter),
+            }
+          }
+        );
+      }
+      
+      console.log(`[${requestId}] ✓ Rate limit check passed (${rateLimit.remaining} remaining)`);
+    }
     
     if (!responses) {
       console.error('❌ No responses in request body');
@@ -33,7 +60,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🚀 Brief generation started');
+    console.log(`[${requestId}] 🚀 Brief generation started`);
 
     // FAST MODE: GPT-4 only, no tightening, no QA
     // Total time: ~15-20 seconds instead of 30-35 seconds
@@ -43,7 +70,19 @@ export async function POST(request: NextRequest) {
     const vcSummaryStructured = gpt4Briefs.vcStructured;
     const vcSummaryMd = gpt4Briefs.vc;
     
-    console.log('✅ Briefs generated');
+    console.log(`[${requestId}] ✅ Briefs generated`);
+    
+    // Track costs
+    if (gpt4Briefs.usage) {
+      const cost = calculateCost('gpt-4-turbo-preview', gpt4Briefs.usage);
+      trackCost('generate-brief', cost, {
+        requestId,
+        userId,
+        anonymousId,
+        duration: Date.now() - startTime
+      });
+      console.log(`[${requestId}] 💰 Cost: $${cost.totalCost.toFixed(4)} (${cost.tokens.total} tokens)`);
+    }
 
     // Score VC Summary if structured version exists
     let vcSummaryScores = null;
@@ -174,10 +213,24 @@ async function generateGPT4Briefs(responses: any) {
     console.error('❌ Failed to parse structured VC Summary:', error);
   }
 
+  // Calculate total usage for cost tracking
+  const totalUsage = {
+    input: (founderResult.usage?.prompt_tokens || 0) + 
+           (vcResult.usage?.prompt_tokens || 0) + 
+           (vcStructuredResult.usage?.prompt_tokens || 0),
+    output: (founderResult.usage?.completion_tokens || 0) + 
+            (vcResult.usage?.completion_tokens || 0) + 
+            (vcStructuredResult.usage?.completion_tokens || 0),
+    total: (founderResult.usage?.total_tokens || 0) + 
+           (vcResult.usage?.total_tokens || 0) + 
+           (vcStructuredResult.usage?.total_tokens || 0)
+  };
+
   return {
     founder: founderResult.choices[0]?.message?.content || '',
     vc: vcResult.choices[0]?.message?.content || '',
-    vcStructured
+    vcStructured,
+    usage: totalUsage
   };
 }
 

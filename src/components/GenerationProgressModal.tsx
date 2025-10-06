@@ -1,160 +1,129 @@
-'use client';
+import React from 'react';
+import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
-import { useEffect, useState } from 'react';
-
-interface GenerationStep {
+export interface GenerationStep {
   id: string;
   label: string;
-  status: 'pending' | 'active' | 'complete';
-  estimatedSeconds: number;
+  status: 'pending' | 'in_progress' | 'complete' | 'error';
+  progress?: number; // 0-100
+  message?: string;
+  duration?: number; // in ms
 }
 
 interface GenerationProgressModalProps {
   isOpen: boolean;
-  currentStep: string;
   steps: GenerationStep[];
+  currentStep?: string;
+  onClose?: () => void;
 }
 
-export default function GenerationProgressModal({ 
-  isOpen, 
+export const GenerationProgressModal: React.FC<GenerationProgressModalProps> = ({
+  isOpen,
+  steps,
   currentStep,
-  steps 
-}: GenerationProgressModalProps) {
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  
-  useEffect(() => {
-    if (!isOpen) {
-      setStartTime(null);
-      setElapsedTime(0);
-      return;
-    }
-    
-    // Set start time when modal opens
-    const start = Date.now();
-    setStartTime(start);
-    
-    // Update elapsed time every second
-    const interval = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - start) / 1000);
-      setElapsedTime(elapsed);
-    }, 100); // Update every 100ms for smoother display
-    
-    // Cleanup function
-    return () => {
-      clearInterval(interval);
-    };
-  }, [isOpen]);
-  
+  onClose
+}) => {
   if (!isOpen) return null;
-  
-  const currentStepIndex = steps.findIndex(s => s.id === currentStep);
-  const completedSteps = steps.filter(s => s.status === 'complete').length;
-  const totalSteps = steps.length;
-  const overallProgress = Math.min(100, Math.round((completedSteps / totalSteps) * 100));
-  
-  const totalEstimatedTime = steps.reduce((acc, step) => acc + step.estimatedSeconds, 0);
-  const remainingTime = Math.max(0, totalEstimatedTime - elapsedTime);
-  
+
+  const allComplete = steps.every(s => s.status === 'complete');
+  const hasError = steps.some(s => s.status === 'error');
+
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-banyan-bg-surface rounded-xl shadow-banyan-high border border-banyan-border-default p-xl max-w-md w-full mx-4">
-        {/* Header */}
-        <div className="text-center mb-l">
-          <div className="w-16 h-16 bg-banyan-mist rounded-full flex items-center justify-center mx-auto mb-m">
-            <svg className="w-8 h-8 text-banyan-primary animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          </div>
-          <h2 className="text-h2 font-semibold text-banyan-text-default mb-xs">Generating Your Documents</h2>
-          <p className="text-body text-banyan-text-subtle">Please wait while we create your brief and vision framework</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-high border border-banyan-border-default p-6 max-w-2xl w-full mx-4">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-banyan-text-default mb-2">
+            {hasError ? 'Generation Failed' : allComplete ? 'Generation Complete!' : 'Generating Vision Framework'}
+          </h2>
+          <p className="text-sm text-banyan-text-subtle">
+            {hasError 
+              ? 'An error occurred during generation' 
+              : allComplete 
+              ? 'Your Vision Framework is ready' 
+              : 'Please wait while we create your strategic framework'}
+          </p>
         </div>
-        
-        {/* Overall Progress Bar */}
-        <div className="mb-l">
-          <div className="flex justify-between text-caption text-banyan-text-subtle mb-xs">
-            <span>Overall Progress</span>
-            <span className="font-medium">{Math.round(overallProgress)}%</span>
-          </div>
-          <div className="w-full bg-banyan-border-default rounded-full h-3">
-            <div 
-              className="bg-banyan-primary h-3 rounded-full transition-all duration-slow ease-banyan-out"
-              style={{ width: `${overallProgress}%` }}
-            />
-          </div>
-        </div>
-        
-        {/* Time Display */}
-        <div className="flex justify-between text-caption text-banyan-text-subtle mb-l">
-          <span>Elapsed: {elapsedTime}s</span>
-          <span>Est. remaining: ~{remainingTime}s</span>
-        </div>
-        
-        {/* Step List */}
-        <div className="space-y-s">
-          {steps.map((step, index) => (
-            <div 
-              key={step.id}
-              className={`flex items-center gap-s p-s rounded-m transition-all duration-base ease-banyan ${
-                step.status === 'active' 
-                  ? 'bg-banyan-primary/10 border border-banyan-primary' 
-                  : step.status === 'complete'
-                  ? 'bg-banyan-success/10 border border-banyan-success'
-                  : 'bg-banyan-bg-surface border border-banyan-border-default'
-              }`}
-            >
-              {/* Status Icon */}
-              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors duration-base ${
-                step.status === 'complete'
-                  ? 'bg-banyan-success'
-                  : step.status === 'active'
-                  ? 'bg-banyan-primary'
-                  : 'bg-banyan-border-default'
-              }`}>
+
+        <div className="space-y-4">
+          {steps.map((step) => (
+            <div key={step.id} className="flex items-start gap-4">
+              {/* Icon */}
+              <div className="flex-shrink-0 mt-1">
                 {step.status === 'complete' ? (
-                  <svg className="w-4 h-4 text-banyan-primary-contrast" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                ) : step.status === 'active' ? (
-                  <div className="w-2 h-2 bg-banyan-primary-contrast rounded-full animate-pulse" />
+                  <CheckCircle className="h-5 w-5 text-banyan-success" />
+                ) : step.status === 'error' ? (
+                  <AlertCircle className="h-5 w-5 text-banyan-error" />
+                ) : step.status === 'in_progress' ? (
+                  <Loader2 className="h-5 w-5 text-banyan-primary animate-spin" />
                 ) : (
-                  <span className="text-banyan-text-default text-xs font-semibold">{index + 1}</span>
+                  <div className="h-5 w-5 rounded-full border-2 border-banyan-border-default" />
                 )}
               </div>
-              
-              {/* Step Label */}
-              <div className="flex-1">
-                <p className={`font-medium text-body ${
-                  step.status === 'active' 
-                    ? 'text-banyan-primary' 
-                    : step.status === 'complete'
-                    ? 'text-banyan-success'
-                    : 'text-banyan-text-subtle'
-                }`}>
-                  {step.label}
-                </p>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className={`text-sm font-medium ${
+                    step.status === 'complete' ? 'text-banyan-success' :
+                    step.status === 'error' ? 'text-banyan-error' :
+                    step.status === 'in_progress' ? 'text-banyan-primary' :
+                    'text-banyan-text-subtle'
+                  }`}>
+                    {step.label}
+                  </h3>
+                  {step.duration && step.status === 'complete' && (
+                    <span className="text-xs text-banyan-text-subtle">
+                      {(step.duration / 1000).toFixed(1)}s
+                    </span>
+                  )}
+                </div>
+
+                {step.message && (
+                  <p className="text-xs text-banyan-text-subtle">{step.message}</p>
+                )}
+
+                {/* Progress bar for in-progress steps */}
+                {step.status === 'in_progress' && step.progress !== undefined && (
+                  <div className="mt-2 w-full bg-banyan-bg-base rounded-full h-1.5">
+                    <div 
+                      className="bg-banyan-primary h-1.5 rounded-full transition-all duration-300"
+                      style={{ width: `${step.progress}%` }}
+                    />
+                  </div>
+                )}
               </div>
-              
-              {/* Active Spinner */}
-              {step.status === 'active' && (
-                <svg className="w-5 h-5 text-banyan-primary animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              )}
             </div>
           ))}
         </div>
-        
-        {/* Footer Note */}
-        <div className="mt-l pt-l border-t border-banyan-border-default">
-          <p className="text-caption text-banyan-text-subtle text-center">
-            This process uses GPT-4 and Gemini 2.5 to generate high-quality documents. Please don't close this window.
-          </p>
+
+        {/* Action buttons */}
+        <div className="mt-6 flex justify-end gap-3">
+          {(allComplete || hasError) && onClose && (
+            <button
+              onClick={onClose}
+              className="btn-banyan-primary"
+            >
+              {hasError ? 'Close' : 'View Framework'}
+            </button>
+          )}
         </div>
+
+        {/* Overall progress indicator */}
+        {!allComplete && !hasError && (
+          <div className="mt-6 pt-4 border-t border-banyan-border-default">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-banyan-text-subtle">
+                Step {steps.filter(s => s.status === 'complete').length + 1} of {steps.length}
+              </span>
+              <span className="text-banyan-text-subtle">
+                {Math.round((steps.filter(s => s.status === 'complete').length / steps.length) * 100)}% complete
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};
 
+export default GenerationProgressModal;

@@ -1,23 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { VisionFrameworkV2 } from '@/lib/vision-framework-schema-v2';
+import { checkRateLimit, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limiter';
+import { calculateCost, trackCost, type AIModel } from '@/lib/cost-tracker';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  const requestId = request.headers.get('X-Request-ID') || 'unknown';
+  
   try {
     const { 
       section, 
       currentContent, 
       feedback, 
       originalResponses, 
-      fullFramework 
+      fullFramework,
+      userId,
+      anonymousId
     } = await request.json();
 
-    console.log('🔄 Starting refinement for section:', section);
-    console.log('📝 User feedback:', feedback);
+    // Rate limiting
+    if (process.env.DISABLE_RATE_LIMIT !== 'true') {
+      const identifier = userId || anonymousId || request.ip || 'unknown';
+      const rateLimit = checkRateLimit(identifier, RATE_LIMITS.AI_REFINEMENT);
+      
+      if (!rateLimit.allowed) {
+        console.warn(`[${requestId}] ⚠️  Rate limit exceeded for ${identifier}`);
+        return NextResponse.json(
+          rateLimitResponse(rateLimit),
+          { 
+            status: 429,
+            headers: {
+              'X-RateLimit-Remaining': '0',
+              'X-RateLimit-Reset': String(rateLimit.retryAfter),
+            }
+          }
+        );
+      }
+      
+      console.log(`[${requestId}] ✓ Rate limit check passed (${rateLimit.remaining} remaining)`);
+    }
+
+    console.log(`[${requestId}] 🔄 Starting refinement for section:`, section);
+    console.log(`[${requestId}] 📝 User feedback:`, feedback);
 
     const refinementPrompt = createRefinementPrompt(
       section,
@@ -50,14 +79,39 @@ export async function POST(request: NextRequest) {
     const refinedText = result.choices[0]?.message?.content || '{}';
     const refinedData = JSON.parse(refinedText);
 
-    console.log('✅ Refinement complete');
+    console.log(`[${requestId}] ✅ Refinement complete`);
+
+    // Track costs
+    const usage = {
+      input: result.usage?.prompt_tokens || 0,
+      output: result.usage?.completion_tokens || 0,
+      total: result.usage?.total_tokens || 0
+    };
+    
+    const cost = calculateCost(model as AIModel, usage);
+    trackCost('refine-section', cost, {
+      requestId,
+      userId,
+      anonymousId,
+      section,
+      model,
+      duration: Date.now() - startTime
+    });
+    console.log(`[${requestId}] 💰 Cost: $${cost.totalCost.toFixed(4)} (${cost.tokens.total} tokens)`);
+    console.log(`[${requestId}] ⏱️  Duration: ${(Date.now() - startTime) / 1000}s`);
 
     return NextResponse.json({
       status: 'success',
       section,
       refinedContent: refinedData.refined,
       suggestions: refinedData.suggestions || [],
-      quality: refinedData.quality || {}
+      quality: refinedData.quality || {},
+      metadata: {
+        model,
+        cost: cost.totalCost,
+        tokens: usage,
+        duration: Date.now() - startTime
+      }
     });
 
   } catch (error) {

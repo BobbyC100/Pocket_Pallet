@@ -114,6 +114,23 @@ export const lensReflections = pgTable('lens_reflections', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Cost Events (for AI cost tracking)
+export const costEvents = pgTable('cost_events', {
+  id: text('id').primaryKey(), // Use requestId as primary key
+  operation: text('operation').notNull(), // e.g., 'generate-brief', 'refine-section'
+  model: text('model').notNull(), // e.g., 'gpt-4-turbo-preview', 'gpt-3.5-turbo'
+  inputTokens: text('input_tokens').notNull(), // Store as text to avoid integer overflow
+  outputTokens: text('output_tokens').notNull(),
+  totalTokens: text('total_tokens').notNull(),
+  inputCost: text('input_cost').notNull(), // Store as text for precision
+  outputCost: text('output_cost').notNull(),
+  totalCost: text('total_cost').notNull(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  anonymousId: text('anonymous_id'),
+  metadata: jsonb('metadata'), // Additional context (duration, etc.)
+  createdAt: text('created_at').notNull(), // ISO timestamp as text
+});
+
 // Type exports for TypeScript
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -133,4 +150,6 @@ export type VisionEmbedding = typeof visionEmbeddings.$inferSelect;
 export type NewVisionEmbedding = typeof visionEmbeddings.$inferInsert;
 export type LensReflection = typeof lensReflections.$inferSelect;
 export type NewLensReflection = typeof lensReflections.$inferInsert;
+export type CostEvent = typeof costEvents.$inferSelect;
+export type NewCostEvent = typeof costEvents.$inferInsert;
 

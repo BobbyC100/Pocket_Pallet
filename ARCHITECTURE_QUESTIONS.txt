@@ -1,0 +1,438 @@
+BANYAN ARCHITECTURE: 5 KEY QUESTIONS ANSWERED
+================================================
+
+Written in Plain Language for Founders & Non-Technical Stakeholders
+
+
+QUESTION 1: Who Controls Access When We Have Multiple Companies?
+================================================================
+
+THE SITUATION TODAY:
+-------------------
+Right now, Banyan uses Clerk to handle logins (email, Google, anonymous users). 
+But there's no system to control WHO can see WHAT documents.
+
+Everyone who creates a document owns it, but there's no:
+- Shared team workspaces
+- Different permission levels (view-only vs editor)
+- Organization boundaries
+
+WHAT WE NEED TO BUILD:
+---------------------
+Think of it like Google Docs permissions, but for your company:
+
+1. ORGANIZATIONS
+   - Each company is an "organization"
+   - Documents belong to an organization, not just one person
+   - Example: "Acme Construction Co" is an org with 5 team members
+
+2. ROLES & PERMISSIONS
+   - Owner: Can do everything, including delete the org
+   - Admin: Can invite people, manage settings
+   - Editor: Can create and edit documents
+   - Viewer: Can only read documents
+
+3. SHARING
+   - Share a document with specific people outside your org
+   - Set expiration dates on shares (like "view for 30 days")
+   - Track who viewed what and when
+
+WHO'S IN CHARGE:
+---------------
+- Clerk handles logins (who you are)
+- We build custom permission system (what you can access)
+- Database enforces rules automatically (safety net)
+
+ANALOGY: Clerk is like your building's front desk (checks ID). Our permission 
+system is like the key cards that let you into certain floors and rooms.
+
+
+QUESTION 2: How Do We Handle Errors & Track Problems?
+=====================================================
+
+THE SITUATION TODAY:
+-------------------
+When something breaks, we just log "Error: failed" to the console. This makes 
+debugging really hard because:
+- No context about what went wrong
+- No way to track patterns (is this happening to everyone?)
+- Generic error messages confuse users
+- No alerts when critical things break
+
+WHAT WE NEED TO BUILD:
+---------------------
+
+1. CLEAR ERROR TYPES
+   Instead of "Error: failed", we'd have:
+   - "AI Generation Failed: OpenAI timeout after 30 seconds"
+   - "Document Not Found: User tried to access document they don't own"
+   - "Validation Error: Vision statement must be under 500 characters"
+
+2. ERROR TRACKING SERVICE (Sentry)
+   Think of it as a "mission control dashboard" for errors:
+   - Emails you when new errors appear
+   - Groups similar errors together (shows if 50 users hit same bug)
+   - Shows you the user's journey before the error
+   - Tracks if errors are increasing or decreasing
+
+3. STRUCTURED LOGGING
+   Every important action writes a proper log entry:
+   - What happened: "User generated vision framework"
+   - Who did it: User ID or anonymous ID
+   - How long it took: 35 seconds
+   - Success or failure
+   
+   This makes it easy to answer questions like:
+   - "Why did Bobby's generation fail yesterday at 3pm?"
+   - "How many people are hitting AI timeouts?"
+   - "What's our average generation time?"
+
+4. USER-FRIENDLY ERROR MESSAGES
+   Users see helpful messages, not technical jargon:
+   
+   BAD:  "Error: undefined response from chat.completions.create"
+   GOOD: "AI generation timed out. This usually means high demand. 
+          Please try again in a few minutes."
+
+REAL EXAMPLE:
+------------
+If OpenAI's API goes down:
+- We catch the error immediately
+- Sentry alerts you via email/Slack
+- Users see: "Our AI partner is experiencing issues. We're monitoring it."
+- Dashboard shows how many users were affected
+- When it's fixed, you can see recovery time
+
+
+QUESTION 3: How Do We Test AI-Generated Content?
+================================================
+
+THE SITUATION TODAY:
+-------------------
+We have a bash script that tests scoring, but no automated tests for:
+- Actual AI generation
+- Quality of outputs
+- Regression (making sure new code doesn't break old features)
+
+THE CHALLENGE:
+-------------
+Testing AI is hard because:
+- Outputs vary (same input = slightly different output each time)
+- Real API calls cost money ($0.10 per test = expensive!)
+- Tests take 30+ seconds to run (too slow for development)
+
+WHAT WE NEED TO BUILD:
+---------------------
+
+1. GOLDEN FIXTURES (The "Before" Photos)
+   Save examples of really good outputs as reference files.
+   
+   Example: Save a high-quality vision framework as "golden_framework_v1.json"
+   
+   In tests, we check:
+   - Does new output have all the required fields?
+   - Does it score at least 7.5/10 like the golden version?
+   - Is the structure still correct?
+   
+   ANALOGY: Like keeping "before" photos when renovating. You compare new 
+   work against the original to make sure you didn't lose anything good.
+
+2. MOCKED AI RESPONSES (Fake It Until You Make It)
+   For 95% of tests, we don't call the real AI. We pretend.
+   
+   Instead of waiting 30 seconds and paying $0.10, we instantly return a 
+   pre-written response. Tests run in 0.5 seconds and cost nothing.
+   
+   We only call the REAL AI:
+   - Once a day (nightly test to verify API still works)
+   - When someone manually requests it
+   - Before deploying to production
+
+3. CONTRACT TESTS (Making Sure the Rules Still Apply)
+   Check that AI responses still follow our format rules:
+   - Is "vision" a string?
+   - Is "strategy" an array of 2-5 items?
+   - Does each bet have an owner and measure?
+   
+   If OpenAI changes their API, these tests catch it immediately.
+
+4. VISUAL REGRESSION TESTS (Screenshot Comparisons)
+   Take screenshots of quality badges, compare to previous screenshots.
+   
+   If a code change accidentally breaks the visual design, we know before 
+   users see it.
+
+COST BREAKDOWN:
+--------------
+- Mock tests (95%): $0 per run, instant
+- Real API tests (5%): $5-10 per day in API costs
+- Visual tests: $0, runs on CI/CD
+
+This is way cheaper than the current "manual testing in production" approach.
+
+
+QUESTION 4: Where Does Analytics Data Go?
+=========================================
+
+THE SITUATION TODAY:
+-------------------
+We have database tables for tracking events (lensEvents, eventsAudit) but:
+- Barely used
+- No dashboard to view the data
+- No way to answer business questions like:
+  * How many people finish the wizard?
+  * Which sections get refined most?
+  * What's our conversion rate from anonymous to signed-up?
+
+WHAT WE NEED TO BUILD:
+---------------------
+
+TWO-TRACK SYSTEM:
+
+1. INTERNAL DATABASE (For Product Features)
+   Store basic analytics in Postgres for:
+   - Showing users their own stats ("You've created 5 frameworks")
+   - Real-time dashboards in the app
+   - Features like "Recently viewed documents"
+   
+   Think: Operational data that powers the product itself.
+
+2. EXTERNAL SERVICE - PostHog (For Business Intelligence)
+   Send all events to PostHog for:
+   - Funnel analysis (where do users drop off?)
+   - Cohort analysis (do users from Google convert better than organic?)
+   - Session replay (watch recordings of user sessions to spot UX issues)
+   - Feature flags (show new features to 10% of users first)
+   
+   Think: Business intelligence and product improvement.
+
+WHAT EVENTS TO TRACK:
+--------------------
+Every important user action:
+- wizard_step_completed
+- brief_generated
+- framework_generated
+- section_refined
+- document_saved
+- document_shared
+- user_signed_up
+- export_pdf
+
+Each event includes:
+- Who did it (user ID or anonymous ID)
+- When (timestamp)
+- Context (what was the quality score? how long did it take?)
+
+EXAMPLE QUESTIONS WE CAN ANSWER:
+--------------------------------
+Week 1: "95 people started the wizard, 67 finished. 28 dropped off."
+Week 2: "Of the 67 who finished, 42 refined at least one section."
+Week 3: "Average quality score improved from 6.8 to 7.4 after refinements."
+
+WHY POSTHOG?
+-----------
+- Free up to 1 million events per month (plenty for early stage)
+- Can self-host if we need data privacy later
+- All-in-one: analytics + session replay + feature flags
+- No code changes needed to add new events
+
+COSTS:
+------
+- Free tier: 1M events/month
+- Paid tier: ~$200/month at 5M events
+- Database storage: Minimal (we only keep last 90 days)
+
+
+QUESTION 5: When Do We Need to Break Up the App?
+================================================
+
+THE SITUATION TODAY:
+-------------------
+Everything lives in one Next.js app on Vercel:
+- Web pages
+- API routes
+- AI generation
+- Database queries
+
+This is PERFECT for where we are now. But there are predictable breaking 
+points as we grow.
+
+BREAKING POINT 1: 100+ People Using It At Once
+==============================================
+PROBLEM: 
+AI generation takes 30-40 seconds. Vercel has a 60-second timeout on free 
+tier (300 seconds on paid). If we get popular, we'll hit timeouts.
+
+SOLUTION: Worker Queue System
+Instead of generating in real-time:
+
+1. User clicks "Generate"
+2. We instantly return: "Your framework is being generated (Job #12345)"
+3. Heavy work happens in the background (no timeout)
+4. We notify user when done (email or real-time update)
+
+ANALOGY: Like Apple Store's "We'll text you when your phone is ready" instead 
+of making you wait at the counter.
+
+TOOLS:
+- Inngest (easiest, serverless workers)
+- BullMQ (more control, requires Redis server)
+
+COST: ~$50-100/month for worker infrastructure
+
+WHEN: When we hit 100+ daily active users doing heavy AI operations
+
+
+BREAKING POINT 2: 1,000+ Daily Users
+====================================
+PROBLEM:
+Database connections max out. Queries slow down. Users see "Loading..." 
+for too long.
+
+SOLUTION: Database Optimization
+1. Connection Pooling (reuse database connections, don't create new ones)
+2. Read Replicas (separate database for read-heavy queries)
+3. Caching (Redis for frequently-accessed data)
+
+EXAMPLE:
+Instead of hitting database for every "Get my documents" request, we:
+- Cache the list in Redis for 5 minutes
+- Update cache when user creates/edits document
+- Database load drops by 70%
+
+COST: 
+- Redis: $10-50/month
+- Read replica: $50-150/month
+
+WHEN: When database CPU consistently above 70% or queries taking >500ms
+
+
+BREAKING POINT 3: $10,000/Month in AI Costs
+===========================================
+PROBLEM:
+OpenAI charges $0.03-0.10 per generation. At scale:
+- 100 generations/day = $300/month ✓ Affordable
+- 1,000 generations/day = $3,000/month ⚠️ Getting expensive
+- 5,000 generations/day = $15,000/month ❌ Not sustainable
+
+SOLUTION: Hybrid AI Strategy
+
+Keep OpenAI for:
+- Initial high-quality generation (worth the cost)
+- Complex reasoning tasks
+
+Add Self-Hosted AI for:
+- Refinements (cheaper, faster)
+- Bulk operations
+- Non-critical tasks
+
+NUMBERS:
+- OpenAI GPT-4: $0.10 per generation
+- Self-hosted Llama 3.1: $0.01 per generation (after setup)
+- Savings: 90% on refinement operations
+
+EXAMPLE MONTHLY COSTS:
+1,000 users × 2 generations each = 2,000 operations
+- All OpenAI: $200/month
+- Hybrid (50/50): $110/month
+- Mostly self-hosted: $60/month
+
+WHEN: When AI costs exceed $1,000/month
+
+
+BREAKING POINT 4: 10,000+ Organizations
+=======================================
+PROBLEM:
+Single database can't handle that many tenants efficiently. Queries slow 
+down even with optimization.
+
+SOLUTION: Database Sharding
+Split organizations across multiple databases based on ID:
+- Orgs 0-2499 → Database 1
+- Orgs 2500-4999 → Database 2
+- Orgs 5000-7499 → Database 3
+- Orgs 7500-10000 → Database 4
+
+OR: Move to auto-scaling database (CockroachDB, PlanetScale)
+
+COST: $500-2000/month for managed sharding
+
+WHEN: When we hit 5,000+ organizations (likely 2+ years away)
+
+
+THE TIMELINE (Rough Estimates)
+==============================
+
+TODAY (0-100 users):
+- Keep everything as-is
+- Current stack is perfect for this stage
+- Focus on product, not infrastructure
+
+3-6 MONTHS (100-500 users):
+- Add worker queue for AI generation
+- Implement proper error tracking (Sentry)
+- Set up analytics (PostHog)
+Cost: +$150/month
+
+6-12 MONTHS (500-2,000 users):
+- Add database connection pooling
+- Consider read replicas
+- Optimize slow queries
+Cost: +$300/month
+
+12-18 MONTHS (2,000-5,000 users):
+- Add caching layer (Redis)
+- Hybrid AI strategy (if costs justify it)
+- Consider database sharding
+Cost: +$800/month
+
+18+ MONTHS (5,000+ users):
+- Full microservices if needed
+- Multiple database shards
+- Dedicated AI infrastructure
+Cost: +$2,000+/month
+
+BUT REMEMBER: These are problems you WANT to have. They mean you're growing.
+
+
+PRIORITY RANKING (What to Build First)
+=======================================
+
+HIGH PRIORITY (Do in Next 2-4 Weeks):
+✓ Error handling system (Sentry)
+✓ Basic permission middleware
+✓ Analytics setup (PostHog)
+EFFORT: 5-7 days total
+COST: ~$50/month
+
+MEDIUM PRIORITY (Do in Next 1-2 Months):
+✓ Testing framework with golden fixtures
+✓ Worker queue for AI generation (when timeouts start happening)
+EFFORT: 8-10 days total
+COST: ~$100/month
+
+LOW PRIORITY (Do When Pain Points Appear):
+✓ Database optimization (wait until you see slowness)
+✓ Self-hosted AI (wait until costs justify it)
+✓ Sharding (wait until you're enterprise-scale)
+
+
+BOTTOM LINE
+===========
+
+Your current architecture is GREAT for where you are. The key is knowing:
+
+1. What to build NOW (error handling, basic permissions)
+2. What to build SOON (analytics, testing)
+3. What to build LATER (scaling infrastructure)
+
+Most startups over-engineer too early. You're in good shape - focus on 
+getting users first, then scale when you need to.
+
+The fact you're thinking about these questions now means you'll be ready 
+when you hit the breaking points. But don't build for 10,000 users when 
+you have 100. Build for 300 users, and you'll know when to scale up.
+
+
+QUESTIONS? Need help implementing any of this? Just ask.
+

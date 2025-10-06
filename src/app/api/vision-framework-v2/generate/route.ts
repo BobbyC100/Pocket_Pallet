@@ -6,17 +6,44 @@ import {
   createVisionFrameworkPrompt,
   createExecutiveOnePagerPrompt
 } from '@/lib/vision-framework-schema-v2';
+import { checkRateLimit, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limiter';
+import { calculateCost, trackCost } from '@/lib/cost-tracker';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  const requestId = request.headers.get('X-Request-ID') || 'unknown';
+  
   try {
-    const { companyId, responses } = await request.json();
+    const { companyId, responses, userId, anonymousId } = await request.json();
 
-    console.log('🚀 Starting Vision Framework V2 generation with GPT-4');
-    console.log('📝 Company:', companyId);
+    // Rate limiting
+    if (process.env.DISABLE_RATE_LIMIT !== 'true') {
+      const identifier = userId || anonymousId || request.ip || 'unknown';
+      const rateLimit = checkRateLimit(identifier, RATE_LIMITS.AI_GENERATION);
+      
+      if (!rateLimit.allowed) {
+        console.warn(`[${requestId}] ⚠️  Rate limit exceeded for ${identifier}`);
+        return NextResponse.json(
+          rateLimitResponse(rateLimit),
+          { 
+            status: 429,
+            headers: {
+              'X-RateLimit-Remaining': '0',
+              'X-RateLimit-Reset': String(rateLimit.retryAfter),
+            }
+          }
+        );
+      }
+      
+      console.log(`[${requestId}] ✓ Rate limit check passed (${rateLimit.remaining} remaining)`);
+    }
+
+    console.log(`[${requestId}] 🚀 Starting Vision Framework V2 generation with GPT-4`);
+    console.log(`[${requestId}] 📝 Company:`, companyId);
 
     // Step 1: GPT-4 generates the framework with contradiction detection
     console.log('Step 1: GPT-4 mapping sections and detecting tensions...');
@@ -124,9 +151,32 @@ export async function POST(request: NextRequest) {
     console.log('✅ QA checks complete');
 
     // Step 5: Quality scoring for each section
-    console.log('Step 5: Scoring section quality...');
+    console.log(`[${requestId}] Step 5: Scoring section quality...`);
     const qualityScores = await scoreFrameworkQuality(openai, completeFramework, responses);
-    console.log('✅ Quality scoring complete');
+    console.log(`[${requestId}] ✅ Quality scoring complete`);
+
+    // Calculate total cost from all API calls
+    const totalUsage = {
+      input: (frameworkResult.usage?.prompt_tokens || 0) + 
+             (onePagerResult.usage?.prompt_tokens || 0),
+      output: (frameworkResult.usage?.completion_tokens || 0) + 
+              (onePagerResult.usage?.completion_tokens || 0),
+      total: (frameworkResult.usage?.total_tokens || 0) + 
+             (onePagerResult.usage?.total_tokens || 0)
+    };
+
+    // Track costs
+    const cost = calculateCost('gpt-4-turbo-preview', totalUsage);
+    trackCost('generate-vision-framework-v2', cost, {
+      requestId,
+      userId,
+      anonymousId,
+      companyId,
+      duration: Date.now() - startTime,
+      sectionsGenerated: Object.keys(completeFramework).length
+    });
+    console.log(`[${requestId}] 💰 Total Cost: $${cost.totalCost.toFixed(4)} (${cost.tokens.total} tokens)`);
+    console.log(`[${requestId}] ⏱️  Total Duration: ${(Date.now() - startTime) / 1000}s`);
 
     return NextResponse.json({
       status: 'success',
@@ -136,7 +186,12 @@ export async function POST(request: NextRequest) {
         modelsUsed: ['gpt-4-turbo-preview'],
         qaChecks: qaResults,
         qualityScores: qualityScores,
-        generatedAt: new Date().toISOString()
+        generatedAt: new Date().toISOString(),
+        cost: {
+          total: cost.totalCost,
+          tokens: totalUsage
+        },
+        duration: Date.now() - startTime
       }
     });
 

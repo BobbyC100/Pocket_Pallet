@@ -8,6 +8,7 @@ import LensBadge from '@/components/LensBadge';
 import LensDashboardWidget from '@/components/LensDashboardWidget';
 import { VcSummary, validateVcSummary } from '@/lib/vc-summary-schema';
 import { exportToPDF, exportToMarkdown } from '@/lib/pdf-export';
+import { exportFrameworkToPDF, exportBriefToPDF, exportCompleteToPDF } from '@/lib/pdf-export-v2';
 
 type DocType = 'vision-v2' | 'executive-onepager' | 'founder-brief' | 'vc-summary' | 'qa-results';
 
@@ -40,24 +41,88 @@ export default function SOSPage() {
 
   // Export handlers
   const handleExportCurrent = async () => {
-    // For now, just download the HTML content as a text file
-    // You can enhance this to use proper PDF export later
     const currentDoc = documents.find(doc => doc.id === activeDoc);
     if (!currentDoc) return;
 
-    const element = document.getElementById('document-content');
-    if (!element) return;
+    try {
+      if (activeDoc === 'vision-v2') {
+        // Export Vision Framework as PDF
+        const draftData = sessionStorage.getItem('visionFrameworkV2Draft');
+        if (!draftData) {
+          alert('No Vision Framework data found');
+          return;
+        }
+        
+        const parsed = JSON.parse(draftData);
+        if (!parsed.framework) {
+          alert('Framework data is incomplete');
+          return;
+        }
 
-    const content = element.innerText;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${currentDoc.title.toLowerCase().replace(/\s+/g, '-')}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+        console.log('📄 Exporting Vision Framework to PDF...');
+        exportFrameworkToPDF(parsed.framework, `vision-framework-${Date.now()}.pdf`);
+        console.log('✅ Vision Framework PDF exported successfully');
+        
+      } else if (activeDoc === 'founder-brief') {
+        // Export Founder Brief as PDF
+        const briefData = sessionStorage.getItem('lastGeneratedBrief');
+        if (!briefData) {
+          alert('No brief data found');
+          return;
+        }
+        
+        const parsed = JSON.parse(briefData);
+        if (!parsed.founderBriefMd) {
+          alert('Brief data is incomplete');
+          return;
+        }
+
+        // Parse markdown sections
+        const cleanText = (md: string) => {
+          return md
+            .replace(/#{1,6}\s/g, '')
+            .replace(/\*\*(.+?)\*\*/g, '$1')
+            .replace(/\*(.+?)\*/g, '$1')
+            .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+            .trim();
+        };
+
+        console.log('📄 Exporting Founder Brief to PDF...');
+        exportBriefToPDF({
+          problem: cleanText(parsed.founderBriefMd.split('## Problem')[1]?.split('##')[0] || ''),
+          solution: cleanText(parsed.founderBriefMd.split('## Solution')[1]?.split('##')[0] || ''),
+          market: cleanText(parsed.founderBriefMd.split('## Market')[1]?.split('##')[0] || ''),
+          uniqueValue: cleanText(parsed.founderBriefMd.split('## What Makes Us Different')[1]?.split('##')[0] || ''),
+          targetCustomer: cleanText(parsed.founderBriefMd.split('## Target Customer')[1]?.split('##')[0] || ''),
+          businessModel: cleanText(parsed.founderBriefMd.split('## Business Model')[1]?.split('##')[0] || ''),
+          traction: cleanText(parsed.founderBriefMd.split('## Current Traction')[1]?.split('##')[0] || ''),
+          team: cleanText(parsed.founderBriefMd.split('## Team')[1]?.split('##')[0] || ''),
+          competition: cleanText(parsed.founderBriefMd.split('## Competition')[1]?.split('##')[0] || ''),
+          name: 'Founder Brief',
+          createdAt: new Date().toISOString()
+        }, `founder-brief-${Date.now()}.pdf`);
+        console.log('✅ Founder Brief PDF exported successfully');
+        
+      } else {
+        // Fallback: Export as text for other document types
+        const element = document.getElementById('document-content');
+        if (!element) return;
+
+        const content = element.innerText;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentDoc.title.toLowerCase().replace(/\s+/g, '-')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('❌ Export failed:', error);
+      alert('Failed to export document. Please try again.');
+    }
   };
 
   const handleExportAll = async () => {
@@ -310,9 +375,13 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
               <span className="text-sm text-banyan-text-subtle">Last updated: Today</span>
               <button 
                 onClick={handleExportCurrent}
-                className="btn-banyan-ghost"
+                className="btn-banyan-ghost flex items-center gap-2"
+                title="Download current document as PDF"
               >
-                Export Current
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                Export PDF
               </button>
               <button 
                 onClick={handleExportAll}
