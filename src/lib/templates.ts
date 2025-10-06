@@ -42,18 +42,13 @@ export const PROMPT_STEPS = [
     field: 'current_state'
   },
   {
-    id: 'vision_purpose',
-    title: 'Vision: Why does your company exist?',
-    description: 'In one clean sentence, what is the fundamental reason you\'re building this? What change are you bringing to the world?',
-    placeholder: 'Example: To eliminate construction site delivery delays that waste time and money',
-    field: 'vision_purpose'
-  },
-  {
-    id: 'vision_endstate',
-    title: 'Vision: What does the end state look like?',
-    description: 'Paint your end-state in 2–3 sentences. When you\'ve achieved your mission, what will the world look like?',
-    placeholder: 'Example: A world where every construction site receives materials exactly when and where needed, eliminating costly delays and improving project efficiency across the industry',
-    field: 'vision_endstate'
+    id: 'vision_combined',
+    title: 'Vision: Define your purpose and end state',
+    description: 'First, tell us why your company exists in one sentence. Then, paint the end-state: when you\'ve achieved your mission, what will the world look like?',
+    placeholder: 'Example:\n\nPurpose: To eliminate construction site delivery delays that waste time and money.\n\nEnd State: A world where every construction site receives materials exactly when and where needed, eliminating costly delays and improving project efficiency across the industry.',
+    field: 'vision_combined',
+    multiField: true, // Signals this step collects multiple data points
+    fields: ['vision_purpose', 'vision_endstate'] // Maps to both backend fields
   }
 ];
 

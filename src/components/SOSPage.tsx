@@ -64,16 +64,16 @@ export default function SOSPage() {
         console.log('✅ Vision Framework PDF exported successfully');
         
       } else if (activeDoc === 'founder-brief') {
-        // Export Founder Brief as PDF
+        // Export Vision Statement as PDF
         const briefData = sessionStorage.getItem('lastGeneratedBrief');
         if (!briefData) {
-          alert('No brief data found');
+          alert('No Vision Statement data found');
           return;
         }
         
         const parsed = JSON.parse(briefData);
         if (!parsed.founderBriefMd) {
-          alert('Brief data is incomplete');
+          alert('Vision Statement data is incomplete');
           return;
         }
 
@@ -87,7 +87,7 @@ export default function SOSPage() {
             .trim();
         };
 
-        console.log('📄 Exporting Founder Brief to PDF...');
+        console.log('📄 Exporting Vision Statement to PDF...');
         exportBriefToPDF({
           problem: cleanText(parsed.founderBriefMd.split('## Problem')[1]?.split('##')[0] || ''),
           solution: cleanText(parsed.founderBriefMd.split('## Solution')[1]?.split('##')[0] || ''),
@@ -98,10 +98,10 @@ export default function SOSPage() {
           traction: cleanText(parsed.founderBriefMd.split('## Current Traction')[1]?.split('##')[0] || ''),
           team: cleanText(parsed.founderBriefMd.split('## Team')[1]?.split('##')[0] || ''),
           competition: cleanText(parsed.founderBriefMd.split('## Competition')[1]?.split('##')[0] || ''),
-          name: 'Founder Brief',
+          name: 'Vision Statement',
           createdAt: new Date().toISOString()
-        }, `founder-brief-${Date.now()}.pdf`);
-        console.log('✅ Founder Brief PDF exported successfully');
+        }, `vision-statement-${Date.now()}.pdf`);
+        console.log('✅ Vision Statement PDF exported successfully');
         
       } else {
         // Fallback: Export as text for other document types
@@ -167,7 +167,7 @@ export default function SOSPage() {
     },
     {
       id: 'founder-brief',
-      title: 'Founder Brief',
+      title: 'Vision Statement',
       icon: '',
       status: 'complete',
       lastUpdated: 'Today',
@@ -495,7 +495,7 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
             {activeDoc === 'founder-brief' && (
               <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-banyan-text-default">Founder Brief</h2>
+                  <h2 className="text-2xl font-bold text-banyan-text-default">Vision Statement</h2>
                 </div>
                 {briefContent?.founderBrief ? (
                   <>
@@ -513,9 +513,9 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
                 ) : (
                   <div className="prose prose-sm max-w-none">
                     <p className="text-banyan-text-subtle">
-                      Your founder brief will appear here. Generate a brief from the{' '}
+                      Your Vision Statement will appear here. Generate one from the{' '}
                       <a href="/new" className="link-underline text-banyan-primary">
-                        Create Brief
+                        Start Building
                       </a>{' '}
                       page.
                     </p>
@@ -588,9 +588,9 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
                 ) : (
                   <div className="prose prose-sm max-w-none">
                     <p className="text-banyan-text-subtle">
-                      Your VC summary will appear here. Generate a brief from the{' '}
+                      Your VC summary will appear here. Generate one from the{' '}
                       <a href="/new" className="link-underline text-banyan-primary">
-                        Create Brief
+                        Start Building
                       </a>{' '}
                       page.
                     </p>

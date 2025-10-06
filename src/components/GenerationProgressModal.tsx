@@ -40,7 +40,7 @@ export const GenerationProgressModal: React.FC<GenerationProgressModalProps> = (
               ? 'An error occurred during generation' 
               : allComplete 
               ? 'Your Vision Framework is ready' 
-              : 'Please wait while we create your strategic framework'}
+              : 'Please wait while we create your strategic documents'}
           </p>
         </div>
 

@@ -1,25 +1,25 @@
 export default function Landing() {
   return (
     <div className="min-h-screen bg-banyan-bg-base text-banyan-text-default">
-      <main className="mx-auto max-w-4xl px-6 py-24">
-        <div className="text-center py-[70px]">
+      <main className="mx-auto max-w-5xl px-4 md:px-6 lg:px-8 py-16 md:py-24">
+        <div className="text-center">
           {/* Headline */}
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl text-banyan-text-default">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-balance text-gray-900 dark:text-white">
             From first draft to focused strategy
           </h1>
 
           {/* Subhead */}
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-banyan-text-subtle">
-            From insight to action. Build plans that align your team and investors.
+          <p className="mt-4 md:mt-6 text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-balance">
+            Build plans that align your team and investors.
           </p>
 
-          {/* CTAs */}
+          {/* CTA */}
           <div className="mt-8 flex justify-center">
             <a
               href="/new"
               className="btn-banyan-primary"
             >
-              Create Your Brief
+              Start Building
             </a>
           </div>
         </div>

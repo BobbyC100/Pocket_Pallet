@@ -10,16 +10,16 @@ export default function Dashboard() {
     <main className="mx-auto max-w-4xl px-6 py-12">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-banyan-text-default">Your Briefs</h1>
+          <h1 className="text-xl font-semibold text-banyan-text-default">Your Vision Statements</h1>
           <p className="text-sm text-banyan-text-subtle">Update or create a new one anytime.</p>
         </div>
-        <a href="/new" className="btn-banyan-primary">New Brief</a>
+        <a href="/new" className="btn-banyan-primary">New Vision Statement</a>
       </div>
 
       {briefs.length === 0 ? (
         <div className="rounded-2xl border border-banyan-border-default bg-banyan-bg-surface p-6 text-center shadow-banyan-mid">
-          <p className="text-banyan-text-default">No briefs yet. Create your first one in 10 minutes.</p>
-          <a href="/new" className="btn-banyan-primary mt-3 inline-block">Create Your Brief</a>
+          <p className="text-banyan-text-default">No Vision Statements yet. Create your first one in 10 minutes.</p>
+          <a href="/new" className="btn-banyan-primary mt-3 inline-block">Start Building</a>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">

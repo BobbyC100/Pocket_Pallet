@@ -3,14 +3,22 @@
 import { useState } from 'react';
 
 export default function ShowcasePage() {
-  const [activeDoc, setActiveDoc] = useState<'brief' | 'framework'>('brief');
+  const [activeDoc, setActiveDoc] = useState<'brief' | 'framework' | 'lens'>('brief');
 
-  // Sample Brief (GPT-4 generated)
-  const founderBrief = `**YardBird: Dynamic Dispatch for Construction Logistics**
+  // Sample Vision Statement (GPT-4 generated)
+  const founderBrief = `**SignalIQ: AI-Powered Sales Intelligence Platform**
 
 **The Problem We're Solving**
 
-Material deliveries to urban construction sites are late or misplaced roughly 30% of the time, stalling crews and burning budget. For mid-market General Contractors managing $50M–$500M in annual revenue, these delays translate directly into idle crew hours, missed milestones, and eroded margins. The root cause isn't negligence—it's coordination chaos. Job sites juggle dozens of vendors, dynamic schedules, and ever-changing curb access rules, all tracked in spreadsheets and phone calls.
+B2B sales teams waste 40% of their time chasing dead leads and missing buying signals. Mid-market SaaS companies ($10M-$100M ARR) are drowning in intent data from a dozen different tools—web analytics, G2 reviews, LinkedIn engagement, product usage signals—but lack the intelligence layer to turn this noise into action. Reps default to spray-and-pray outreach because they don't know which prospects are actually in-market. The result: low connect rates, burned territories, and pipeline that never converts.
+
+**Why Now**
+
+Three inflection points make this problem solvable today. First, intent data has become commoditized—Bombora, 6sense, and ZoomInfo all provide raw signals, but none synthesize them intelligently. Second, AI models (specifically LLMs fine-tuned on B2B buying patterns) can now detect nuanced buying intent that rules-based systems miss. Third, sales orgs are desperate for efficiency gains post-downturn, making them willing to rip out legacy workflows for proven ROI.
+
+**Our Solution**
+
+SignalIQ ingests intent data from 15+ sources, uses proprietary AI to score accounts in real-time, and auto-generates personalized outreach suggestions. When a prospect visits your pricing page twice, downloads a competitor comparison, and their CFO posts about "evaluating new tools" on LinkedIn—our system flags it instantly and drafts a contextual email. We're not another data vendor; we're the decision engine that tells reps exactly who to call, when to call them, and what to say.
 
 **Why Now**
 
@@ -250,7 +258,7 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
                 : 'text-banyan-text-subtle hover:text-banyan-text-default'
             }`}
           >
-            Founder Brief
+            Vision Statement
           </button>
           <button
             onClick={() => setActiveDoc('framework')}
@@ -269,10 +277,10 @@ $2M seed to scale from 2 customers to 20+ in our target cities (NYC, Chicago, LA
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         {activeDoc === 'brief' ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Founder Brief */}
+            {/* Vision Statement */}
             <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-banyan-text-default">Founder Brief</h2>
+                <h2 className="text-2xl font-bold text-banyan-text-default">Vision Statement</h2>
               </div>
               <div className="prose prose-sm max-w-none">
                 <div className="whitespace-pre-wrap text-banyan-text-default leading-relaxed">

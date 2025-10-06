@@ -10,15 +10,19 @@ export interface PromptInput {
   current_state: string;
   vision_purpose: string;
   vision_endstate: string;
+  vision_combined?: string; // Combined vision field for wizard UI (gets parsed into vision_purpose + vision_endstate)
 }
 
-export interface BriefOutput {
+export interface VisionStatementOutput {
   founderBriefMd: string;
   vcSummaryMd: string;
   runwayMonths: number | null;
 }
 
-export interface BriefData {
+// Backward compatibility alias
+export type BriefOutput = VisionStatementOutput;
+
+export interface VisionStatementData {
   id: string;
   name: string;
   stage: Stage;
@@ -36,19 +40,25 @@ export interface BriefData {
   vcSummary?: string;
 }
 
+// Backward compatibility alias
+export type BriefData = VisionStatementData;
+
 export interface PromptStep {
   id: string;
   title: string;
   description: string;
   placeholder: string;
-  field: keyof BriefData['responses'];
+  field: keyof VisionStatementData['responses'];
 }
 
-export interface SampleBriefData {
+export interface SampleVisionStatementData {
   id: string;
   name: string;
   stage: Stage;
-  responses: BriefData['responses'];
+  responses: VisionStatementData['responses'];
   founderBrief: string;
   vcSummary: string;
 }
+
+// Backward compatibility alias
+export type SampleBriefData = SampleVisionStatementData;

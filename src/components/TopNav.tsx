@@ -26,7 +26,7 @@ export default function TopNav({ showDashboard = false }: TopNavProps) {
               href="/new" 
               className="btn-banyan-primary text-sm"
             >
-              New Brief
+              New Vision Statement
             </Link>
           </div>
         </div>

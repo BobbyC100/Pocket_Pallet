@@ -5,8 +5,16 @@
 
 // Pricing as of October 2025 (update as needed)
 export const AI_COSTS = {
+  'gpt-4o': {
+    input: 0.005 / 1000,  // $5 per 1M tokens = $0.005 per 1K tokens
+    output: 0.015 / 1000  // $15 per 1M tokens = $0.015 per 1K tokens
+  },
+  'gpt-4o-mini': {
+    input: 0.00015 / 1000,  // $0.15 per 1M tokens
+    output: 0.0006 / 1000   // $0.60 per 1M tokens
+  },
   'gpt-4-turbo-preview': {
-    input: 0.01 / 1000,  // $0.01 per 1K tokens
+    input: 0.01 / 1000,  // $0.01 per 1K tokens (deprecated, use gpt-4o)
     output: 0.03 / 1000   // $0.03 per 1K tokens
   },
   'gpt-4': {

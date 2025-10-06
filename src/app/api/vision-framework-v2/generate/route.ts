@@ -8,6 +8,7 @@ import {
 } from '@/lib/vision-framework-schema-v2';
 import { checkRateLimit, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limiter';
 import { calculateCost, trackCost } from '@/lib/cost-tracker';
+import { retrieveForGeneration, getCitation, type RetrievalResult } from '@/lib/rgrs/retrieval';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -45,9 +46,37 @@ export async function POST(request: NextRequest) {
     console.log(`[${requestId}] 🚀 Starting Vision Framework V2 generation with GPT-4`);
     console.log(`[${requestId}] 📝 Company:`, companyId);
 
-    // Step 1: GPT-4 generates the framework with contradiction detection
+    // Step 0: Retrieve research-backed insights
+    let researchChunks: RetrievalResult[] = [];
+    let researchContext = '';
+    
+    try {
+      console.log(`[${requestId}] 📚 Retrieving research insights...`);
+      researchChunks = await retrieveForGeneration(responses);
+      
+      if (researchChunks.length > 0) {
+        researchContext = '\n\n## Research-Backed Insights\n\n' +
+          'The following findings from organizational science research inform your framework:\n\n' +
+          researchChunks.map((r, idx) => {
+            const citation = getCitation(r);
+            return `**[${idx + 1}] ${citation.title}** (${citation.section || 'N/A'})\n${r.chunk.content.slice(0, 400)}...\n`;
+          }).join('\n') +
+          '\n---\n\n';
+        
+        console.log(`[${requestId}] 📚 Retrieved ${researchChunks.length} research chunks`);
+      } else {
+        console.log(`[${requestId}] ℹ️  No research chunks found (corpus may be empty)`);
+      }
+    } catch (error) {
+      console.error(`[${requestId}] ⚠️  Research retrieval failed, continuing without:`, error);
+    }
+
+    // Step 1: GPT-4 generates the framework with contradiction detection (with research context)
     console.log('Step 1: GPT-4 mapping sections and detecting tensions...');
-    const frameworkPrompt = createVisionFrameworkPrompt(responses);
+    const basePrompt = createVisionFrameworkPrompt(responses);
+    const frameworkPrompt = researchContext 
+      ? basePrompt + researchContext + 'When crafting the framework, incorporate insights from the research above where relevant.'
+      : basePrompt;
     const frameworkResult = await openai.chat.completions.create({
       model: "gpt-4-turbo-preview",
       messages: [{ role: "user", content: frameworkPrompt }],
@@ -177,6 +206,7 @@ export async function POST(request: NextRequest) {
     });
     console.log(`[${requestId}] 💰 Total Cost: $${cost.totalCost.toFixed(4)} (${cost.tokens.total} tokens)`);
     console.log(`[${requestId}] ⏱️  Total Duration: ${(Date.now() - startTime) / 1000}s`);
+    console.log(`[${requestId}] 📚 Sending ${researchChunks.length} citations in response`);
 
     return NextResponse.json({
       status: 'success',
@@ -186,6 +216,10 @@ export async function POST(request: NextRequest) {
         modelsUsed: ['gpt-4-turbo-preview'],
         qaChecks: qaResults,
         qualityScores: qualityScores,
+        researchCitations: researchChunks.length > 0 
+          ? researchChunks.map(r => getCitation(r))
+          : [],
+        researchBacked: researchChunks.length > 0,
         generatedAt: new Date().toISOString(),
         cost: {
           total: cost.totalCost,

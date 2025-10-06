@@ -58,10 +58,10 @@ export default function SaveModal({ isOpen, onClose, onSaveComplete }: SaveModal
           {/* Header */}
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-banyan-text-default mb-2">
-              Create a free account to keep this brief
+              Save and expand your Vision.
             </h2>
             <p className="text-banyan-text-subtle text-sm">
-              Save your progress and access it from anywhere. No spam, ever.
+              Sign up to unlock your full Vision Framework and strategic tools.
             </p>
           </div>
 

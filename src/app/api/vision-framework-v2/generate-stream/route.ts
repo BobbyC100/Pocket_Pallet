@@ -9,6 +9,7 @@ import {
 import { checkRateLimit, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limiter';
 import { calculateCost, trackCost, AIModel } from '@/lib/cost-tracker';
 import { createSSETransformer, createStreamResponse, sendStreamEvent, StreamEvent } from '@/lib/streaming-utils';
+import { retrieveForGeneration, formatCitations, getCitation, type RetrievalResult } from '@/lib/rgrs/retrieval';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -54,7 +55,52 @@ export async function POST(request: NextRequest) {
     // Start async generation process
     (async () => {
       try {
-        // Step 1: Generate framework
+        // Step 0: Retrieve research-backed insights
+        await sendStreamEvent(writer, {
+          type: 'step_start',
+          step: 'research',
+          message: 'Retrieving research-backed insights...'
+        });
+
+        const step0Start = Date.now();
+        let researchChunks: RetrievalResult[] = [];
+        let researchContext = '';
+        
+        try {
+          researchChunks = await retrieveForGeneration(responses);
+          
+          if (researchChunks.length > 0) {
+            researchContext = '\n\n## Research-Backed Insights\n\n' +
+              'The following findings from organizational science research inform your framework:\n\n' +
+              researchChunks.map((r, idx) => {
+                const citation = getCitation(r);
+                return `**[${idx + 1}] ${citation.title}** (${citation.section || 'N/A'})\n${r.chunk.content.slice(0, 400)}...\n`;
+              }).join('\n') +
+              '\n---\n\n';
+            
+            console.log(`[${requestId}] 📚 Retrieved ${researchChunks.length} research chunks`);
+          } else {
+            console.log(`[${requestId}] ℹ️  No research chunks found (corpus may be empty)`);
+          }
+        } catch (error) {
+          console.error(`[${requestId}] ⚠️  Research retrieval failed, continuing without:`, error);
+          // Continue generation even if research retrieval fails
+        }
+
+        await sendStreamEvent(writer, {
+          type: 'step_complete',
+          step: 'research',
+          message: researchChunks.length > 0 
+            ? `Found ${researchChunks.length} relevant research insights`
+            : 'No research insights found (continuing with standard generation)',
+          duration: Date.now() - step0Start,
+          data: {
+            chunksRetrieved: researchChunks.length,
+            citations: researchChunks.map(r => getCitation(r))
+          }
+        });
+
+        // Step 1: Generate framework (with research context)
         await sendStreamEvent(writer, {
           type: 'step_start',
           step: 'framework',
@@ -62,9 +108,12 @@ export async function POST(request: NextRequest) {
         });
 
         const step1Start = Date.now();
-        const frameworkPrompt = createVisionFrameworkPrompt(responses);
+        const basePrompt = createVisionFrameworkPrompt(responses);
+        const frameworkPrompt = researchContext 
+          ? basePrompt + researchContext + 'When crafting the framework, incorporate insights from the research above where relevant. Reference specific findings to add credibility.'
+          : basePrompt;
         const frameworkResult = await openai.chat.completions.create({
-          model: "gpt-4-turbo-preview",
+          model: "gpt-4o", // Upgraded from gpt-4-turbo-preview - 2x faster, same quality
           messages: [{ role: "user", content: frameworkPrompt }],
           temperature: 0.7,
           response_format: { type: "json_object" }
@@ -142,7 +191,7 @@ export async function POST(request: NextRequest) {
         const step3Start = Date.now();
         const onePagerPrompt = createExecutiveOnePagerPrompt(completeFramework);
         const onePagerResult = await openai.chat.completions.create({
-          model: "gpt-4-turbo-preview",
+          model: "gpt-4o", // Upgraded from gpt-4-turbo-preview - 2x faster, same quality
           messages: [{ role: "user", content: onePagerPrompt }],
           temperature: 0.7
         });
@@ -202,7 +251,7 @@ export async function POST(request: NextRequest) {
                  (onePagerResult.usage?.total_tokens || 0)
         };
 
-        const cost = calculateCost('gpt-4-turbo-preview', totalUsage);
+        const cost = calculateCost('gpt-4o', totalUsage);
         trackCost('generate-vision-framework-v2-stream', cost, {
           requestId,
           userId,
@@ -214,6 +263,7 @@ export async function POST(request: NextRequest) {
 
         console.log(`[${requestId}] 💰 Total Cost: $${cost.totalCost.toFixed(4)} (${cost.tokens.total} tokens)`);
         console.log(`[${requestId}] ⏱️  Total Duration: ${(Date.now() - startTime) / 1000}s`);
+        console.log(`[${requestId}] 📚 Sending ${researchChunks.length} citations in final response`);
 
         // Send final complete event
         await sendStreamEvent(writer, {
@@ -223,9 +273,13 @@ export async function POST(request: NextRequest) {
             framework: completeFramework,
             executiveOnePager,
             metadata: {
-              modelsUsed: ['gpt-4-turbo-preview'],
+              modelsUsed: ['gpt-4o'],
               qaChecks: qaResults,
               qualityScores: qualityScores,
+              researchCitations: researchChunks.length > 0 
+                ? researchChunks.map(r => getCitation(r))
+                : [],
+              researchBacked: researchChunks.length > 0,
               generatedAt: new Date().toISOString(),
               cost: {
                 total: cost.totalCost,
@@ -293,7 +347,7 @@ ${JSON.stringify(framework, null, 2)}
 
   try {
     const result = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o-mini", // Using mini for QA - faster and cheaper for validation tasks
       messages: [{ role: "user", content: qaPrompt }],
       temperature: 0.3,
       response_format: { type: "json_object" }
@@ -348,7 +402,7 @@ Example: vision with (8, 7, 9) = (8 + 7 + 9×2) / 4 = 33/4 = 8.25`;
 
   try {
     const result = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o-mini", // Using mini for scoring - faster and cheaper for evaluation tasks
       messages: [{ role: "user", content: scoringPrompt }],
       temperature: 0.3,
       response_format: { type: "json_object" }

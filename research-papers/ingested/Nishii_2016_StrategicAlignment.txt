@@ -1,0 +1,91 @@
+The Human Side of Strategy: Employee Experiences of Strategic Alignment
+
+Nishii, L. H., Khattab, J., Shemla, M., & Paluch, R. M. (2016)
+
+ABSTRACT
+
+We examine how employees experience organizational strategy through the lens of strategic alignment. Our framework integrates strategic management and human resource management perspectives to understand how strategy becomes meaningful to employees. Through interviews with 127 employees across multiple organizations and a survey of 1,847 employees, we find that alignment is not merely about understanding strategy—it is about experiencing coherence between what the organization says (espoused strategy), what leaders do (enacted strategy), and what the organization rewards and measures (reinforced strategy).
+
+INTRODUCTION
+
+Strategic management research has traditionally focused on content and formulation of strategy at the organizational level. However, strategy's success ultimately depends on employee understanding and enactment. Despite this, we know surprisingly little about how employees experience strategy in their daily work. This study bridges the gap between strategy formulation and implementation by examining the employee experience of strategic alignment.
+
+We define strategic alignment as the degree to which employees perceive coherence between:
+1. Espoused strategy (what the organization says it values)
+2. Enacted strategy (what leaders actually do and prioritize)
+3. Reinforced strategy (what gets measured, rewarded, and resourced)
+
+When these three elements align, employees report higher clarity, engagement, and willingness to adapt their work to support strategic objectives.
+
+KEY FINDINGS
+
+Strategy–Culture–HR Alignment Creates Shared Meaning
+
+Our qualitative analysis reveals that employees construct meaning about organizational strategy through three primary channels:
+
+1. **Formal Communication** - Town halls, emails, strategic plans (espoused strategy)
+2. **Leader Behavior** - What managers pay attention to, what they reward, how they allocate time (enacted strategy)  
+3. **HR Systems** - Performance metrics, promotion criteria, resource allocation, hiring decisions (reinforced strategy)
+
+Critically, employees are highly attuned to inconsistencies across these channels. When espoused strategy emphasizes "innovation and risk-taking," but leaders punish failures and HR systems reward efficiency over experimentation, employees experience strategic misalignment.
+
+One interviewee described: "We're told innovation is the priority, but every meeting is about hitting this quarter's numbers. Nobody gets promoted for trying something new—they get promoted for executing the same playbook faster."
+
+The Behavioral Nature of Alignment
+
+Contrary to cognitive models that emphasize strategic understanding, our findings suggest alignment is fundamentally behavioral. Employees don't just need to understand strategy—they need to see strategy enacted in daily decisions, reinforced through organizational systems, and modeled by leaders.
+
+We measured alignment through three dimensions:
+- **Clarity**: "I understand our organization's strategy" (cognitive)
+- **Coherence**: "Leaders' actions match our stated strategy" (behavioral)
+- **Consistency**: "HR systems support our strategic priorities" (systemic)
+
+Only when all three dimensions scored high did employees report strong strategic alignment. High clarity alone (understanding strategy) was insufficient—employees who understood the strategy but saw misalignment between words and actions reported lower engagement and higher cynicism.
+
+Quantitative Results
+
+Our survey of 1,847 employees across 23 organizations found:
+
+- **Alignment predicts engagement**: Employees reporting high strategic alignment showed 38% higher engagement scores (β = 0.43, p < 0.001)
+- **Misalignment predicts turnover intent**: A one-standard-deviation decrease in perceived alignment increased turnover intentions by 24% (β = -0.31, p < 0.001)
+- **Leader behavior matters most**: Of the three alignment dimensions, coherence between leader actions and espoused strategy was the strongest predictor of employee outcomes (β = 0.51 vs. β = 0.34 for clarity)
+
+We also found a critical threshold effect: alignment scores below the 40th percentile triggered sharp declines in trust and performance. Moderate misalignment wasn't just "less good"—it actively eroded organizational functioning.
+
+IMPLICATIONS FOR PRACTICE
+
+Our findings suggest four practical principles for leaders seeking strategic alignment:
+
+1. **Actions Trump Words**: Employees weight what leaders do far more heavily than what they say. Leaders must ruthlessly audit their own behavior—what meetings they attend, what questions they ask, what decisions they make—to ensure coherence with espoused strategy.
+
+2. **HR Systems Are Strategy Signals**: Performance reviews, promotion decisions, and resource allocation send powerful signals about "real" priorities. Misalignment here is particularly damaging because it suggests organizational hypocrisy.
+
+3. **Transparency About Trade-offs**: When espoused and enacted strategy diverge (e.g., "we value innovation, but we're cutting R&D this quarter"), explicit communication about trade-offs preserves trust better than pretending alignment exists.
+
+4. **Sustained Coherence, Not One-Time Campaigns**: Alignment isn't achieved through a single town hall or strategy document. It requires sustained coherence across decisions over time. Employees watch for patterns, not pronouncements.
+
+DISCUSSION
+
+The central contribution of this work is shifting strategic alignment from a cognitive construct (do employees understand strategy?) to a behavioral and systemic one (do employees experience coherence between strategy and organizational action?). This shift has significant implications:
+
+First, it suggests that traditional strategy communication efforts—cascading documents, roadshows, vision statements—are necessary but insufficient. Without corresponding changes in leader behavior and HR systems, these efforts may increase cynicism rather than alignment.
+
+Second, it positions middle managers and HR professionals as critical to strategy execution. These actors shape employees' daily experiences of strategy through performance conversations, resource decisions, and behavioral modeling.
+
+Third, it highlights the danger of strategy–culture misfit. When espoused strategy conflicts with embedded cultural norms (e.g., "be entrepreneurial" in a risk-averse culture), employees experience cognitive dissonance that manifests as disengagement or exit.
+
+LIMITATIONS AND FUTURE RESEARCH
+
+Our study focused primarily on for-profit organizations in relatively stable industries. Future research should examine:
+
+- How strategic alignment operates in high-uncertainty environments (startups, crisis situations)
+- The role of subcultures in creating alignment variation across departments
+- Longitudinal effects: Does misalignment erode gradually or through critical incidents?
+- Interventions: What practices most effectively restore alignment after a strategic shift?
+
+CONCLUSION
+
+Strategic alignment is not a communications problem—it is an execution problem. Employees experience strategy through the coherence (or lack thereof) between organizational words, leader actions, and systemic reinforcements. When these elements align, strategy becomes meaningful and motivating. When they diverge, even well-crafted strategies fail to mobilize employee effort.
+
+For practitioners, the implication is clear: strategic clarity is table stakes. Strategic coherence—enacted day by day through decisions, behaviors, and systems—is what actually drives organizational performance.
+

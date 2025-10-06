@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     
     // Track costs
     if (gpt4Briefs.usage) {
-      const cost = calculateCost('gpt-4-turbo-preview', gpt4Briefs.usage);
+      const cost = calculateCost('gpt-4o', gpt4Briefs.usage);
       trackCost('generate-brief', cost, {
         requestId,
         userId,
@@ -84,29 +84,30 @@ export async function POST(request: NextRequest) {
       console.log(`[${requestId}] 💰 Cost: $${cost.totalCost.toFixed(4)} (${cost.tokens.total} tokens)`);
     }
 
-    // Score VC Summary if structured version exists
+    // SKIP VC Summary scoring for speed - can be done async later if needed
+    // This saves ~2-3 seconds on the initial generation
     let vcSummaryScores = null;
-    if (vcSummaryStructured) {
-      try {
-        console.log('🔍 Scoring VC Summary...');
-        const scoreResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/vc-summary/score`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ vcSummary: vcSummaryStructured })
-        });
-        
-        if (scoreResponse.ok) {
-          const scoreResult = await scoreResponse.json();
-          vcSummaryScores = scoreResult.scores;
-          console.log('✅ VC Summary scored:', scoreResult.overallQuality);
-        } else {
-          console.warn('⚠️ VC Summary scoring failed, continuing without scores');
-        }
-      } catch (error) {
-        console.error('❌ VC Summary scoring error:', error);
-        // Continue without scores - scoring is optional
-      }
-    }
+    // if (vcSummaryStructured) {
+    //   try {
+    //     console.log('🔍 Scoring VC Summary...');
+    //     const scoreResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/vc-summary/score`, {
+    //       method: 'POST',
+    //       headers: { 'Content-Type': 'application/json' },
+    //       body: JSON.stringify({ vcSummary: vcSummaryStructured })
+    //     });
+    //     
+    //     if (scoreResponse.ok) {
+    //       const scoreResult = await scoreResponse.json();
+    //       vcSummaryScores = scoreResult.scores;
+    //       console.log('✅ VC Summary scored:', scoreResult.overallQuality);
+    //     } else {
+    //       console.warn('⚠️ VC Summary scoring failed, continuing without scores');
+    //     }
+    //   } catch (error) {
+    //     console.error('❌ VC Summary scoring error:', error);
+    //     // Continue without scores - scoring is optional
+    //   }
+    // }
 
     // Calculate runway if available
     const runwayMonths = calculateRunway(responses);
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
     console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
       { 
-        error: 'Failed to generate brief',
+        error: 'Failed to generate Vision Statement',
         details: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined
       },
@@ -175,19 +176,19 @@ async function generateGPT4Briefs(responses: any) {
 
   const [founderResult, vcResult, vcStructuredResult] = await Promise.all([
     openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o", // Upgraded from gpt-4-turbo-preview - 2x faster, same quality
       messages: [{ role: "user", content: founderPrompt }],
       temperature: 0.7,
       max_tokens: 2000,
     }),
     openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o", // Upgraded from gpt-4-turbo-preview - 2x faster, same quality
       messages: [{ role: "user", content: vcPrompt }],
       temperature: 0.7,
       max_tokens: 1500,
     }),
     openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o", // Upgraded from gpt-4-turbo-preview - 2x faster, same quality
       messages: [{ role: "user", content: vcStructuredPrompt }],
       temperature: 0.7,
       max_tokens: 1500,

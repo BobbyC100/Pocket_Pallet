@@ -1,0 +1,12 @@
+{
+  "stage": "early_traction",
+  "vision_audience_timing": "We're building a performance management platform for mid-market companies (200-2000 employees) where employees lack clarity on how their work connects to company goals. Right now, engagement is at all-time lows and companies are desperate for tools that create genuine alignment, not just check boxes. Remote work has made goal visibility even more critical.",
+  "hard_decisions": "Should we focus on engagement metrics or performance metrics first? Do we build for HR leaders or team managers? How do we balance individual goal-setting with organizational objectives without adding bureaucracy?",
+  "success_definition": "Financially: Build a $50M+ ARR business with 80%+ retention and become the default alignment platform. Culturally: Build a team where everyone understands how their work matters, where transparency is the default, and where we measure what matters.",
+  "core_principles": "Clarity over complexity — every employee should understand their goals in 5 minutes. Alignment over activity — we measure outcomes, not busy work. Trust through transparency — everyone sees how their work connects to company goals.",
+  "required_capabilities": "Real-time goal tracking that shows individual → team → company connections. Simple UI that makes goal-setting feel natural, not forced. Analytics that surface misalignment before it becomes a problem. Integration with tools teams already use (Slack, Asana, Jira).",
+  "current_state": "2 co-founders: ex-HR tech PM (8 years at Culture Amp) and ex-performance management consultant (worked with 100+ companies). 5 beta customers (50-300 employees each). 400 active users, 75% weekly engagement, 85% report 'clearer understanding of goals'. $200K pre-seed, $15K monthly burn, 13 months runway.",
+  "vision_purpose": "Ensure every employee understands how their work contributes to organizational success",
+  "vision_endstate": "A world where goal alignment is the norm, not the exception—where every employee wakes up knowing exactly how their work matters and feels genuinely connected to their company's mission"
+}
+

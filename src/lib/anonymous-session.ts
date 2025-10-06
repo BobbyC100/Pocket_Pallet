@@ -32,7 +32,7 @@ export function clearAnonymousId(): void {
  */
 export interface Draft {
   id: string;
-  type: 'brief' | 'vision_framework_v2' | 'executive_onepager' | 'vc_summary';
+  type: 'brief' | 'vision_statement' | 'vision_framework_v2' | 'executive_onepager' | 'vc_summary';
   title?: string;
   contentJson: any;
   metadata?: any;

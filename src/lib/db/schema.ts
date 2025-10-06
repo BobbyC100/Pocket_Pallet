@@ -1,14 +1,18 @@
-import { pgTable, uuid, text, timestamp, jsonb, boolean, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, jsonb, boolean, pgEnum, integer, real, vector } from 'drizzle-orm/pg-core';
 
 // Enums
 export const authProviderEnum = pgEnum('auth_provider', ['email', 'google', 'anonymous']);
-export const documentTypeEnum = pgEnum('document_type', ['brief', 'vision_framework_v2', 'executive_onepager', 'vc_summary']);
+export const documentTypeEnum = pgEnum('document_type', ['brief', 'vision_statement', 'vision_framework_v2', 'executive_onepager', 'vc_summary']);
 export const eventTypeEnum = pgEnum('event_type', ['created_brief', 'saved_brief', 'exported_doc', 'signed_up', 'upgraded_account']);
 export const lensEventTypeEnum = pgEnum('lens_event_type', [
   'doc_created', 'doc_edited', 'doc_submitted', 
   'lens_scored', 'score_viewed', 'reflection_viewed',
   'regenerate_with_lens'
 ]);
+
+// RGRS Enums
+export const sourceTypeEnum = pgEnum('source_type', ['paper', 'article', 'book', 'report', 'thesis']);
+export const claimLabelEnum = pgEnum('claim_label', ['confirmed', 'needs_citation', 'unsupported']);
 
 // Users table
 export const users = pgTable('users', {
@@ -131,6 +135,87 @@ export const costEvents = pgTable('cost_events', {
   createdAt: text('created_at').notNull(), // ISO timestamp as text
 });
 
+// ============================================================================
+// RGRS (Research-Grounded Reasoning System) Tables
+// ============================================================================
+
+// Research Sources (papers, articles, books)
+export const sources = pgTable('sources', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  type: sourceTypeEnum('type').notNull(),
+  authors: text('authors').array(), // Array of author names
+  url: text('url'), // Link to paper or DOI
+  publishedAt: timestamp('published_at'), // Publication date
+  vettingScore: real('vetting_score'), // 0-1 quality score (peer-reviewed, relevance, recency)
+  hash: text('hash').unique().notNull(), // Content hash for deduplication
+  metadata: jsonb('metadata'), // Journal, DOI, abstract, etc.
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Text Chunks with Embeddings
+export const chunks = pgTable('chunks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sourceId: uuid('source_id').references(() => sources.id, { onDelete: 'cascade' }).notNull(),
+  ord: integer('ord').notNull(), // Order within source
+  content: text('content').notNull(), // ~1k tokens
+  tokens: integer('tokens').notNull(), // Token count
+  section: text('section'), // e.g., "Introduction", "Discussion", "Findings"
+  embedding: vector('embedding', { dimensions: 1536 }), // text-embedding-3-small
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Extracted Facts (subject-predicate-object triples)
+export const facts = pgTable('facts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sourceId: uuid('source_id').references(() => sources.id, { onDelete: 'cascade' }).notNull(),
+  chunkId: uuid('chunk_id').references(() => chunks.id, { onDelete: 'cascade' }),
+  subject: text('subject').notNull(), // e.g., "goal_congruence"
+  predicate: text('predicate').notNull(), // e.g., "increases"
+  object: text('object').notNull(), // e.g., "employee_engagement"
+  evidence: text('evidence'), // Direct quote or paraphrase
+  confidence: real('confidence'), // 0-1 extraction confidence
+  verified: boolean('verified').default(false), // Human-verified
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Generated Claims (with citations and confidence)
+export const claims = pgTable('claims', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  documentId: uuid('document_id').references(() => documents.id, { onDelete: 'cascade' }).notNull(),
+  claim: text('claim').notNull(), // The actual claim/insight
+  supportingChunkIds: uuid('supporting_chunk_ids').array(), // References to chunks
+  supportingFactIds: uuid('supporting_fact_ids').array(), // References to facts
+  confidence: real('confidence').notNull(), // 0-1 confidence score
+  section: text('section'), // Which part of doc (e.g., "vision", "strategy")
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Claim Evaluations (human feedback for learning)
+export const evals = pgTable('evals', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  claimId: uuid('claim_id').references(() => claims.id, { onDelete: 'cascade' }).notNull(),
+  label: claimLabelEnum('label').notNull(), // confirmed / needs_citation / unsupported
+  notes: text('notes'), // Optional reviewer notes
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// BAI (Banyan Alignment Index) Scores
+export const baiScores = pgTable('bai_scores', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  documentId: uuid('document_id').references(() => documents.id, { onDelete: 'cascade' }).notNull(),
+  goalCongruence: real('goal_congruence').notNull(), // 0-1
+  roleClarity: real('role_clarity').notNull(), // 0-1
+  metricCoherence: real('metric_coherence').notNull(), // 0-1
+  voiceSafety: real('voice_safety').notNull(), // 0-1
+  docConsistency: real('doc_consistency').notNull(), // 0-1
+  overallScore: real('overall_score').notNull(), // Average of 5 signals
+  metadata: jsonb('metadata'), // Detailed breakdown
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Type exports for TypeScript
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -152,4 +237,18 @@ export type LensReflection = typeof lensReflections.$inferSelect;
 export type NewLensReflection = typeof lensReflections.$inferInsert;
 export type CostEvent = typeof costEvents.$inferSelect;
 export type NewCostEvent = typeof costEvents.$inferInsert;
+
+// RGRS Types
+export type Source = typeof sources.$inferSelect;
+export type NewSource = typeof sources.$inferInsert;
+export type Chunk = typeof chunks.$inferSelect;
+export type NewChunk = typeof chunks.$inferInsert;
+export type Fact = typeof facts.$inferSelect;
+export type NewFact = typeof facts.$inferInsert;
+export type Claim = typeof claims.$inferSelect;
+export type NewClaim = typeof claims.$inferInsert;
+export type Eval = typeof evals.$inferSelect;
+export type NewEval = typeof evals.$inferInsert;
+export type BAIScore = typeof baiScores.$inferSelect;
+export type NewBAIScore = typeof baiScores.$inferInsert;
 
