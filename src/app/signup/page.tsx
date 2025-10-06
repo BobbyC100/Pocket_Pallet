@@ -2,12 +2,13 @@
 
 import { SignUp } from '@clerk/nextjs';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 /**
  * Sign up page - uses Clerk's SignUp component
  * Redirects new users to /new by default to create their first brief
  */
-export default function SignUpPage() {
+function SignUpContent() {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get('redirect_url') || '/new';
 
@@ -20,6 +21,18 @@ export default function SignUpPage() {
         signInUrl="/login"
       />
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen bg-banyan-bg-base">
+        <div>Loading...</div>
+      </div>
+    }>
+      <SignUpContent />
+    </Suspense>
   );
 }
 
