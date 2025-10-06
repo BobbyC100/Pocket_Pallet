@@ -93,11 +93,11 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
     }
   }
 
-  const updateStepStatus = (stepId: string, status: 'pending' | 'in_progress' | 'complete' | 'error', message?: string, duration?: number) => {
+  const updateStepStatus = (stepId: string, status: 'pending' | 'active' | 'complete' | 'error', message?: string, duration?: number) => {
     setGenerationSteps(prev => prev.map(step => 
       step.id === stepId ? { ...step, status, message, duration } : step
     ));
-    if (status === 'in_progress') {
+    if (status === 'active') {
       setActiveGenerationStep(stepId);
     }
   };
@@ -142,7 +142,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       }
       
       // Step 1: Generate Vision Statement (fast, no streaming needed)
-      updateStepStatus('brief', 'in_progress', 'Generating Vision Statement...');
+      updateStepStatus('brief', 'active', 'Generating Vision Statement...');
       
       const briefResponse = await fetch('/api/generate-brief', {
         method: 'POST',
@@ -262,7 +262,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         console.log('📡 Stream event:', event);
         
         if (event.type === 'step_start') {
-          updateStepStatus(event.step!, 'in_progress', event.message);
+          updateStepStatus(event.step!, 'active', event.message);
         } else if (event.type === 'step_complete') {
           updateStepStatus(event.step!, 'complete', event.message, event.duration);
           
