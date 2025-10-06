@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Globe } from "lucide-react";
+import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 
 export function AppHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isSignedIn } = useUser();
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur border-b border-black/5 dark:border-white/10 transition-colors duration-300">
@@ -30,18 +32,30 @@ export function AppHeader() {
           >
             Demo
           </Link>
-          <Link 
-            href="/login" 
-            className="text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-150 ease-in-out"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className="inline-flex items-center justify-center h-9 px-4 rounded-2xl text-sm font-medium bg-emerald-700 dark:bg-emerald-600 text-white hover:bg-emerald-800 dark:hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 transition-all duration-150 ease-in-out"
-          >
-            Join for free
-          </Link>
+          {!isSignedIn ? (
+            <>
+              <SignInButton mode="modal">
+                <button className="text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-150 ease-in-out">
+                  Log in
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="inline-flex items-center justify-center h-9 px-4 rounded-2xl text-sm font-medium bg-emerald-700 dark:bg-emerald-600 text-white hover:bg-emerald-800 dark:hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 transition-all duration-150 ease-in-out">
+                  Sign Up
+                </button>
+              </SignUpButton>
+            </>
+          ) : (
+            <>
+              <Link 
+                href="/dashboard" 
+                className="inline-flex items-center justify-center h-9 px-4 rounded-2xl text-sm font-medium bg-emerald-700 dark:bg-emerald-600 text-white hover:bg-emerald-800 dark:hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 transition-all duration-150 ease-in-out"
+              >
+                Dashboard
+              </Link>
+              <UserButton afterSignOutUrl="/" />
+            </>
+          )}
 
           {/* Globe menu */}
           <div className="relative">
@@ -120,19 +134,41 @@ export function AppHeader() {
           <div className="md:hidden absolute top-16 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-lg z-40">
             <div className="px-4 py-2 space-y-1">
               <MobileMenuItem href="/demo" label="Demo" onSelect={() => setMenuOpen(false)} />
-              <MobileMenuItem href="/login" label="Log in" onSelect={() => setMenuOpen(false)} />
-              <MobileMenuItem href="/pricing" label="Plans / Cost" onSelect={() => setMenuOpen(false)} />
-              <MobileMenuItem href="/settings" label="Settings" onSelect={() => setMenuOpen(false)} />
-              <MobileMenuItem href="/help" label="Help / Knowledge" onSelect={() => setMenuOpen(false)} />
-              <div className="pt-2">
-                <Link
-                  href="/signup"
-                  onClick={() => setMenuOpen(false)}
-                  className="block w-full text-center py-2 px-4 rounded-2xl text-sm font-medium bg-emerald-700 dark:bg-emerald-600 text-white hover:bg-emerald-800 dark:hover:bg-emerald-700 transition-all duration-150 ease-in-out"
-                >
-                  Join for free
-                </Link>
-              </div>
+              {!isSignedIn ? (
+                <>
+                  <SignInButton mode="modal">
+                    <button 
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full text-left py-2 px-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-all duration-150 ease-in-out"
+                    >
+                      Log in
+                    </button>
+                  </SignInButton>
+                  <MobileMenuItem href="/pricing" label="Plans / Cost" onSelect={() => setMenuOpen(false)} />
+                  <MobileMenuItem href="/settings" label="Settings" onSelect={() => setMenuOpen(false)} />
+                  <MobileMenuItem href="/help" label="Help / Knowledge" onSelect={() => setMenuOpen(false)} />
+                  <div className="pt-2">
+                    <SignUpButton mode="modal">
+                      <button
+                        onClick={() => setMenuOpen(false)}
+                        className="block w-full text-center py-2 px-4 rounded-2xl text-sm font-medium bg-emerald-700 dark:bg-emerald-600 text-white hover:bg-emerald-800 dark:hover:bg-emerald-700 transition-all duration-150 ease-in-out"
+                      >
+                        Sign Up
+                      </button>
+                    </SignUpButton>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <MobileMenuItem href="/dashboard" label="Dashboard" onSelect={() => setMenuOpen(false)} />
+                  <MobileMenuItem href="/pricing" label="Plans / Cost" onSelect={() => setMenuOpen(false)} />
+                  <MobileMenuItem href="/settings" label="Settings" onSelect={() => setMenuOpen(false)} />
+                  <MobileMenuItem href="/help" label="Help / Knowledge" onSelect={() => setMenuOpen(false)} />
+                  <div className="pt-2 flex items-center justify-center">
+                    <UserButton afterSignOutUrl="/" />
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}

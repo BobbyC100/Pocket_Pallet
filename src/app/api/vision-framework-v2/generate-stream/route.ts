@@ -181,74 +181,15 @@ export async function POST(request: NextRequest) {
           duration: Date.now() - step2Start
         });
 
-        // Step 3: Generate one-pager
-        await sendStreamEvent(writer, {
-          type: 'step_start',
-          step: 'onepager',
-          message: 'Creating executive summary...'
-        });
+        // ⚡ OPTIMIZATION: Skip One-Pager, QA, and Scoring (now on-demand)
+        // These steps are deferred to improve generation speed by ~50%
+        // Generate on-demand when user clicks respective tabs
 
-        const step3Start = Date.now();
-        const onePagerPrompt = createExecutiveOnePagerPrompt(completeFramework);
-        const onePagerResult = await openai.chat.completions.create({
-          model: "gpt-4o", // Upgraded from gpt-4-turbo-preview - 2x faster, same quality
-          messages: [{ role: "user", content: onePagerPrompt }],
-          temperature: 0.7
-        });
-        const executiveOnePager = onePagerResult.choices[0]?.message?.content || '';
-
-        await sendStreamEvent(writer, {
-          type: 'step_complete',
-          step: 'onepager',
-          message: 'Executive one-pager generated',
-          duration: Date.now() - step3Start,
-          data: executiveOnePager
-        });
-
-        // Step 4: QA checks
-        await sendStreamEvent(writer, {
-          type: 'step_start',
-          step: 'qa',
-          message: 'Running quality assurance checks...'
-        });
-
-        const step4Start = Date.now();
-        const qaResults = await performQAChecks(openai, completeFramework);
-
-        await sendStreamEvent(writer, {
-          type: 'step_complete',
-          step: 'qa',
-          message: 'QA checks complete',
-          duration: Date.now() - step4Start,
-          data: qaResults
-        });
-
-        // Step 5: Quality scoring
-        await sendStreamEvent(writer, {
-          type: 'step_start',
-          step: 'scoring',
-          message: 'Scoring section quality...'
-        });
-
-        const step5Start = Date.now();
-        const qualityScores = await scoreFrameworkQuality(openai, completeFramework, responses);
-
-        await sendStreamEvent(writer, {
-          type: 'step_complete',
-          step: 'scoring',
-          message: 'Quality scoring complete',
-          duration: Date.now() - step5Start,
-          data: qualityScores
-        });
-
-        // Calculate costs
+        // Calculate costs (framework generation only)
         const totalUsage = {
-          input: (frameworkResult.usage?.prompt_tokens || 0) + 
-                 (onePagerResult.usage?.prompt_tokens || 0),
-          output: (frameworkResult.usage?.completion_tokens || 0) + 
-                  (onePagerResult.usage?.completion_tokens || 0),
-          total: (frameworkResult.usage?.total_tokens || 0) + 
-                 (onePagerResult.usage?.total_tokens || 0)
+          input: (frameworkResult.usage?.prompt_tokens || 0),
+          output: (frameworkResult.usage?.completion_tokens || 0),
+          total: (frameworkResult.usage?.total_tokens || 0)
         };
 
         const cost = calculateCost('gpt-4o', totalUsage);
@@ -258,12 +199,14 @@ export async function POST(request: NextRequest) {
           anonymousId,
           companyId,
           duration: Date.now() - startTime,
-          sectionsGenerated: Object.keys(completeFramework).length
+          sectionsGenerated: Object.keys(completeFramework).length,
+          optimized: true // Flag to track optimized generation
         });
 
         console.log(`[${requestId}] 💰 Total Cost: $${cost.totalCost.toFixed(4)} (${cost.tokens.total} tokens)`);
         console.log(`[${requestId}] ⏱️  Total Duration: ${(Date.now() - startTime) / 1000}s`);
         console.log(`[${requestId}] 📚 Sending ${researchChunks.length} citations in final response`);
+        console.log(`[${requestId}] ⚡ Optimization enabled: One-Pager, QA, and Scoring deferred to on-demand`);
 
         // Send final complete event
         await sendStreamEvent(writer, {
@@ -271,11 +214,11 @@ export async function POST(request: NextRequest) {
           message: 'Vision Framework generated successfully',
           data: {
             framework: completeFramework,
-            executiveOnePager,
+            executiveOnePager: null, // Deferred to on-demand
             metadata: {
               modelsUsed: ['gpt-4o'],
-              qaChecks: qaResults,
-              qualityScores: qualityScores,
+              qaChecks: null, // Deferred to on-demand
+              qualityScores: null, // Deferred to on-demand
               researchCitations: researchChunks.length > 0 
                 ? researchChunks.map(r => getCitation(r))
                 : [],
@@ -285,7 +228,8 @@ export async function POST(request: NextRequest) {
                 total: cost.totalCost,
                 tokens: totalUsage
               },
-              duration: Date.now() - startTime
+              duration: Date.now() - startTime,
+              optimized: true // Flag for client to know data is deferred
             }
           }
         });

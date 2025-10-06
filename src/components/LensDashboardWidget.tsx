@@ -37,7 +37,7 @@ export default function LensDashboardWidget({ visionLensScores, vcLensScores }: 
   const colors = getBadgeColor(avgScore ? parseFloat(avgScore) : undefined);
 
   return (
-    <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-6 mb-6">
+    <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default pt-3 px-5 pb-5 mb-6">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-banyan-text-default mb-1">Founder's Lens</h3>

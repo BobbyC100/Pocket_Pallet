@@ -153,41 +153,41 @@ export default function SOSPage() {
       id: 'vision-v2',
       title: 'Vision Framework',
       icon: '',
-      status: 'complete',
-      lastUpdated: 'Today',
-      completionPercent: 100
+      status: 'empty',
+      lastUpdated: undefined,
+      completionPercent: 0
     },
     {
       id: 'executive-onepager',
       title: 'Executive One-Pager',
       icon: '',
-      status: 'complete',
-      lastUpdated: 'Today',
-      completionPercent: 100
+      status: 'empty',
+      lastUpdated: undefined,
+      completionPercent: 0
     },
     {
       id: 'founder-brief',
       title: 'Vision Statement',
       icon: '',
-      status: 'complete',
-      lastUpdated: 'Today',
-      completionPercent: 100
+      status: 'empty',
+      lastUpdated: undefined,
+      completionPercent: 0
     },
     {
       id: 'vc-summary',
       title: 'VC Summary',
       icon: '',
-      status: 'complete',
-      lastUpdated: 'Today',
-      completionPercent: 100
+      status: 'empty',
+      lastUpdated: undefined,
+      completionPercent: 0
     },
     {
       id: 'qa-results',
       title: 'QA Results',
       icon: '',
-      status: 'complete',
-      lastUpdated: 'Today',
-      completionPercent: 100
+      status: 'empty',
+      lastUpdated: undefined,
+      completionPercent: 0
     }
   ]);
 
@@ -268,15 +268,81 @@ export default function SOSPage() {
     }
     
     setDocuments(prev => prev.map(doc => {
-      if (doc.id === 'founder-brief' && briefData) {
-        return { ...doc, status: 'complete' as const };
+      // Vision Statement - check if brief data exists
+      if (doc.id === 'founder-brief') {
+        if (briefData) {
+          try {
+            const parsed = JSON.parse(briefData);
+            if (parsed.founderBriefMd) {
+              return { ...doc, status: 'complete' as const, lastUpdated: 'Today', completionPercent: 100 };
+            }
+          } catch (e) {
+            console.error('Error parsing brief data:', e);
+          }
+        }
+        return { ...doc, status: 'empty' as const, lastUpdated: undefined, completionPercent: 0 };
       }
-      if (doc.id === 'vision-v2' && visionV2Data) {
-        return { ...doc, status: 'complete' as const };
+      
+      // Vision Framework - check if V2 data exists
+      if (doc.id === 'vision-v2') {
+        if (visionV2Data) {
+          try {
+            const parsed = JSON.parse(visionV2Data);
+            if (parsed.framework) {
+              return { ...doc, status: 'complete' as const, lastUpdated: 'Today', completionPercent: 100 };
+            }
+          } catch (e) {
+            console.error('Error parsing V2 data:', e);
+          }
+        }
+        return { ...doc, status: 'empty' as const, lastUpdated: undefined, completionPercent: 0 };
       }
-      if (doc.id === 'vc-summary' && briefData) {
-        return { ...doc, status: 'complete' as const };
+      
+      // VC Summary - check if brief data has VC summary
+      if (doc.id === 'vc-summary') {
+        if (briefData) {
+          try {
+            const parsed = JSON.parse(briefData);
+            if (parsed.vcSummaryMd || parsed.vcSummaryStructured) {
+              return { ...doc, status: 'complete' as const, lastUpdated: 'Today', completionPercent: 100 };
+            }
+          } catch (e) {
+            console.error('Error parsing brief data:', e);
+          }
+        }
+        return { ...doc, status: 'empty' as const, lastUpdated: undefined, completionPercent: 0 };
       }
+      
+      // Executive One-Pager - check if V2 data has one-pager
+      if (doc.id === 'executive-onepager') {
+        if (visionV2Data) {
+          try {
+            const parsed = JSON.parse(visionV2Data);
+            if (parsed.executiveOnePager) {
+              return { ...doc, status: 'complete' as const, lastUpdated: 'Today', completionPercent: 100 };
+            }
+          } catch (e) {
+            console.error('Error parsing V2 data:', e);
+          }
+        }
+        return { ...doc, status: 'empty' as const, lastUpdated: undefined, completionPercent: 0 };
+      }
+      
+      // QA Results - check if V2 data has QA results
+      if (doc.id === 'qa-results') {
+        if (visionV2Data) {
+          try {
+            const parsed = JSON.parse(visionV2Data);
+            if (parsed.metadata?.qaChecks) {
+              return { ...doc, status: 'complete' as const, lastUpdated: 'Today', completionPercent: 100 };
+            }
+          } catch (e) {
+            console.error('Error parsing V2 data:', e);
+          }
+        }
+        return { ...doc, status: 'empty' as const, lastUpdated: undefined, completionPercent: 0 };
+      }
+      
       return doc;
     }));
   }, []);

@@ -97,9 +97,6 @@ export default function ResultTabs({ founderMd, vcMd, isAnonymous = false, onUnl
                     Sign up to unlock
                   </button>
                 </SignInButton>
-                <p className="text-xs text-banyan-text-subtle mt-3">
-                  Free forever • No credit card required
-                </p>
               </div>
             </div>
           </div>

@@ -26,13 +26,11 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   const [showPreGenerationSignup, setShowPreGenerationSignup] = useState(false)
   const [startTime] = useState(Date.now())
   const [generationSteps, setGenerationSteps] = useState<GenerationStep[]>([
-    { id: 'brief', label: 'Generate Vision Statement', status: 'pending' },
-    { id: 'research', label: 'Retrieve Research Insights', status: 'pending' },
-    { id: 'framework', label: 'Generate Strategic Framework', status: 'pending' },
-    { id: 'validation', label: 'Validate Framework Structure', status: 'pending' },
-    { id: 'onepager', label: 'Create Executive Summary', status: 'pending' },
-    { id: 'qa', label: 'Run Quality Checks', status: 'pending' },
-    { id: 'scoring', label: 'Score Section Quality', status: 'pending' }
+    { id: 'brief', label: 'Generating Vision Statement', status: 'pending' },
+    { id: 'research', label: 'Retrieving research-backed insights', status: 'pending' },
+    { id: 'framework', label: 'Building strategic framework', status: 'pending' },
+    { id: 'validation', label: 'Validating framework structure', status: 'pending' }
+    // Note: One-Pager, QA, and Scoring are now generated on-demand when user clicks the tabs
   ])
   const [activeGenerationStep, setActiveGenerationStep] = useState('')
 
@@ -171,6 +169,39 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       sessionStorage.setItem('lastGeneratedBrief', JSON.stringify(briefResult));
       console.log('✅ Vision Statement saved to session storage');
       
+      // Save Vision Statement to database for signed-in users
+      if (isSignedIn) {
+        try {
+          const saveResponse = await fetch('/api/documents', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'vision_statement',
+              title: `Vision Statement - ${new Date().toLocaleDateString()}`,
+              contentJson: {
+                founderBriefMd: briefResult.founderBriefMd,
+                vcSummaryMd: briefResult.vcSummaryMd,
+                runwayMonths: briefResult.runwayMonths,
+                responses: processedResponses
+              },
+              metadata: {
+                generatedAt: new Date().toISOString()
+              }
+            })
+          });
+          
+          if (saveResponse.ok) {
+            const { document } = await saveResponse.json();
+            console.log('✅ Vision Statement saved to database:', document.id);
+            // Store document ID for later updates
+            sessionStorage.setItem('currentDocumentId', document.id);
+          }
+        } catch (error) {
+          console.error('⚠️ Failed to save to database:', error);
+          // Don't block the flow if database save fails
+        }
+      }
+      
       // Skip framework generation for anonymous users (freemium model)
       if (!isSignedIn) {
         console.log('⚠️ Anonymous user - skipping framework generation');
@@ -280,6 +311,36 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(frameworkDraftData));
       console.log('✅ Framework saved to session storage');
       console.log('📚 Research citations in metadata:', frameworkResult.metadata?.researchCitations?.length || 0);
+      
+      // Save Vision Framework to database
+      try {
+        const saveResponse = await fetch('/api/documents', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'vision_framework_v2',
+            title: `Vision Framework - ${new Date().toLocaleDateString()}`,
+            contentJson: {
+              framework: frameworkResult.framework,
+              executiveOnePager: frameworkResult.executiveOnePager,
+              originalResponses: responses
+            },
+            metadata: {
+              ...frameworkResult.metadata,
+              qualityScores: qualityScores,
+              generatedAt: new Date().toISOString()
+            }
+          })
+        });
+        
+        if (saveResponse.ok) {
+          const { document } = await saveResponse.json();
+          console.log('✅ Vision Framework saved to database:', document.id);
+          sessionStorage.setItem('currentFrameworkId', document.id);
+        }
+      } catch (error) {
+        console.error('⚠️ Failed to save framework to database:', error);
+      }
       
       // Analytics
       const qualityValues = Object.values(qualityScores);

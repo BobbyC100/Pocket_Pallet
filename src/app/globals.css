@@ -902,6 +902,13 @@ textarea::-webkit-input-placeholder {
   opacity: 0.65 !important;
 }
 
+/* ===== LOADING ANIMATIONS ===== */
+@keyframes banyan-bar {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(150%); }
+  100% { transform: translateX(150%); }
+}
+
 /* ===== PRINT STYLES ===== */
 @media print {
   .btn-banyan-primary,

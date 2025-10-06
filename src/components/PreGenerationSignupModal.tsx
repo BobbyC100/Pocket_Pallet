@@ -85,15 +85,10 @@ export default function PreGenerationSignupModal({ isOpen, onClose, onContinue }
               }}
               className="btn-banyan-ghost w-full"
             >
-              Continue without signing up
-            </button>
-          </div>
-
-          {/* Reassurance text */}
-          <p className="text-xs text-banyan-text-subtle mt-4">
-            Free forever • No credit card required
-          </p>
+            Continue without signing up
+          </button>
         </div>
+      </div>
       </div>
     </div>
   );
