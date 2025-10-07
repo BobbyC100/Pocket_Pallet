@@ -9,7 +9,7 @@ interface LensBadgeProps {
   overall?: number;
   badge?: 'gold' | 'silver' | 'bronze';
   message?: string;
-  feedback?: {
+  feedback?: string | {
     clarity?: string;
     alignment?: string;
     actionability?: string;
@@ -81,8 +81,8 @@ export default function LensBadge({
               <div className="text-center">
                 <div className="text-2xl font-bold text-banyan-text-default">{clarity.toFixed(1)}</div>
                 <div className="text-xs text-banyan-text-subtle uppercase tracking-wide mt-1">Clarity</div>
-                {feedback?.clarity && (
-                  <div className="text-xs text-banyan-text-default mt-2">{feedback.clarity}</div>
+                {typeof feedback === 'object' && feedback?.clarity && (
+                  <div className="text-xs text-banyan-text-default mt-2">{String(feedback.clarity)}</div>
                 )}
               </div>
             )}
@@ -92,8 +92,8 @@ export default function LensBadge({
               <div className="text-center">
                 <div className="text-2xl font-bold text-banyan-text-default">{alignment.toFixed(1)}</div>
                 <div className="text-xs text-banyan-text-subtle uppercase tracking-wide mt-1">Alignment</div>
-                {feedback?.alignment && (
-                  <div className="text-xs text-banyan-text-default mt-2">{feedback.alignment}</div>
+                {typeof feedback === 'object' && feedback?.alignment && (
+                  <div className="text-xs text-banyan-text-default mt-2">{String(feedback.alignment)}</div>
                 )}
               </div>
             )}
@@ -103,12 +103,19 @@ export default function LensBadge({
               <div className="text-center">
                 <div className="text-2xl font-bold text-banyan-text-default">{actionability.toFixed(1)}</div>
                 <div className="text-xs text-banyan-text-subtle uppercase tracking-wide mt-1">Actionability</div>
-                {feedback?.actionability && (
-                  <div className="text-xs text-banyan-text-default mt-2">{feedback.actionability}</div>
+                {typeof feedback === 'object' && feedback?.actionability && (
+                  <div className="text-xs text-banyan-text-default mt-2">{String(feedback.actionability)}</div>
                 )}
               </div>
             )}
           </div>
+          
+          {/* General Feedback (if feedback is a string) */}
+          {typeof feedback === 'string' && feedback && (
+            <div className="pt-3 border-t border-banyan-border-default">
+              <p className="text-sm text-banyan-text-default">{feedback}</p>
+            </div>
+          )}
 
           {/* Overall Message */}
           {message && (
