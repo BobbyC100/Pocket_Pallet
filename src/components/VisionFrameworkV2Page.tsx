@@ -601,13 +601,13 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div data-testid="vf2-lens-badge">
             <LensBadge
-            clarity={lensScores.scores?.clarity}
-            alignment={lensScores.scores?.alignment}
-            actionability={lensScores.scores?.actionability}
-            overall={lensScores.scores?.overall}
+            clarity={typeof lensScores.scores?.clarity === 'number' ? lensScores.scores.clarity : undefined}
+            alignment={typeof lensScores.scores?.alignment === 'number' ? lensScores.scores.alignment : undefined}
+            actionability={typeof lensScores.scores?.actionability === 'number' ? lensScores.scores.actionability : undefined}
+            overall={typeof lensScores.scores?.overall === 'number' ? lensScores.scores.overall : undefined}
             badge={lensScores.badge}
-            message={lensScores.message}
-            feedback={lensScores.scores?.feedback}
+            message={typeof lensScores.message === 'string' ? lensScores.message : undefined}
+            feedback={typeof lensScores.scores?.feedback === 'string' ? lensScores.scores.feedback : undefined}
           />
             </div>
         </div>
@@ -1402,24 +1402,24 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                   })}
                 </div>
 
-                {((lensScores.insights && lensScores.insights.length > 0) || (lensScores.scores?.feedback)) && (
+                {((lensScores.insights && lensScores.insights.length > 0) || (typeof lensScores.scores?.feedback === 'string')) && (
                   <div className="mt-6 p-6 bg-banyan-bg-base rounded-lg border border-banyan-border-default">
                     <h4 className="text-sm font-semibold text-banyan-text-default mb-2">Key Insights</h4>
-                    {lensScores.scores?.feedback ? (
-                      <p className="text-sm text-banyan-text-default">{lensScores.scores.feedback}</p>
+                    {typeof lensScores.scores?.feedback === 'string' && lensScores.scores.feedback ? (
+                      <p className="text-sm text-banyan-text-default">{String(lensScores.scores.feedback)}</p>
                     ) : lensScores.insights && lensScores.insights.length > 0 ? (
                       <ul className="list-disc pl-5 space-y-1 text-sm text-banyan-text-default">
                         {lensScores.insights.map((insight: string, i: number) => (
-                          <li key={i}>{insight}</li>
+                          <li key={i}>{String(insight)}</li>
                         ))}
                       </ul>
                     ) : null}
                   </div>
                 )}
 
-                {lensScores.message && (
+                {typeof lensScores.message === 'string' && lensScores.message && (
                   <div className="p-4 bg-banyan-bg-base rounded-lg border border-banyan-border-default">
-                    <p className="text-sm text-banyan-text-subtle">{lensScores.message}</p>
+                    <p className="text-sm text-banyan-text-subtle">{String(lensScores.message)}</p>
                   </div>
                 )}
               </div>
