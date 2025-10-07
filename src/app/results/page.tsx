@@ -187,23 +187,15 @@ export default function ResultsPage() {
               Back to Wizard
             </button>
 
-            <div className="flex items-center gap-3">
-              {isSignedIn ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-banyan-success rounded-full animate-pulse"></div>
-                  <span className="text-sm text-banyan-text-subtle">
-                    Signed in as <span className="font-semibold">{user?.primaryEmailAddress?.emailAddress}</span>
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-banyan-warning rounded-full"></div>
-                  <span className="text-sm text-banyan-text-subtle">
-                    Not saved — Sign in to save your work
-                  </span>
-                </div>
-              )}
-            </div>
+            {/* User status - only show for signed-in users */}
+            {isSignedIn && (
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-banyan-success rounded-full animate-pulse"></div>
+                <span className="text-sm text-banyan-text-subtle">
+                  Signed in as <span className="font-semibold">{user?.primaryEmailAddress?.emailAddress}</span>
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Save Status Bar */}

@@ -20,7 +20,7 @@ const SaveIndicator = ({ saving, dirty }: { saving: boolean; dirty: boolean }) =
   </span>
 );
 
-type TabKey = 'edit' | 'onepager' | 'qa';
+type TabKey = 'edit' | 'onepager' | 'qa' | 'lens';
 
 interface VisionFrameworkV2PageProps {
   companyId?: string;
@@ -101,7 +101,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
   }, []);
 
   // Tab URL hash management
-  const tabOrder: TabKey[] = ['edit', 'onepager', 'qa'];
+  const tabOrder: TabKey[] = ['edit', 'onepager', 'qa', 'lens'];
 
   useEffect(() => {
     const hash = (typeof window !== 'undefined' && window.location.hash.replace('#', '')) as TabKey;
@@ -566,15 +566,6 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  data-testid="vf2-score-lens-button"
-                  onClick={handleLensScore}
-                  disabled={scoringLens}
-                  className="btn-banyan-ghost"
-                  title="Score with Founder's Lens"
-                >
-                  {scoringLens ? 'Scoring…' : 'Score with Lens'}
-                </button>
-                <button
                   data-testid="vf2-save-button"
                   onClick={handleSave}
                   disabled={saving}
@@ -634,6 +625,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
               { key: 'edit', label: 'Framework' },
               { key: 'onepager', label: 'Executive One-Pager' },
               { key: 'qa', label: 'QA Results' },
+              { key: 'lens', label: 'Lens' },
             ] as { key: TabKey; label: string }[]).map(t => (
               <button
                 key={t.key}
@@ -657,17 +649,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                 {t.label}
               </button>
             ))}
-            {/* Score button - show in embedded view */}
-            {embedded && (
-              <button
-                onClick={handleLensScore}
-                disabled={scoringLens}
-                className="btn-banyan-ghost text-sm ml-auto"
-                title="Score with Founder's Lens"
-              >
-                {scoringLens ? 'Scoring…' : 'Score with Lens'}
-              </button>
-            )}
+            {/* Lens scoring moved to dedicated Lens tab */}
           </div>
           </div>
         </div>
@@ -1340,6 +1322,127 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                           Running Quality Assessment...
                         </span>
                       ) : 'Run Quality Assessment'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Lens Tab */}
+        {activeTab === 'lens' && (
+          <section
+            data-testid="vf2-lens-content"
+            role="tabpanel"
+            aria-labelledby="lens"
+            className="bg-banyan-bg-surface rounded-xl shadow-banyan-mid border border-banyan-border-default p-6 sm:p-8"
+          >
+            {lensScores ? (
+              <div className="space-y-6">
+                <div className="flex items-end justify-between pb-4 border-b border-banyan-border-default">
+                  <h3 className="text-lg font-semibold text-banyan-text-default">Lens Analysis</h3>
+                  <div className="flex items-center gap-4">
+                    <p className="text-2xl font-bold text-banyan-text-default">{lensScores.overallScore}/10</p>
+                    <button
+                      onClick={handleLensScore}
+                      disabled={scoringLens || !framework?.vision}
+                      className="btn-banyan-secondary text-sm"
+                      data-testid="vf2-run-lens-again"
+                    >
+                      {scoringLens ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Running...
+                        </span>
+                      ) : 'Run Again'}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { key: 'clarity', label: 'Clarity', score: lensScores.clarity },
+                    { key: 'alignment', label: 'Alignment', score: lensScores.alignment },
+                    { key: 'consistency', label: 'Consistency', score: lensScores.consistency },
+                    { key: 'actionability', label: 'Actionability', score: lensScores.actionability },
+                  ].map(({ key, label, score }) => {
+                    const scoreNum = typeof score === 'number' ? score : 0;
+                    return (
+                      <div key={key} className="rounded-md border border-banyan-border-default bg-banyan-bg-base p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-banyan-text-default">{label}</span>
+                          <span className="text-sm text-banyan-text-subtle">{scoreNum.toFixed(1)}/10</span>
+                        </div>
+                        <div className="h-2 rounded bg-banyan-bg-base overflow-hidden">
+                          <div
+                            className="h-full rounded bg-banyan-text-default"
+                            style={{ width: `${(scoreNum / 10) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {lensScores.insights && lensScores.insights.length > 0 && (
+                  <div className="mt-6 p-6 bg-banyan-bg-base rounded-lg border border-banyan-border-default">
+                    <h4 className="text-sm font-semibold text-banyan-text-default mb-2">Key Insights</h4>
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-banyan-text-default">
+                      {lensScores.insights.map((insight: string, i: number) => (
+                        <li key={i}>{insight}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="max-w-md mx-auto">
+                  <div className="mb-6">
+                    <svg className="w-16 h-16 mx-auto text-banyan-text-subtle opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-banyan-text-default mb-2">
+                    Lens Analysis
+                  </h3>
+                  <p className="text-banyan-text-subtle mb-6">
+                    Use Lens to evaluate how clearly your Vision aligns with Strategy and Culture. Get detailed scoring on clarity, alignment, consistency, and actionability.
+                  </p>
+                  
+                  {!framework?.vision ? (
+                    <div className="space-y-3">
+                      <button
+                        disabled
+                        className="btn-banyan-primary w-full opacity-50 cursor-not-allowed"
+                        data-testid="vf2-run-lens-disabled"
+                      >
+                        Run Lens Analysis
+                      </button>
+                      <p className="text-sm text-banyan-text-subtle">
+                        Complete your Vision to enable Lens Analysis
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleLensScore}
+                      disabled={scoringLens}
+                      className="btn-banyan-primary w-full"
+                      data-testid="vf2-run-lens"
+                    >
+                      {scoringLens ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Scoring your Vision Framework...
+                        </span>
+                      ) : 'Run Lens Analysis'}
                     </button>
                   )}
                 </div>
