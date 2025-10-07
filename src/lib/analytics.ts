@@ -10,6 +10,8 @@ export type AnalyticsEvent =
   | 'wizard_started'
   | 'wizard_step_completed'
   | 'wizard_completed'
+  | 'wizard_state_restored'
+  | 'wizard_back_clicked'
   | 'load_example_clicked'
   | 'soft_signup_shown'
   | 'soft_signup_accepted'
@@ -25,6 +27,15 @@ export type AnalyticsEvent =
   | 'strategic_tool_selected'
   | 'framework_generated'
   | 'pro_upgrade_modal_shown'
+  | 'results_viewed_anonymous'
+  | 'results_viewed_authenticated'
+  | 'results_save_prompt_shown'
+  | 'onepager_generate_clicked'
+  | 'onepager_generated_success'
+  | 'onepager_generated_error'
+  | 'qa_run_clicked'
+  | 'qa_completed'
+  | 'qa_failed'
   | 'pro_upgrade_started'
   | 'pro_upgrade_dismissed'
   | 'signup_completed'
@@ -204,13 +215,22 @@ export function trackProUpgrade(
  * Track user actions
  */
 export function trackUserAction(
-  action: 'pdf_exported' | 'cloud_saved' | 'tool_selected',
+  action: 'pdf_exported' | 'cloud_saved' | 'tool_selected' | 'results_viewed_anonymous' | 'results_viewed_authenticated' | 'results_save_prompt_shown' | 'onepager_generate_clicked' | 'onepager_generated_success' | 'onepager_generated_error' | 'qa_run_clicked' | 'qa_completed' | 'qa_failed',
   properties?: AnalyticsProperties
 ) {
   const eventMap = {
     pdf_exported: 'pdf_exported',
     cloud_saved: 'cloud_save_clicked',
     tool_selected: 'strategic_tool_selected',
+    results_viewed_anonymous: 'results_viewed_anonymous',
+    results_viewed_authenticated: 'results_viewed_authenticated',
+    results_save_prompt_shown: 'results_save_prompt_shown',
+    onepager_generate_clicked: 'onepager_generate_clicked',
+    onepager_generated_success: 'onepager_generated_success',
+    onepager_generated_error: 'onepager_generated_error',
+    qa_run_clicked: 'qa_run_clicked',
+    qa_completed: 'qa_completed',
+    qa_failed: 'qa_failed',
   };
 
   trackEvent(eventMap[action] as AnalyticsEvent, properties);

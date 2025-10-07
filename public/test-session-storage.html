@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vision Framework Session Storage Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 8px; }
+        button { padding: 10px 20px; margin: 5px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #065f46; }
+        .error { background: #7f1d1d; }
+        .info { background: #1e3a8a; }
+        .debug { background: #374151; font-family: monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Vision Framework Session Storage Test</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Create Framework via API</h2>
+        <button onclick="createFramework()">Create Framework</button>
+        <div id="create-status" class="status info">Ready to create...</div>
+        <div id="create-debug" class="debug"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 2: Store in Session Storage</h2>
+        <button onclick="storeInSession()">Store in Session Storage</button>
+        <div id="store-status" class="status info">Ready to store...</div>
+        <div id="store-debug" class="debug"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 3: Test Session Storage</h2>
+        <button onclick="testSessionStorage()">Test Session Storage</button>
+        <div id="test-status" class="status info">Ready to test...</div>
+        <div id="test-debug" class="debug"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 4: Navigate to Vision Framework</h2>
+        <button onclick="openVisionFramework()">Open Vision Framework Page</button>
+        <p>This should load the framework from session storage without validation errors.</p>
+    </div>
+
+    <script>
+        let frameworkData = null;
+
+        async function createFramework() {
+            updateStatus('create-status', 'Creating framework via API...', 'info');
+            
+            try {
+                const response = await fetch('/api/vision-framework/from-brief', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        briefData: {
+                            stage: "early_traction",
+                            problem_now: "Material deliveries to urban job sites are late/misplaced ~30% of the time, stalling crews and burning budget.",
+                            customer_gtm: "Mid-market GCs (50–500 employees) in NYC/Chicago/LA. Buyer = Ops Director; users = site supers + vendor drivers.",
+                            traction_proud: "2 paid pilots (GCs doing $200M/yr rev). 18 active sites; 1,240 drops coordinated; 27% fewer idle crew hours; NRR 118% on pilot add-ons.",
+                            milestone_6mo: "Scale to 50 active sites across 3 metros, achieve $500K ARR, and launch mobile app for foremen",
+                            cash_on_hand: 500000,
+                            monthly_burn: 25000,
+                            risky_assumption: "Contractors will adopt new scheduling software and vendors will comply with dynamic routing requirements."
+                        },
+                        visionPurpose: "Transform construction logistics through intelligent dispatch and eliminate delivery delays",
+                        visionEndState: "Every construction site runs efficiently with zero delivery delays, reducing project costs by 15% and improving contractor satisfaction",
+                        companyId: "yardbird-session-test"
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    frameworkData = data;
+                    updateStatus('create-status', '✅ Framework created successfully!', 'success');
+                    updateDebug('create-debug', JSON.stringify(data.framework, null, 2));
+                } else {
+                    updateStatus('create-status', '❌ API Error: ' + (data.error || 'Unknown error'), 'error');
+                    updateDebug('create-debug', JSON.stringify(data, null, 2));
+                }
+            } catch (error) {
+                updateStatus('create-status', '❌ Network Error: ' + error.message, 'error');
+                updateDebug('create-debug', error.stack);
+            }
+        }
+
+        function storeInSession() {
+            if (!frameworkData) {
+                updateStatus('store-status', '❌ No framework data to store. Create framework first.', 'error');
+                return;
+            }
+
+            try {
+                const sessionData = {
+                    framework: frameworkData.framework,
+                    fromBrief: true,
+                    autoFilledFields: frameworkData.autoFilledFields,
+                    frameworkId: frameworkData.frameworkId
+                };
+
+                sessionStorage.setItem('visionFrameworkDraft', JSON.stringify(sessionData));
+                
+                updateStatus('store-status', '✅ Framework stored in session storage!', 'success');
+                updateDebug('store-debug', 'Session storage data:\n' + JSON.stringify(sessionData, null, 2));
+            } catch (error) {
+                updateStatus('store-status', '❌ Storage Error: ' + error.message, 'error');
+                updateDebug('store-debug', error.stack);
+            }
+        }
+
+        function testSessionStorage() {
+            try {
+                const storedData = sessionStorage.getItem('visionFrameworkDraft');
+                
+                if (storedData) {
+                    const parsed = JSON.parse(storedData);
+                    updateStatus('test-status', '✅ Session storage data found!', 'success');
+                    updateDebug('test-debug', 'Stored data:\n' + JSON.stringify(parsed, null, 2));
+                    
+                    // Check if all required fields are present
+                    const framework = parsed.framework;
+                    const requiredFields = [
+                        'mission.whatWeDo',
+                        'mission.whoFor', 
+                        'mission.howWeWin',
+                        'mission.successSignals',
+                        'operatingPrinciples',
+                        'objectives',
+                        'brandBrief.oneLiner',
+                        'brandBrief.positioning',
+                        'brandBrief.audience',
+                        'brandBrief.tone',
+                        'brandBrief.story',
+                        'brandBrief.visualCues'
+                    ];
+                    
+                    let missingFields = [];
+                    if (!framework.mission.whatWeDo) missingFields.push('mission.whatWeDo');
+                    if (!framework.mission.whoFor) missingFields.push('mission.whoFor');
+                    if (!framework.mission.howWeWin) missingFields.push('mission.howWeWin');
+                    if (!framework.mission.successSignals || framework.mission.successSignals.length < 3) missingFields.push('mission.successSignals');
+                    if (!framework.operatingPrinciples || framework.operatingPrinciples.length < 3) missingFields.push('operatingPrinciples');
+                    if (!framework.objectives || framework.objectives.length < 2) missingFields.push('objectives');
+                    if (!framework.brandBrief.oneLiner) missingFields.push('brandBrief.oneLiner');
+                    if (!framework.brandBrief.positioning) missingFields.push('brandBrief.positioning');
+                    if (!framework.brandBrief.audience) missingFields.push('brandBrief.audience');
+                    if (!framework.brandBrief.tone || framework.brandBrief.tone.length < 3) missingFields.push('brandBrief.tone');
+                    if (!framework.brandBrief.story) missingFields.push('brandBrief.story');
+                    if (!framework.brandBrief.visualCues || framework.brandBrief.visualCues.length < 3) missingFields.push('brandBrief.visualCues');
+                    
+                    if (missingFields.length === 0) {
+                        updateDebug('test-debug', 'All required fields present! ✅\n\n' + updateDebug('test-debug', 'Stored data:\n' + JSON.stringify(parsed, null, 2)));
+                    } else {
+                        updateDebug('test-debug', 'Missing fields: ' + missingFields.join(', ') + '\n\n' + updateDebug('test-debug', 'Stored data:\n' + JSON.stringify(parsed, null, 2)));
+                    }
+                } else {
+                    updateStatus('test-status', '❌ No session storage data found', 'error');
+                }
+            } catch (error) {
+                updateStatus('test-status', '❌ Parse Error: ' + error.message, 'error');
+                updateDebug('test-debug', error.stack);
+            }
+        }
+
+        function openVisionFramework() {
+            window.open('/vision-framework', '_blank');
+        }
+
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        function updateDebug(elementId, content) {
+            const element = document.getElementById(elementId);
+            element.textContent = content;
+            element.className = 'debug';
+        }
+
+        // Auto-run the test sequence
+        window.addEventListener('load', function() {
+            setTimeout(createFramework, 1000);
+            setTimeout(storeInSession, 3000);
+            setTimeout(testSessionStorage, 4000);
+        });
+    </script>
+</body>
+</html>

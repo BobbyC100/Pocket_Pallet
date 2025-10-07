@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YardBird Framework Injector</title>
+</head>
+<body>
+    <h1>YardBird Framework Data Injector</h1>
+    <button onclick="injectFramework()">Inject YardBird Framework</button>
+    <button onclick="goToFramework()">Go to Vision Framework</button>
+    
+    <script>
+        function injectFramework() {
+            const yardbirdFramework = {
+                "companyId": "yardbird-demo",
+                "updatedAt": "2025-10-04T10:06:34.139Z",
+                "vision": {
+                    "purpose": "Transform construction logistics through intelligent dispatch and eliminate delivery delays",
+                    "endState": "Every construction site runs efficiently with zero delivery delays, reducing project costs by 15% and improving contractor satisfaction"
+                },
+                "mission": {
+                    "whatWeDo": "Mid-market GCs (50–500 employees) in NYC/Chicago/LA",
+                    "whoFor": "Buyer = Ops Director",
+                    "howWeWin": "users = site supers + vendor drivers",
+                    "successSignals": [
+                        "2 paid pilots (GCs doing $200M/yr rev)",
+                        "18 active sites",
+                        "240 drops coordinated",
+                        "27% fewer idle crew hours",
+                        "NRR 118% on pilot add-ons"
+                    ]
+                },
+                "operatingPrinciples": [
+                    {
+                        "name": "Customer First",
+                        "description": "Every decision prioritizes customer value and experience.",
+                        "behaviors": ["Listen to customer feedback", "Iterate based on user needs", "Measure customer satisfaction"],
+                        "antiBehaviors": ["Ignore user feedback", "Build features without validation"]
+                    },
+                    {
+                        "name": "Move Fast",
+                        "description": "Speed of execution is our competitive advantage.",
+                        "behaviors": ["Ship early and often", "Make decisions quickly", "Learn from failures"],
+                        "antiBehaviors": ["Perfect before shipping", "Analysis paralysis"]
+                    },
+                    {
+                        "name": "Data-Driven",
+                        "description": "Use metrics and evidence to guide decisions.",
+                        "behaviors": ["Track key metrics", "A/B test changes", "Make evidence-based decisions"],
+                        "antiBehaviors": ["Gut-feeling decisions", "Ignore data"]
+                    }
+                ],
+                "objectives": [
+                    {
+                        "id": "q1-primary",
+                        "timespan": "Q1",
+                        "statement": "Achieve key business milestones",
+                        "keyResults": [
+                            { "metric": "Revenue", "target": "TBD" },
+                            { "metric": "Customers", "target": "TBD" }
+                        ],
+                        "owner": "Founder"
+                    },
+                    {
+                        "id": "q1-secondary",
+                        "timespan": "Q1",
+                        "statement": "Build core product features and achieve product-market fit",
+                        "keyResults": [
+                            { "metric": "Feature completion", "target": "100% of planned features" },
+                            { "metric": "User satisfaction", "target": ">90% NPS score" }
+                        ],
+                        "owner": "CTO"
+                    }
+                ],
+                "brandBrief": {
+                    "oneLiner": "Material deliveries to urban job sites are late/misplaced ~30% of the time, stalling crews and burning budget",
+                    "positioning": "Mid-market GCs (50–500 employees) in NYC/Chicago/LA. Buyer = Ops Director; users = site supers + vendor drivers.",
+                    "audience": "Mid-market GCs (50–500 employees) in NYC/Chicago/LA. Buyer = Ops Director",
+                    "tone": ["Professional", "Confident", "Clear"],
+                    "story": "Material deliveries to urban job sites are late/misplaced ~30% of the time, stalling crews and burning budget",
+                    "visualCues": ["Clean", "Modern", "Professional"]
+                }
+            };
+            
+            const draftData = {
+                framework: yardbirdFramework,
+                fromBrief: true,
+                autoFilledFields: [
+                    "mission.whatWeDo",
+                    "mission.whoFor", 
+                    "mission.howWeWin",
+                    "mission.successSignals",
+                    "objectives[0].statement",
+                    "objectives[0].timespan",
+                    "brandBrief.positioning",
+                    "brandBrief.audience",
+                    "brandBrief.tone",
+                    "brandBrief.story"
+                ]
+            };
+            
+            sessionStorage.setItem('visionFrameworkDraft', JSON.stringify(draftData));
+            alert('YardBird framework data injected!');
+        }
+        
+        function goToFramework() {
+            window.location.href = '/vision-framework';
+        }
+    </script>
+</body>
+</html>

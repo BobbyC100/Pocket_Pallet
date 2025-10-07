@@ -5,10 +5,14 @@ import { SignInButton } from '@clerk/nextjs'
 interface SoftSignupModalProps {
   isOpen: boolean;
   onClose: () => void;
+  currentStep?: number; // Current wizard step for returnTo URL
 }
 
-export default function SoftSignupModal({ isOpen, onClose }: SoftSignupModalProps) {
+export default function SoftSignupModal({ isOpen, onClose, currentStep = 0 }: SoftSignupModalProps) {
   if (!isOpen) return null;
+
+  // Build returnTo URL with current step
+  const returnToUrl = `/new?step=${currentStep}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -47,7 +51,10 @@ export default function SoftSignupModal({ isOpen, onClose }: SoftSignupModalProp
 
           {/* CTA Buttons */}
           <div className="flex flex-col gap-3">
-            <SignInButton mode="modal">
+            <SignInButton 
+              mode="modal"
+              forceRedirectUrl={returnToUrl}
+            >
               <button className="btn-banyan-primary w-full">
                 Sign up to protect my work
               </button>

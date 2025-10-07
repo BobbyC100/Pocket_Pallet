@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@clerk/nextjs'
 import { PROMPT_STEPS } from '@/lib/templates'
 import { PromptInput, BriefOutput } from '@/lib/types'
@@ -15,8 +15,20 @@ interface PromptWizardProps {
   onGenerated?: (result: BriefOutput & { responses?: PromptInput }) => void; // Optional for backwards compat
 }
 
+// LocalStorage key for wizard state persistence
+const WIZARD_STATE_KEY = 'banyan_wizard_state_v1';
+
+interface WizardState {
+  currentStep: number;
+  responses: Partial<PromptInput>;
+  softSignupShown: boolean;
+  startTime: number;
+  lastSaved: string;
+}
+
 export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { isSignedIn } = useUser()
   const [currentStep, setCurrentStep] = useState(0)
   const [responses, setResponses] = useState<Partial<PromptInput>>({})
@@ -25,6 +37,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   const [softSignupShown, setSoftSignupShown] = useState(false)
   const [showPreGenerationSignup, setShowPreGenerationSignup] = useState(false)
   const [startTime] = useState(Date.now())
+  const [stateRestored, setStateRestored] = useState(false)
   const [generationSteps, setGenerationSteps] = useState<GenerationStep[]>([
     { id: 'brief', label: 'Generating Vision Statement', status: 'pending' },
     { id: 'research', label: 'Retrieving research-backed insights', status: 'pending' },
@@ -34,17 +47,81 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   ])
   const [activeGenerationStep, setActiveGenerationStep] = useState('')
 
-  // Initialize analytics on mount
+  // Restore wizard state from localStorage and URL params on mount
   useEffect(() => {
+    if (stateRestored) return;
+    
     initAnalytics();
-    trackEvent('wizard_started');
-  }, []);
+    
+    // Check for step parameter in URL (from auth callback)
+    const stepParam = searchParams.get('step');
+    const targetStep = stepParam ? parseInt(stepParam, 10) : null;
+    
+    // Try to restore from localStorage
+    try {
+      const savedState = localStorage.getItem(WIZARD_STATE_KEY);
+      if (savedState) {
+        const parsed: WizardState = JSON.parse(savedState);
+        
+        // Restore responses
+        setResponses(parsed.responses || {});
+        setSoftSignupShown(parsed.softSignupShown || false);
+        
+        // Use URL param step if present, otherwise use saved step
+        const restoredStep = targetStep !== null ? targetStep : (parsed.currentStep || 0);
+        setCurrentStep(Math.min(restoredStep, PROMPT_STEPS.length - 1));
+        
+        console.log('✅ Wizard state restored from localStorage', {
+          step: restoredStep,
+          fromUrl: targetStep !== null,
+          responseCount: Object.keys(parsed.responses || {}).length
+        });
+        
+        trackEvent('wizard_state_restored', {
+          step: restoredStep,
+          from_url: targetStep !== null,
+          has_responses: Object.keys(parsed.responses || {}).length > 0
+        });
+      } else if (targetStep !== null) {
+        // URL param but no saved state - just set the step
+        setCurrentStep(Math.min(targetStep, PROMPT_STEPS.length - 1));
+        console.log('📍 Starting at step from URL:', targetStep);
+      } else {
+        // Fresh start
+        trackEvent('wizard_started');
+      }
+    } catch (error) {
+      console.error('Failed to restore wizard state:', error);
+      trackEvent('wizard_started');
+    }
+    
+    setStateRestored(true);
+  }, [searchParams, stateRestored]);
+
+  // Persist wizard state to localStorage whenever it changes
+  useEffect(() => {
+    if (!stateRestored) return;
+    
+    try {
+      const state: WizardState = {
+        currentStep,
+        responses,
+        softSignupShown,
+        startTime,
+        lastSaved: new Date().toISOString()
+      };
+      localStorage.setItem(WIZARD_STATE_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.error('Failed to save wizard state:', error);
+    }
+  }, [currentStep, responses, softSignupShown, startTime, stateRestored]);
 
   // Soft signup logic: Show after step 4-5 or 5 minutes, only once, and only if not signed in
+  // IMPORTANT: Only trigger when moving FORWARD through steps, not on Back navigation
   useEffect(() => {
-    if (isSignedIn || softSignupShown) return;
+    if (isSignedIn || softSignupShown || !stateRestored) return;
 
-    // Check if we've reached step 4 or 5 (index 3 or 4)
+    // Check if we've reached step 4 or 5 (index 3 or 4) FOR THE FIRST TIME
     const stepTrigger = currentStep >= 3;
     
     // Check if 5 minutes have passed
@@ -54,8 +131,9 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       setShowSoftSignup(true);
       setSoftSignupShown(true);
       trackSignupTouchpoint('soft_wizard', 'shown');
+      console.log('🔔 Soft signup modal triggered', { step: currentStep, reason: stepTrigger ? 'step' : 'time' });
     }
-  }, [currentStep, isSignedIn, softSignupShown, startTime]);
+  }, [currentStep, isSignedIn, softSignupShown, startTime, stateRestored]);
 
   const loadTestData = () => {
     trackEvent('load_example_clicked');
@@ -89,7 +167,10 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
 
   const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
+      const newStep = currentStep - 1;
+      setCurrentStep(newStep);
+      trackEvent('wizard_back_clicked', { from_step: currentStep, to_step: newStep });
+      console.log('⬅️ Back navigation:', { from: currentStep, to: newStep });
     }
   }
 
@@ -396,6 +477,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       
       <SoftSignupModal
         isOpen={showSoftSignup}
+        currentStep={currentStep}
         onClose={() => {
           setShowSoftSignup(false);
           trackSignupTouchpoint('soft_wizard', 'dismissed');
@@ -404,6 +486,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       
       <PreGenerationSignupModal
         isOpen={showPreGenerationSignup}
+        currentStep={currentStep}
         onClose={() => {
           setShowPreGenerationSignup(false);
           trackSignupTouchpoint('pre_generation', 'dismissed');

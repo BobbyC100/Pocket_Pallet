@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Banyan Auto-Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 8px; }
+        button { padding: 10px 20px; margin: 5px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #065f46; }
+        .error { background: #7f1d1d; }
+        .info { background: #1e3a8a; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Banyan Auto-Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Auto-Fill Brief Wizard</h2>
+        <p>Go to the wizard page and click "🚀 Load Test Data (YardBird)" button:</p>
+        <button onclick="openWizard()">Open Wizard Page</button>
+        <div id="wizard-status" class="status info">Click the button above, then click "Load Test Data" in the wizard</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 2: Generate Brief</h2>
+        <p>Generate the brief using the filled data:</p>
+        <button onclick="generateBrief()">Generate Brief</button>
+        <div id="brief-status" class="status info">Waiting for wizard completion...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 3: Create Vision Framework</h2>
+        <p>Create vision framework from the brief:</p>
+        <button onclick="createVisionFramework()">Create Vision Framework</button>
+        <div id="framework-status" class="status info">Waiting for brief generation...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 4: View Results</h2>
+        <p>Navigate to see the results:</p>
+        <button onclick="viewBrief()">View Brief</button>
+        <button onclick="viewFramework()">View Vision Framework</button>
+    </div>
+
+    <script>
+        const yardbirdData = {
+            stage: "early_traction",
+            problem_now: "Material deliveries to urban job sites are late/misplaced ~30% of the time, stalling crews and burning budget.",
+            why_now: "Cities are tightening curb access + contractors are moving to software-first scheduling. APIs + telematics are finally standardized.",
+            solution: "A dynamic dispatch layer that ingests PO data, traffic, and crane/lift windows, then auto-routes box trucks and schedules curb permits. Mobile app for foremen to time-stamp drop zones; chargebacks auto-logged to vendors.",
+            customer_gtm: "Mid-market GCs (50–500 employees) in NYC/Chicago/LA. Buyer = Ops Director; users = site supers + vendor drivers.",
+            traction_proud: "2 paid pilots (GCs doing $200M/yr rev). 18 active sites; 1,240 drops coordinated; 27% fewer idle crew hours; NRR 118% on pilot add-ons.",
+            milestone_6mo: "Scale to 50 active sites across 3 metros, achieve $500K ARR, and launch mobile app for foremen",
+            cash_on_hand: 500000,
+            monthly_burn: 25000,
+            risky_assumption: "Contractors will adopt new scheduling software and vendors will comply with dynamic routing requirements."
+        };
+
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        function openWizard() {
+            updateStatus('wizard-status', 'Opening wizard page...', 'info');
+            window.open('/new', '_blank');
+            updateStatus('wizard-status', '✅ Wizard opened! Click "🚀 Load Test Data (YardBird)" button in the wizard', 'success');
+        }
+
+        function generateBrief() {
+            updateStatus('brief-status', 'Generating brief via API...', 'info');
+            
+            fetch('/api/generate-brief', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(yardbirdData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateStatus('brief-status', '✅ Brief generated successfully!', 'success');
+                console.log('Brief generated:', data);
+            })
+            .catch(error => {
+                updateStatus('brief-status', '❌ Error: ' + error.message, 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        function createVisionFramework() {
+            updateStatus('framework-status', 'Creating vision framework...', 'info');
+            
+            const frameworkData = {
+                briefData: yardbirdData,
+                visionPurpose: "Transform construction logistics through intelligent dispatch and eliminate delivery delays",
+                visionEndState: "Every construction site runs efficiently with zero delivery delays, reducing project costs by 15% and improving contractor satisfaction",
+                companyId: "yardbird-auto-test"
+            };
+            
+            fetch('/api/vision-framework/from-brief', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(frameworkData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateStatus('framework-status', '✅ Vision framework created!', 'success');
+                
+                // Store in session storage for the framework page
+                sessionStorage.setItem('visionFrameworkDraft', JSON.stringify({
+                    framework: data.framework,
+                    fromBrief: true,
+                    autoFilledFields: data.autoFilledFields,
+                    frameworkId: data.frameworkId
+                }));
+                
+                console.log('Framework created:', data);
+            })
+            .catch(error => {
+                updateStatus('framework-status', '❌ Error: ' + error.message, 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        function viewBrief() {
+            window.open('/new', '_blank');
+        }
+
+        function viewFramework() {
+            window.open('/vision-framework', '_blank');
+        }
+
+        // Auto-run the test sequence
+        function runFullTest() {
+            updateStatus('wizard-status', '🚀 Starting full auto-test...', 'info');
+            
+            setTimeout(() => generateBrief(), 2000);
+            setTimeout(() => createVisionFramework(), 4000);
+            setTimeout(() => {
+                updateStatus('wizard-status', '✅ Full test complete! Check the other tabs.', 'success');
+            }, 6000);
+        }
+
+        // Add a button to run the full test
+        document.addEventListener('DOMContentLoaded', function() {
+            const fullTestButton = document.createElement('button');
+            fullTestButton.textContent = '🚀 Run Full Auto-Test';
+            fullTestButton.style.background = '#dc2626';
+            fullTestButton.style.fontSize = '16px';
+            fullTestButton.style.padding = '15px 30px';
+            fullTestButton.onclick = runFullTest;
+            document.body.insertBefore(fullTestButton, document.body.firstChild);
+        });
+    </script>
+</body>
+</html>

@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useUser, SignInButton } from '@clerk/nextjs';
 import { VisionFrameworkV2, NearTermBet, Metric } from '@/lib/vision-framework-schema-v2';
 import RefinementPanel from './RefinementPanel';
 import QualityBadge from './QualityBadge';
 import LensBadge from './LensBadge';
 import ResearchCitations, { Citation } from './ResearchCitations';
+import { trackUserAction } from '@/lib/analytics';
 
 // Save indicator component
 const SaveIndicator = ({ saving, dirty }: { saving: boolean; dirty: boolean }) => (
@@ -25,6 +27,7 @@ interface VisionFrameworkV2PageProps {
 }
 
 export default function VisionFrameworkV2Page({ companyId = 'demo-company', embedded = false, editOnly = false }: VisionFrameworkV2PageProps) {
+  const { isSignedIn, user } = useUser();
   const [framework, setFramework] = useState<VisionFrameworkV2 | null>(null);
   const [executiveOnePager, setExecutiveOnePager] = useState<string>('');
   const [qaResults, setQaResults] = useState<any>(null);
@@ -41,6 +44,8 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
   const [lensScores, setLensScores] = useState<any>(null);
   const [scoringLens, setScoringLens] = useState(false);
   const [researchCitations, setResearchCitations] = useState<Citation[]>([]);
+  const [generatingOnePager, setGeneratingOnePager] = useState(false);
+  const [runningQA, setRunningQA] = useState(false);
 
   // Load framework from session storage on mount
   useEffect(() => {
@@ -222,6 +227,125 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleGenerateOnePager = async () => {
+    if (!framework) {
+      setMessage({ type: 'error', text: 'No Vision Framework available. Please complete the Vision section first.' });
+      return;
+    }
+
+    if (!isSignedIn) {
+      setMessage({ type: 'error', text: 'Please sign in to generate the Executive One-Pager.' });
+      return;
+    }
+
+    setGeneratingOnePager(true);
+    setMessage(null);
+    trackUserAction('onepager_generate_clicked');
+
+    try {
+      console.log('🚀 Generating Executive One-Pager...');
+      
+      const response = await fetch('/api/vision-framework-v2/generate-onepager', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          framework,
+          userId: user?.id,
+          anonymousId: null
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate one-pager');
+      }
+
+      const data = await response.json();
+      setExecutiveOnePager(data.executiveOnePager);
+      
+      // Update session storage
+      const draftData = JSON.parse(sessionStorage.getItem('visionFrameworkV2Draft') || '{}');
+      draftData.executiveOnePager = data.executiveOnePager;
+      sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(draftData));
+
+      setMessage({ type: 'success', text: 'Executive One-Pager generated successfully!' });
+      trackUserAction('onepager_generated_success');
+      console.log('✅ Executive One-Pager generated successfully');
+    } catch (error) {
+      console.error('❌ One-Pager generation error:', error);
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to generate one-pager'
+      });
+      trackUserAction('onepager_generated_error');
+    } finally {
+      setGeneratingOnePager(false);
+    }
+  };
+
+  const handleRunQA = async () => {
+    if (!framework) {
+      setMessage({ type: 'error', text: 'No Vision Framework available. Please complete the Vision section first.' });
+      return;
+    }
+
+    if (!isSignedIn) {
+      setMessage({ type: 'error', text: 'Please sign in to run Quality Assessment.' });
+      return;
+    }
+
+    setRunningQA(true);
+    setMessage(null);
+    trackUserAction('qa_run_clicked');
+
+    try {
+      console.log('🚀 Running Quality Assessment...');
+      
+      const response = await fetch('/api/vision-framework-v2/qa-and-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          framework,
+          originalResponses,
+          userId: user?.id,
+          anonymousId: null
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to run QA');
+      }
+
+      const data = await response.json();
+      setQaResults(data.qaResults);
+      setSectionQualities(data.qualityScores || {});
+      
+      // Update session storage
+      const draftData = JSON.parse(sessionStorage.getItem('visionFrameworkV2Draft') || '{}');
+      if (draftData.metadata) {
+        draftData.metadata.qaChecks = data.qaResults;
+      } else {
+        draftData.metadata = { qaChecks: data.qaResults };
+      }
+      draftData.qualityScores = data.qualityScores;
+      sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(draftData));
+
+      setMessage({ type: 'success', text: 'Quality Assessment completed successfully!' });
+      trackUserAction('qa_completed');
+      console.log('✅ Quality Assessment completed successfully');
+    } catch (error) {
+      console.error('❌ QA error:', error);
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to run Quality Assessment'
+      });
+      trackUserAction('qa_failed');
+    } finally {
+      setRunningQA(false);
     }
   };
 
@@ -432,16 +556,17 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between">
               <div className="min-w-0">
-                <a href="/new" className="text-sm text-banyan-text-subtle hover:text-banyan-text-default transition-colors">
+                <a href="/new" data-testid="vf2-back-button" className="text-sm text-banyan-text-subtle hover:text-banyan-text-default transition-colors">
                   ← Back to Brief
                 </a>
                 <div className="flex items-baseline gap-3">
-                  <h1 className="truncate text-xl sm:text-2xl font-semibold text-banyan-text-default">Vision Framework</h1>
+                  <h1 data-testid="vf2-page-title" className="truncate text-xl sm:text-2xl font-semibold text-banyan-text-default">Vision Framework</h1>
                   <p className="hidden sm:block text-xs text-banyan-text-subtle">Your strategic operating system</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
+                  data-testid="vf2-score-lens-button"
                   onClick={handleLensScore}
                   disabled={scoringLens}
                   className="btn-banyan-ghost"
@@ -450,13 +575,16 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                   {scoringLens ? 'Scoring…' : 'Score with Lens'}
                 </button>
                 <button
+                  data-testid="vf2-save-button"
                   onClick={handleSave}
                   disabled={saving}
                   className="btn-banyan-primary"
                 >
                   {saving ? 'Saving…' : 'Save'}
                 </button>
-                <SaveIndicator saving={saving} dirty={isDirty} />
+                <div data-testid="vf2-save-indicator">
+                  <SaveIndicator saving={saving} dirty={isDirty} />
+                </div>
               </div>
             </div>
           </div>
@@ -478,16 +606,18 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
       {lensScores && (
         <div className="bg-banyan-bg-base">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <LensBadge
-            clarity={lensScores.scores?.clarity}
-            alignment={lensScores.scores?.alignment}
-            actionability={lensScores.scores?.actionability}
-            overall={lensScores.scores?.overall}
-            badge={lensScores.badge}
-            message={lensScores.message}
-            feedback={lensScores.scores?.feedback}
-          />
-        </div>
+            <div data-testid="vf2-lens-badge">
+              <LensBadge
+                clarity={lensScores.scores?.clarity}
+                alignment={lensScores.scores?.alignment}
+                actionability={lensScores.scores?.actionability}
+                overall={lensScores.scores?.overall}
+                badge={lensScores.badge}
+                message={lensScores.message}
+                feedback={lensScores.scores?.feedback}
+              />
+            </div>
+          </div>
         </div>
       )}
 
@@ -507,6 +637,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
             ] as { key: TabKey; label: string }[]).map(t => (
               <button
                 key={t.key}
+                data-testid={`vf2-tab-${t.key}`}
                 role="tab"
                 aria-selected={activeTab === t.key}
                 aria-controls={`panel-${t.key}`}
@@ -573,6 +704,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
             {/* Vision */}
             <motion.section
               id="vision"
+              data-testid="vf2-section-vision"
               role="region"
               aria-labelledby="vision-title"
               initial={{ opacity: 0, y: 6 }}
@@ -593,6 +725,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                 )}
               </div>
               <textarea
+                data-testid="vf2-vision-textarea"
                 value={framework.vision}
                 onChange={(e) => setFramework({ ...framework, vision: e.target.value })}
                 rows={4}
@@ -613,6 +746,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
             {/* Strategy */}
             <motion.section
               id="strategy"
+              data-testid="vf2-section-strategy"
               role="region"
               aria-labelledby="strategy-title"
               initial={{ opacity: 0, y: 6 }}
@@ -636,6 +770,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                 {framework.strategy.map((pillar, index) => (
                   <input
                     key={index}
+                    data-testid="vf2-strategy-input"
                     type="text"
                     value={pillar}
                     onChange={(e) => {
@@ -648,6 +783,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                   />
                 ))}
                 <button
+                  data-testid="vf2-add-strategy-button"
                   type="button"
                   onClick={() => setFramework({ ...framework, strategy: [...framework.strategy, ''] })}
                   className="btn-banyan-ghost"
@@ -669,6 +805,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
             {/* Operating Principles */}
             <motion.section
               id="operating_principles"
+              data-testid="vf2-section-operating-principles"
               role="region"
               aria-labelledby="operating-principles-title"
               initial={{ opacity: 0, y: 6 }}
@@ -692,6 +829,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                 {framework.operating_principles.map((principle, index) => (
                   <input
                     key={index}
+                    data-testid="vf2-operating-principle-input"
                     type="text"
                     value={principle}
                     onChange={(e) => {
@@ -704,6 +842,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                   />
                 ))}
                 <button
+                  data-testid="vf2-add-operating-principle-button"
                   type="button"
                   onClick={() => setFramework({ ...framework, operating_principles: [...framework.operating_principles, ''] })}
                   className="btn-banyan-ghost"
@@ -725,6 +864,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
             {/* Near-term Bets */}
             <motion.section
               id="near_term_bets"
+              data-testid="vf2-section-near-term-bets"
               role="region"
               aria-labelledby="near-term-bets-title"
               initial={{ opacity: 0, y: 6 }}
@@ -746,11 +886,12 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
               </div>
               <div className="space-y-3">
                 {framework.near_term_bets.map((bet, index) => (
-                  <div key={index} className="p-4 border border-banyan-border-default bg-banyan-bg-base rounded-lg">
+                  <div key={index} data-testid="vf2-bet-card" className="p-4 border border-banyan-border-default bg-banyan-bg-base rounded-lg">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="col-span-2">
                         <label className="block text-sm font-medium text-banyan-text-default mb-1">Bet</label>
                         <input
+                          data-testid="vf2-bet-input"
                           type="text"
                           value={bet.bet}
                           onChange={(e) => updateBet(index, 'bet', e.target.value)}
@@ -761,6 +902,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                       <div>
                         <label className="block text-sm font-medium text-banyan-text-default mb-1">Owner</label>
                         <input
+                          data-testid="vf2-bet-owner-input"
                           type="text"
                           value={bet.owner}
                           onChange={(e) => updateBet(index, 'owner', e.target.value)}
@@ -771,6 +913,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                       <div>
                         <label className="block text-sm font-medium text-banyan-text-default mb-1">Horizon</label>
                         <select
+                          data-testid="vf2-bet-horizon-select"
                           value={bet.horizon}
                           onChange={(e) => updateBet(index, 'horizon', e.target.value)}
                           className="w-full rounded-md border border-banyan-border-default bg-banyan-bg-base px-3 py-2 text-banyan-text-default focus:outline-none focus:ring-2 focus:ring-banyan-focus"
@@ -788,6 +931,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                       <div className="col-span-2">
                         <label className="block text-sm font-medium text-banyan-text-default mb-1">Measure</label>
                         <input
+                          data-testid="vf2-bet-measure-input"
                           type="text"
                           value={bet.measure}
                           onChange={(e) => updateBet(index, 'measure', e.target.value)}
@@ -806,6 +950,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                   </div>
                 ))}
                 <button
+                  data-testid="vf2-add-bet-button"
                   type="button"
                   onClick={addBet}
                   className="btn-banyan-ghost"
@@ -827,6 +972,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
             {/* Metrics */}
             <motion.section
               id="metrics"
+              data-testid="vf2-section-metrics"
               role="region"
               aria-labelledby="metrics-title"
               initial={{ opacity: 0, y: 6 }}
@@ -848,11 +994,12 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
               </div>
               <div className="space-y-3">
                 {framework.metrics.map((metric, index) => (
-                  <div key={index} className="p-4 border border-banyan-border-default bg-banyan-bg-base rounded-lg">
+                  <div key={index} data-testid="vf2-metric-card" className="p-4 border border-banyan-border-default bg-banyan-bg-base rounded-lg">
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className="block text-sm font-medium text-banyan-text-default mb-1">Metric</label>
                         <input
+                          data-testid="vf2-metric-name-input"
                           type="text"
                           value={metric.name}
                           onChange={(e) => updateMetric(index, 'name', e.target.value)}
@@ -863,6 +1010,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                       <div>
                         <label className="block text-sm font-medium text-banyan-text-default mb-1">Target</label>
                         <input
+                          data-testid="vf2-metric-target-input"
                           type="text"
                           value={metric.target}
                           onChange={(e) => updateMetric(index, 'target', e.target.value)}
@@ -873,6 +1021,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                       <div>
                         <label className="block text-sm font-medium text-banyan-text-default mb-1">Cadence</label>
                         <select
+                          data-testid="vf2-metric-cadence-select"
                           value={metric.cadence}
                           onChange={(e) => updateMetric(index, 'cadence', e.target.value)}
                           className="w-full rounded-md border border-banyan-border-default bg-banyan-bg-base px-3 py-2 text-banyan-text-default focus:outline-none focus:ring-2 focus:ring-banyan-focus"
@@ -895,6 +1044,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                   </div>
                 ))}
                 <button
+                  data-testid="vf2-add-metric-button"
                   type="button"
                   onClick={addMetric}
                   className="btn-banyan-ghost"
@@ -916,6 +1066,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
             {/* Tensions */}
             <motion.section
               id="tensions"
+              data-testid="vf2-section-tensions"
               role="region"
               aria-labelledby="tensions-title"
               initial={{ opacity: 0, y: 6 }}
@@ -942,6 +1093,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                 {framework.tensions.map((tension, index) => (
                   <input
                     key={index}
+                    data-testid="vf2-tension-input"
                     type="text"
                     value={tension}
                     onChange={(e) => {
@@ -954,6 +1106,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                   />
                 ))}
                 <button
+                  data-testid="vf2-add-tension-button"
                   type="button"
                   onClick={() => setFramework({ ...framework, tensions: [...framework.tensions, ''] })}
                   className="btn-banyan-ghost"
@@ -977,30 +1130,110 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
         {activeTab === 'onepager' && (
           <section
             id="panel-onepager"
+            data-testid="vf2-onepager-content"
             role="tabpanel"
             aria-labelledby="onepager"
             className="bg-banyan-bg-surface rounded-xl shadow-banyan-mid border border-banyan-border-default p-6 sm:p-8"
           >
             <div className="prose prose-sm max-w-none print:prose print:!max-w-none">
               {executiveOnePager ? (
-                <div 
-                  className="text-banyan-text-default leading-relaxed"
-                  dangerouslySetInnerHTML={{ 
-                    __html: executiveOnePager
-                      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
-                      .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
-                      .replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>') // H3
-                      .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>') // H2
-                      .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>') // H1
-                      .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc list-inside">$1</li>') // List items
-                      .replace(/\n\n/g, '</p><p class="mb-4">') // Paragraphs
-                      .replace(/^(.+)$/gm, (match) => match.startsWith('<') ? match : `<p class="mb-2">${match}</p>`) // Wrap remaining lines
-                  }}
-                />
+                <div>
+                  {/* Regenerate button for existing one-pager */}
+                  <div className="mb-6 flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-banyan-text-default">Executive One-Pager</h3>
+                    <button
+                      onClick={handleGenerateOnePager}
+                      disabled={generatingOnePager || !framework?.vision}
+                      className="btn-banyan-secondary text-sm"
+                      data-testid="vf2-regenerate-onepager"
+                    >
+                      {generatingOnePager ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Regenerating...
+                        </span>
+                      ) : 'Regenerate One-Pager'}
+                    </button>
+                  </div>
+                  <div 
+                    className="text-banyan-text-default leading-relaxed"
+                    dangerouslySetInnerHTML={{ 
+                      __html: executiveOnePager
+                        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
+                        .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
+                        .replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>') // H3
+                        .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>') // H2
+                        .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>') // H1
+                        .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc list-inside">$1</li>') // List items
+                        .replace(/\n\n/g, '</p><p class="mb-4">') // Paragraphs
+                        .replace(/^(.+)$/gm, (match) => match.startsWith('<') ? match : `<p class="mb-2">${match}</p>`) // Wrap remaining lines
+                    }}
+                  />
+                </div>
               ) : (
-                <div className="text-banyan-text-subtle">
-                  <p><strong>Executive one-pager</strong> will appear here after generation.</p>
-                  <p className="mt-2">Tip: Complete Vision and at least one Strategy pillar, then run <em>Score with Lens</em> to unlock the draft.</p>
+                <div className="text-center py-12">
+                  <div className="max-w-md mx-auto">
+                    <div className="mb-6">
+                      <svg className="w-16 h-16 mx-auto text-banyan-text-subtle opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold text-banyan-text-default mb-2">
+                      Executive One-Pager
+                    </h3>
+                    <p className="text-banyan-text-subtle mb-6">
+                      Generate a concise one-page summary from your Vision (and any available Strategy). You can refine and regenerate anytime.
+                    </p>
+                    
+                    {!framework?.vision ? (
+                      <div className="space-y-3">
+                        <button
+                          disabled
+                          className="btn-banyan-primary w-full opacity-50 cursor-not-allowed"
+                          data-testid="vf2-generate-onepager-disabled"
+                        >
+                          Create Executive One-Pager
+                        </button>
+                        <p className="text-sm text-banyan-text-subtle">
+                          Complete your Vision to enable One-Pager generation
+                        </p>
+                      </div>
+                    ) : !isSignedIn ? (
+                      <div className="space-y-3">
+                        <SignInButton mode="modal">
+                          <button
+                            className="btn-banyan-primary w-full"
+                            data-testid="vf2-generate-onepager-signin"
+                          >
+                            Sign in to Create One-Pager
+                          </button>
+                        </SignInButton>
+                        <p className="text-sm text-banyan-text-subtle">
+                          Sign in to generate and save your Executive One-Pager
+                        </p>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handleGenerateOnePager}
+                        disabled={generatingOnePager}
+                        className="btn-banyan-primary w-full"
+                        data-testid="vf2-generate-onepager"
+                      >
+                        {generatingOnePager ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            Generating One-Pager...
+                          </span>
+                        ) : 'Create Executive One-Pager'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -1010,6 +1243,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
         {activeTab === 'qa' && (
           <section
             id="panel-qa"
+            data-testid="vf2-qa-content"
             role="tabpanel"
             aria-labelledby="qa"
             className="bg-banyan-bg-surface rounded-xl shadow-banyan-mid border border-banyan-border-default p-6 sm:p-8"
@@ -1018,7 +1252,25 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
               <div className="space-y-6">
                 <div className="flex items-end justify-between pb-4 border-b border-banyan-border-default">
                   <h3 className="text-lg font-semibold text-banyan-text-default">Quality Assessment</h3>
-                  <p className="text-2xl font-bold text-banyan-text-default">{qaResults.overallScore}/10</p>
+                  <div className="flex items-center gap-4">
+                    <p className="text-2xl font-bold text-banyan-text-default">{qaResults.overallScore}/10</p>
+                    <button
+                      onClick={handleRunQA}
+                      disabled={runningQA || !framework?.vision}
+                      className="btn-banyan-secondary text-sm"
+                      data-testid="vf2-run-qa-again"
+                    >
+                      {runningQA ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Running...
+                        </span>
+                      ) : 'Run Again'}
+                    </button>
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1053,7 +1305,67 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                 )}
               </div>
             ) : (
-              <p className="text-banyan-text-subtle">QA results will appear here after generation.</p>
+              <div className="text-center py-12">
+                <div className="max-w-md mx-auto">
+                  <div className="mb-6">
+                    <svg className="w-16 h-16 mx-auto text-banyan-text-subtle opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-banyan-text-default mb-2">
+                    Quality Assessment
+                  </h3>
+                  <p className="text-banyan-text-subtle mb-6">
+                    Evaluate clarity, alignment, and actionability across your Vision Framework. Get detailed scoring and recommendations for improvement.
+                  </p>
+                  
+                  {!framework?.vision ? (
+                    <div className="space-y-3">
+                      <button
+                        disabled
+                        className="btn-banyan-primary w-full opacity-50 cursor-not-allowed"
+                        data-testid="vf2-run-qa-disabled"
+                      >
+                        Run Quality Assessment
+                      </button>
+                      <p className="text-sm text-banyan-text-subtle">
+                        Complete your Vision to enable Quality Assessment
+                      </p>
+                    </div>
+                  ) : !isSignedIn ? (
+                    <div className="space-y-3">
+                      <SignInButton mode="modal">
+                        <button
+                          className="btn-banyan-primary w-full"
+                          data-testid="vf2-run-qa-signin"
+                        >
+                          Sign in to Run QA
+                        </button>
+                      </SignInButton>
+                      <p className="text-sm text-banyan-text-subtle">
+                        Sign in to run Quality Assessment and get detailed scoring
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleRunQA}
+                      disabled={runningQA}
+                      className="btn-banyan-primary w-full"
+                      data-testid="vf2-run-qa"
+                    >
+                      {runningQA ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Running Quality Assessment...
+                        </span>
+                      ) : 'Run Quality Assessment'}
+                    </button>
+                  )}
+                </div>
+              </div>
             )}
           </section>
         )}

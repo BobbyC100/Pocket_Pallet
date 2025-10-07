@@ -6,10 +6,14 @@ interface PreGenerationSignupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onContinue: () => void;
+  currentStep?: number; // Current wizard step for returnTo URL
 }
 
-export default function PreGenerationSignupModal({ isOpen, onClose, onContinue }: PreGenerationSignupModalProps) {
+export default function PreGenerationSignupModal({ isOpen, onClose, onContinue, currentStep = 0 }: PreGenerationSignupModalProps) {
   if (!isOpen) return null;
+
+  // Build returnTo URL with current step
+  const returnToUrl = `/new?step=${currentStep}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -72,7 +76,10 @@ export default function PreGenerationSignupModal({ isOpen, onClose, onContinue }
 
           {/* CTA Buttons */}
           <div className="flex flex-col gap-3">
-            <SignInButton mode="modal">
+            <SignInButton 
+              mode="modal"
+              forceRedirectUrl={returnToUrl}
+            >
               <button className="btn-banyan-primary w-full">
                 Sign up and generate
               </button>

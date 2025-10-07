@@ -6,7 +6,6 @@ import ResultTabs from "@/components/ResultTabs";
 import GenerationProgressModal, { GenerationStep } from "@/components/GenerationProgressModal";
 import SaveModal from "@/components/SaveModal";
 import StrategicToolsModal from "@/components/StrategicToolsModal";
-import { SaveBar } from "@/components/SaveBar";
 import { AutoSaveIndicator } from "@/components/AutoSaveIndicator";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { exportBriefToPDF } from "@/lib/pdf-export-v2";
@@ -46,6 +45,9 @@ export default function ResultsPage() {
       try {
         const parsed = JSON.parse(savedResult);
         setResult(parsed);
+        
+        // Track results view (anonymous or authenticated)
+        trackUserAction(isSignedIn ? 'results_viewed_authenticated' : 'results_viewed_anonymous');
       } catch (error) {
         console.error('Failed to load result:', error);
         router.push('/new');
@@ -54,7 +56,7 @@ export default function ResultsPage() {
       // No result found, redirect to wizard
       router.push('/new');
     }
-  }, [router]);
+  }, [router, isSignedIn]);
 
   const autoSave = useAutoSave(result, {
     debounceMs: 3000,
@@ -102,7 +104,9 @@ export default function ResultsPage() {
       // TODO: Save to database
       alert('Saved to cloud!');
     } else {
-      trackSignupTouchpoint('unlock_results', 'shown');
+      // Track save prompt for anonymous users
+      trackSignupTouchpoint('results_save_prompt', 'shown');
+      trackUserAction('results_save_prompt_shown');
       setShowSaveModal(true);
     }
   };
@@ -119,8 +123,11 @@ export default function ResultsPage() {
   };
 
   const handleCreateVisionFramework = async () => {
-    if (!result?.responses) {
-      alert('No Vision Statement data available.');
+    // Check if Vision Framework data exists in session storage
+    const frameworkData = sessionStorage.getItem('visionFrameworkV2Draft');
+    
+    if (!frameworkData) {
+      alert('No Vision Framework data available. Please complete the wizard first.');
       return;
     }
 
@@ -129,21 +136,14 @@ export default function ResultsPage() {
       return;
     }
 
-    setIsCreatingFramework(true);
-
     try {
-      // Store responses in session for framework generation
-      sessionStorage.setItem('visionFrameworkV2Input', JSON.stringify({
-        responses: result.responses,
-        fromResults: true
-      }));
-
-      // Navigate to framework page which will pick up the data
+      // Data is already in sessionStorage from wizard generation
+      // Just navigate to the Vision Framework page
+      console.log('📍 Navigating to Vision Framework V2...');
       router.push('/vision-framework-v2');
     } catch (error) {
       console.error('Error navigating to framework:', error);
-      alert('Failed to start framework generation. Please try again.');
-      setIsCreatingFramework(false);
+      alert('Failed to navigate to Vision Framework. Please try again.');
     }
   };
 
@@ -197,14 +197,23 @@ export default function ResultsPage() {
               Back to Wizard
             </button>
 
-            {isSignedIn && (
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-banyan-success rounded-full animate-pulse"></div>
-                <span className="text-sm text-banyan-text-subtle">
-                  Signed in as <span className="font-semibold">{user?.primaryEmailAddress?.emailAddress}</span>
-                </span>
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              {isSignedIn ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-banyan-success rounded-full animate-pulse"></div>
+                  <span className="text-sm text-banyan-text-subtle">
+                    Signed in as <span className="font-semibold">{user?.primaryEmailAddress?.emailAddress}</span>
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-banyan-warning rounded-full"></div>
+                  <span className="text-sm text-banyan-text-subtle">
+                    Not saved — Sign in to save your work
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Save Status Bar */}
@@ -236,11 +245,11 @@ export default function ResultsPage() {
             </div>
           </div>
 
-          {/* Results */}
+          {/* Results - Full content shown to all users */}
           <ResultTabs
             founderMd={result.founderBriefMd}
             vcMd={result.vcSummaryMd}
-            isAnonymous={result.isAnonymous || false}
+            isAnonymous={false}
           />
           
           {/* Expand Your Vision into Strategy Section */}
@@ -269,10 +278,8 @@ export default function ResultsPage() {
         </div>
       </main>
       
-      <SaveBar 
-        onSave={handleSave}
-        hasUnsavedChanges={hasUnsavedChanges && result !== null}
-      />
+      {/* REMOVED: SaveBar footer banner */}
+      {/* Auth prompt moved to explicit actions (Save/Generate) */}
     </>
   );
 }

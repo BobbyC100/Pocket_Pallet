@@ -430,7 +430,7 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-banyan-text-default">
+              <h1 data-testid="sos-page-title" className="text-2xl font-bold text-banyan-text-default">
                 Strategic Operating System
               </h1>
               <p className="text-sm text-banyan-text-subtle mt-1">
@@ -440,6 +440,7 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
             <div className="flex items-center gap-3">
               <span className="text-sm text-banyan-text-subtle">Last updated: Today</span>
               <button 
+                data-testid="sos-export-pdf-button"
                 onClick={handleExportCurrent}
                 className="btn-banyan-ghost flex items-center gap-2"
                 title="Download current document as PDF"
@@ -450,6 +451,7 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
                 Export PDF
               </button>
               <button 
+                data-testid="sos-export-all-button"
                 onClick={handleExportAll}
                 className="btn-banyan-primary"
               >
@@ -463,15 +465,17 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
       {/* Main Layout */}
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Lens Dashboard Widget */}
-        <LensDashboardWidget 
-          visionLensScores={visionV2Content?.lensScores}
-          vcLensScores={briefContent?.vcLensScores}
-        />
+        <div data-testid="sos-lens-dashboard">
+          <LensDashboardWidget 
+            visionLensScores={visionV2Content?.lensScores}
+            vcLensScores={briefContent?.vcLensScores}
+          />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-4 sticky top-24">
+            <div data-testid="sos-sidebar" className="bg-banyan-bg-surface rounded-lg shadow-banyan-mid border border-banyan-border-default p-4 sticky top-24">
               <h2 className="text-sm font-semibold text-banyan-text-default mb-3 uppercase tracking-wide">
                 Documents
               </h2>
@@ -479,6 +483,7 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
                 {documents.map((doc) => (
                   <button
                     key={doc.id}
+                    data-testid={`sos-doc-${doc.id}`}
                     onClick={() => setActiveDoc(doc.id)}
                     className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
                       activeDoc === doc.id
@@ -499,7 +504,7 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(doc.status)}`}>
+                        <span data-testid="sos-doc-status" className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(doc.status)}`}>
                           {doc.status}
                         </span>
                         {doc.completionPercent !== undefined && (
@@ -516,7 +521,7 @@ ${summary.kpis6mo.map((k: string, i: number) => `${i + 1}. ${k}`).join('\n')}
           </div>
 
           {/* Content Area */}
-          <div id="document-content" className="lg:col-span-3">
+          <div id="document-content" data-testid="sos-content-area" className="lg:col-span-3">
             {activeDoc === 'vision-v2' && (
               <VisionFrameworkV2Page companyId="demo-company" embedded={true} editOnly={true} />
             )}
