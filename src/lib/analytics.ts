@@ -30,6 +30,7 @@ export type AnalyticsEvent =
   | 'results_viewed_anonymous'
   | 'results_viewed_authenticated'
   | 'results_save_prompt_shown'
+  | 'results_unlock_clicked'
   | 'onepager_generate_clicked'
   | 'onepager_generated_success'
   | 'onepager_generated_error'
@@ -131,29 +132,39 @@ export function trackWizardProgress(
  * Track signup conversion touchpoints
  */
 export function trackSignupTouchpoint(
-  touchpoint: 'soft_wizard' | 'pre_generation' | 'unlock_results' | 'unlock_tools',
-  action: 'shown' | 'accepted' | 'dismissed'
+  touchpoint: 'soft_wizard' | 'pre_generation' | 'unlock_results' | 'unlock_tools' | 'results_save_prompt',
+  action: 'shown' | 'accepted' | 'dismissed' | 'anonymous_access'
 ) {
   const eventMap = {
     soft_wizard: {
       shown: 'soft_signup_shown',
       accepted: 'soft_signup_accepted',
       dismissed: 'soft_signup_dismissed',
+      anonymous_access: 'soft_signup_dismissed',
     },
     pre_generation: {
       shown: 'pre_generation_signup_shown',
       accepted: 'pre_generation_signup_accepted',
       dismissed: 'pre_generation_signup_skipped',
+      anonymous_access: 'pre_generation_signup_skipped',
     },
     unlock_results: {
       shown: 'vision_statement_partial_shown',
       accepted: 'unlock_vision_statement_clicked',
-      dismissed: 'unlock_vision_statement_clicked', // Same as accepted for now
+      dismissed: 'unlock_vision_statement_clicked',
+      anonymous_access: 'unlock_vision_statement_clicked',
     },
     unlock_tools: {
       shown: 'strategic_tools_modal_shown',
       accepted: 'unlock_strategic_tools_clicked',
       dismissed: 'unlock_strategic_tools_clicked',
+      anonymous_access: 'unlock_strategic_tools_clicked',
+    },
+    results_save_prompt: {
+      shown: 'results_save_prompt_shown',
+      accepted: 'results_save_prompt_shown',
+      dismissed: 'results_save_prompt_shown',
+      anonymous_access: 'results_save_prompt_shown',
     },
   };
 
@@ -215,7 +226,7 @@ export function trackProUpgrade(
  * Track user actions
  */
 export function trackUserAction(
-  action: 'pdf_exported' | 'cloud_saved' | 'tool_selected' | 'results_viewed_anonymous' | 'results_viewed_authenticated' | 'results_save_prompt_shown' | 'onepager_generate_clicked' | 'onepager_generated_success' | 'onepager_generated_error' | 'qa_run_clicked' | 'qa_completed' | 'qa_failed',
+  action: 'pdf_exported' | 'cloud_saved' | 'tool_selected' | 'results_viewed_anonymous' | 'results_viewed_authenticated' | 'results_save_prompt_shown' | 'results_unlock_clicked' | 'onepager_generate_clicked' | 'onepager_generated_success' | 'onepager_generated_error' | 'qa_run_clicked' | 'qa_completed' | 'qa_failed',
   properties?: AnalyticsProperties
 ) {
   const eventMap = {
@@ -225,6 +236,7 @@ export function trackUserAction(
     results_viewed_anonymous: 'results_viewed_anonymous',
     results_viewed_authenticated: 'results_viewed_authenticated',
     results_save_prompt_shown: 'results_save_prompt_shown',
+    results_unlock_clicked: 'results_unlock_clicked',
     onepager_generate_clicked: 'onepager_generate_clicked',
     onepager_generated_success: 'onepager_generated_success',
     onepager_generated_error: 'onepager_generated_error',

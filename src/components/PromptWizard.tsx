@@ -116,24 +116,21 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
     }
   }, [currentStep, responses, softSignupShown, startTime, stateRestored]);
 
-  // Soft signup logic: Show after step 4-5 or 5 minutes, only once, and only if not signed in
-  // IMPORTANT: Only trigger when moving FORWARD through steps, not on Back navigation
+  // DISABLED: Midpoint soft signup removed per Issue #5.2
+  // Signup now only appears when user clicks Save or Generate Tools
+  // Keeping this commented for reference in case we want to re-enable later
+  /*
   useEffect(() => {
     if (isSignedIn || softSignupShown || !stateRestored) return;
-
-    // Check if we've reached step 4 or 5 (index 3 or 4) FOR THE FIRST TIME
     const stepTrigger = currentStep >= 3;
-    
-    // Check if 5 minutes have passed
     const timeTrigger = (Date.now() - startTime) > 5 * 60 * 1000;
-    
     if (stepTrigger || timeTrigger) {
       setShowSoftSignup(true);
       setSoftSignupShown(true);
       trackSignupTouchpoint('soft_wizard', 'shown');
-      console.log('🔔 Soft signup modal triggered', { step: currentStep, reason: stepTrigger ? 'step' : 'time' });
     }
   }, [currentStep, isSignedIn, softSignupShown, startTime, stateRestored]);
+  */
 
   const loadTestData = () => {
     trackEvent('load_example_clicked');
@@ -185,14 +182,9 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
 
   const handleInitiateGeneration = () => {
     trackWizardProgress(PROMPT_STEPS.length, PROMPT_STEPS.length, true);
-    // Show pre-generation signup modal if not signed in
-    if (!isSignedIn) {
-      setShowPreGenerationSignup(true);
-      trackSignupTouchpoint('pre_generation', 'shown');
-    } else {
-      // If already signed in, start generation immediately
-      handleSubmit();
-    }
+    // CHANGED: Allow anonymous users to complete wizard without auth gate
+    // Auth gating happens later at Save/Generate Tools actions
+    handleSubmit();
   };
 
   const handleSubmit = async () => {
@@ -303,8 +295,87 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
           visionFramework: null
         };
         
-        // Store in session and redirect to results page
+        // Store Vision Statement in session
         sessionStorage.setItem('lastGeneratedBrief', JSON.stringify(anonymousResult));
+        
+        // ADDED: Create basic Vision Framework draft for anonymous users
+        // This allows them to access the Vision Framework page without full framework generation
+        const visionPurpose = processedResponses.vision_purpose || '';
+        const visionEndstate = processedResponses.vision_endstate || '';
+        const combinedVision = visionPurpose && visionEndstate 
+          ? `${visionPurpose}\n\n${visionEndstate}` 
+          : visionPurpose || visionEndstate || 'Define your vision';
+        
+        // Extract structured data from wizard responses
+        const strategyItems = [];
+        if (processedResponses.vision_audience_timing) {
+          strategyItems.push(`Focus: ${processedResponses.vision_audience_timing.substring(0, 250)}`);
+        }
+        if (processedResponses.required_capabilities) {
+          strategyItems.push(`Build: ${processedResponses.required_capabilities.substring(0, 250)}`);
+        }
+        
+        const operatingPrinciples = [];
+        if (processedResponses.core_principles) {
+          const principles = processedResponses.core_principles.split(/[.\n]/).filter((p: string) => p.trim().length > 10);
+          operatingPrinciples.push(...principles.slice(0, 5).map((p: string) => p.trim()));
+        }
+        
+        const nearTermBets = [];
+        if (processedResponses.hard_decisions) {
+          nearTermBets.push({
+            bet: processedResponses.hard_decisions.substring(0, 200),
+            owner: 'Team',
+            horizon: 'Q2' as const,
+            measure: 'Decision made and executed'
+          });
+        }
+        
+        const metrics = [];
+        if (processedResponses.success_definition) {
+          metrics.push({
+            name: 'Success Criteria',
+            target: processedResponses.success_definition.substring(0, 100),
+            cadence: 'quarterly' as const
+          });
+        }
+        
+        const tensions = [];
+        // Extract tensions from hard decisions (trade-offs and conflicts)
+        if (processedResponses.hard_decisions) {
+          const decisionsText = processedResponses.hard_decisions;
+          // Look for question marks, "or", "vs", "but" - indicators of tensions
+          const tensionIndicators = decisionsText.split(/[?.!]/).filter((s: string) => 
+            s.length > 20 && (s.includes(' or ') || s.includes(' vs ') || s.includes(' but '))
+          );
+          if (tensionIndicators.length > 0) {
+            tensions.push(...tensionIndicators.slice(0, 3).map((t: string) => t.trim()));
+          }
+        }
+        // Add tension from current state vs. vision gap
+        if (processedResponses.current_state && visionEndstate) {
+          tensions.push('Gap: Current capabilities vs. vision execution requirements');
+        }
+        
+        const basicFrameworkDraft = {
+          framework: {
+            companyId: 'demo-company',
+            updatedAt: new Date().toISOString(),
+            vision: combinedVision,
+            strategy: strategyItems,
+            operating_principles: operatingPrinciples.length > 0 ? operatingPrinciples : ['Define your operating principles'],
+            near_term_bets: nearTermBets,
+            metrics: metrics,
+            tensions: tensions.length > 0 ? tensions : ['Run Quality Assessment to identify tensions']
+          },
+          originalResponses: processedResponses,
+          metadata: {
+            isAnonymous: true,
+            createdAt: new Date().toISOString()
+          }
+        };
+        sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(basicFrameworkDraft));
+        console.log('✅ Structured Vision Framework draft created for anonymous user with', strategyItems.length, 'strategy items,', operatingPrinciples.length, 'principles');
         
         if (onGenerated) {
           onGenerated(anonymousResult);

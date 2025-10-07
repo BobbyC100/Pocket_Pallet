@@ -9,6 +9,8 @@ import QualityBadge from './QualityBadge';
 import LensBadge from './LensBadge';
 import ResearchCitations, { Citation } from './ResearchCitations';
 import { trackUserAction } from '@/lib/analytics';
+import { normalizeQaResults } from '@/lib/qa-normalize';
+import { QaResults } from '@/types/qa';
 
 // Save indicator component
 const SaveIndicator = ({ saving, dirty }: { saving: boolean; dirty: boolean }) => (
@@ -30,7 +32,7 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
   const { isSignedIn, user } = useUser();
   const [framework, setFramework] = useState<VisionFrameworkV2 | null>(null);
   const [executiveOnePager, setExecutiveOnePager] = useState<string>('');
-  const [qaResults, setQaResults] = useState<any>(null);
+  const [qaResults, setQaResults] = useState<QaResults | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -69,8 +71,9 @@ export default function VisionFrameworkV2Page({ companyId = 'demo-company', embe
           console.log('✅ One-pager set, length:', parsed.executiveOnePager.length);
         }
         if (parsed.metadata?.qaChecks) {
-          setQaResults(parsed.metadata.qaChecks);
-          console.log('✅ QA results set');
+          const normalized = normalizeQaResults(parsed.metadata.qaChecks);
+          setQaResults(normalized);
+          console.log('✅ QA results set and normalized');
         }
         if (parsed.originalResponses) {
           setOriginalResponses(parsed.originalResponses);
@@ -236,11 +239,8 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
       return;
     }
 
-    if (!isSignedIn) {
-      setMessage({ type: 'error', text: 'Please sign in to generate the Executive One-Pager.' });
-      return;
-    }
-
+    // CHANGED: Allow anonymous users to generate One-Pager
+    // Auth gating happens only on save/export actions
     setGeneratingOnePager(true);
     setMessage(null);
     trackUserAction('onepager_generate_clicked');
@@ -292,11 +292,8 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
       return;
     }
 
-    if (!isSignedIn) {
-      setMessage({ type: 'error', text: 'Please sign in to run Quality Assessment.' });
-      return;
-    }
-
+    // CHANGED: Allow anonymous users to run QA
+    // Auth gating happens only on save/export actions
     setRunningQA(true);
     setMessage(null);
     trackUserAction('qa_run_clicked');
@@ -321,15 +318,18 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
       }
 
       const data = await response.json();
-      setQaResults(data.qaResults);
+      
+      // Normalize QA results to handle various API response formats
+      const normalized = normalizeQaResults(data.qaResults);
+      setQaResults(normalized);
       setSectionQualities(data.qualityScores || {});
       
       // Update session storage
       const draftData = JSON.parse(sessionStorage.getItem('visionFrameworkV2Draft') || '{}');
       if (draftData.metadata) {
-        draftData.metadata.qaChecks = data.qaResults;
+        draftData.metadata.qaChecks = normalized;
       } else {
-        draftData.metadata = { qaChecks: data.qaResults };
+        draftData.metadata = { qaChecks: normalized };
       }
       draftData.qualityScores = data.qualityScores;
       sessionStorage.setItem('visionFrameworkV2Draft', JSON.stringify(draftData));
@@ -535,13 +535,13 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
         <div className="text-center max-w-md">
           <h2 className="text-2xl font-bold text-banyan-text-default mb-4">No Vision Framework Found</h2>
           <p className="text-banyan-text-subtle mb-6">
-            Create a brief first, then generate your Vision Framework from there.
+            Complete the Vision Wizard first, then your framework will appear here.
           </p>
           <a
             href="/new"
             className="btn-banyan-primary inline-block"
           >
-            Create a Brief
+            Create Vision Framework
           </a>
         </div>
       </div>
@@ -1201,20 +1201,6 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                           Complete your Vision to enable One-Pager generation
                         </p>
                       </div>
-                    ) : !isSignedIn ? (
-                      <div className="space-y-3">
-                        <SignInButton mode="modal">
-                          <button
-                            className="btn-banyan-primary w-full"
-                            data-testid="vf2-generate-onepager-signin"
-                          >
-                            Sign in to Create One-Pager
-                          </button>
-                        </SignInButton>
-                        <p className="text-sm text-banyan-text-subtle">
-                          Sign in to generate and save your Executive One-Pager
-                        </p>
-                      </div>
                     ) : (
                       <button
                         onClick={handleGenerateOnePager}
@@ -1274,18 +1260,24 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {['consistency', 'measurability', 'tensions', 'actionability', 'completeness'].map((category) => {
-                    const score = qaResults[category] || 0;
+                  {[
+                    { key: 'consistency', label: 'Consistency', score: qaResults.consistency },
+                    { key: 'measurability', label: 'Measurability', score: qaResults.measurability },
+                    { key: 'tensions', label: 'Tensions', score: qaResults.tensions },
+                    { key: 'actionability', label: 'Actionability', score: qaResults.actionability },
+                    { key: 'completeness', label: 'Completeness', score: qaResults.completeness },
+                  ].map(({ key, label, score }) => {
+                    const scoreNum = typeof score === 'number' ? score : 0;
                     return (
-                      <div key={category} className="rounded-md border border-banyan-border-default bg-banyan-bg-base p-3">
+                      <div key={key} className="rounded-md border border-banyan-border-default bg-banyan-bg-base p-3">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium capitalize text-banyan-text-default">{category}</span>
-                          <span className="text-sm text-banyan-text-subtle">{score}/10</span>
+                          <span className="text-sm font-medium text-banyan-text-default">{label}</span>
+                          <span className="text-sm text-banyan-text-subtle">{scoreNum.toFixed(1)}/10</span>
                         </div>
                         <div className="h-2 rounded bg-banyan-bg-base overflow-hidden">
                           <div
                             className="h-full rounded bg-banyan-text-default"
-                            style={{ width: `${(score / 10) * 100}%` }}
+                            style={{ width: `${(scoreNum / 10) * 100}%` }}
                           />
                         </div>
                       </div>
@@ -1330,20 +1322,6 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                       </button>
                       <p className="text-sm text-banyan-text-subtle">
                         Complete your Vision to enable Quality Assessment
-                      </p>
-                    </div>
-                  ) : !isSignedIn ? (
-                    <div className="space-y-3">
-                      <SignInButton mode="modal">
-                        <button
-                          className="btn-banyan-primary w-full"
-                          data-testid="vf2-run-qa-signin"
-                        >
-                          Sign in to Run QA
-                        </button>
-                      </SignInButton>
-                      <p className="text-sm text-banyan-text-subtle">
-                        Sign in to run Quality Assessment and get detailed scoring
                       </p>
                     </div>
                   ) : (

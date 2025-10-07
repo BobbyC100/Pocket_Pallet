@@ -54,7 +54,7 @@ export default function GenerationProgressModal({ isOpen, currentStep, steps }: 
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-banyan-text-default mb-2">
-            Generating Your Vision
+            Creating Vision Statement
           </h2>
           <p className="text-banyan-text-subtle">
             This will take about 15-20 seconds

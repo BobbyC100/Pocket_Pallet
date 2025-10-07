@@ -5,7 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import ResultTabs from "@/components/ResultTabs";
 import GenerationProgressModal, { GenerationStep } from "@/components/GenerationProgressModal";
 import SaveModal from "@/components/SaveModal";
-import StrategicToolsModal from "@/components/StrategicToolsModal";
+// StrategicToolsModal removed - users now navigate directly to Vision Framework
 import { AutoSaveIndicator } from "@/components/AutoSaveIndicator";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { exportBriefToPDF } from "@/lib/pdf-export-v2";
@@ -25,8 +25,8 @@ export default function ResultsPage() {
   
   const [isCreatingFramework, setIsCreatingFramework] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [showStrategicToolsModal, setShowStrategicToolsModal] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [pageLoaded, setPageLoaded] = useState(false);
   
   const [frameworkSteps, setFrameworkSteps] = useState<GenerationStep[]>([
     { id: 'research', label: 'Retrieve Research Insights', status: 'pending' },
@@ -45,9 +45,13 @@ export default function ResultsPage() {
       try {
         const parsed = JSON.parse(savedResult);
         setResult(parsed);
+        setPageLoaded(true);
         
         // Track results view (anonymous or authenticated)
         trackUserAction(isSignedIn ? 'results_viewed_authenticated' : 'results_viewed_anonymous');
+        
+        // DEBUG: Log if modal state is somehow true on load
+        console.log('📍 Results page loaded', { showSaveModal: false, isSignedIn });
       } catch (error) {
         console.error('Failed to load result:', error);
         router.push('/new');
@@ -112,14 +116,11 @@ export default function ResultsPage() {
   };
 
   const handleUnlockStrategicTools = () => {
-    if (!isSignedIn) {
-      trackSignupTouchpoint('unlock_tools', 'shown');
-      setShowSaveModal(true);
-      return;
-    }
-
-    trackSignupTouchpoint('unlock_tools', 'accepted');
-    setShowStrategicToolsModal(true);
+    // CHANGED: Allow both anonymous and authenticated users to access Vision Framework
+    // Auth gating now happens within Vision Framework for specific actions (Save/Generate/Export)
+    trackUserAction('results_unlock_clicked');
+    trackSignupTouchpoint('unlock_tools', isSignedIn ? 'accepted' : 'anonymous_access');
+    handleCreateVisionFramework();
   };
 
   const handleCreateVisionFramework = async () => {
@@ -131,15 +132,12 @@ export default function ResultsPage() {
       return;
     }
 
-    if (!isSignedIn) {
-      setShowSaveModal(true);
-      return;
-    }
-
+    // CHANGED: Allow anonymous users to access Vision Framework
+    // Auth gating happens on specific actions within the Vision Framework page
     try {
       // Data is already in sessionStorage from wizard generation
       // Just navigate to the Vision Framework page
-      console.log('📍 Navigating to Vision Framework V2...');
+      console.log('📍 Navigating to Vision Framework V2...', { isSignedIn });
       router.push('/vision-framework-v2');
     } catch (error) {
       console.error('Error navigating to framework:', error);
@@ -169,17 +167,9 @@ export default function ResultsPage() {
       <SaveModal 
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}
+        returnTo="/vision-framework-v2#edit"
         onSaveComplete={() => {
           setShowSaveModal(false);
-        }}
-      />
-
-      <StrategicToolsModal
-        isOpen={showStrategicToolsModal}
-        onClose={() => setShowStrategicToolsModal(false)}
-        onSelectTool={(tool) => {
-          console.log('Selected tool:', tool);
-          handleCreateVisionFramework();
         }}
       />
       

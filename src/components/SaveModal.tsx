@@ -1,23 +1,28 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { SignIn, useSignIn } from '@clerk/nextjs';
 
 interface SaveModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSaveComplete?: () => void;
+  returnTo?: string; // Optional: specify custom return URL
 }
 
-export default function SaveModal({ isOpen, onClose, onSaveComplete }: SaveModalProps) {
+export default function SaveModal({ isOpen, onClose, onSaveComplete, returnTo }: SaveModalProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { signIn } = useSignIn();
 
   if (!isOpen) return null;
 
+  // Use provided returnTo, or default to current page
+  const redirectUrl = returnTo || pathname || '/results';
+
   const handleEmailSignIn = () => {
-    // Redirect to sign-in with a return URL back to /new
-    router.push('/sign-in?redirect_url=/new');
+    // Redirect to sign-in with a return URL back to current page
+    router.push(`/sign-in?redirect_url=${encodeURIComponent(redirectUrl)}`);
   };
 
   const handleGoogleSignIn = async () => {
@@ -26,8 +31,8 @@ export default function SaveModal({ isOpen, onClose, onSaveComplete }: SaveModal
     try {
       await signIn.authenticateWithRedirect({
         strategy: 'oauth_google',
-        redirectUrl: '/new',
-        redirectUrlComplete: '/new',
+        redirectUrl: redirectUrl,
+        redirectUrlComplete: redirectUrl,
       });
     } catch (error) {
       console.error('Google sign-in error:', error);
