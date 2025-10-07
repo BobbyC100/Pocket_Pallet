@@ -8,8 +8,10 @@ import RefinementPanel from './RefinementPanel';
 import QualityBadge from './QualityBadge';
 import LensBadge from './LensBadge';
 import ResearchCitations, { Citation } from './ResearchCitations';
+import { ClaimValidation } from './qa/ClaimValidation';
 import { trackUserAction } from '@/lib/analytics';
 import { normalizeQaResults } from '@/lib/qa-normalize';
+import { extractClaimsFromFramework } from '@/lib/extract-claims';
 import { QaResults } from '@/types/qa';
 
 // Save indicator component
@@ -1277,6 +1279,16 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                     </ul>
                   </div>
                 )}
+
+                {/* Claim Validation - Research-backed validation */}
+                <div className="mt-8 pt-8 border-t border-banyan-border-default">
+                  <ClaimValidation 
+                    claims={extractClaimsFromFramework(framework)}
+                    topK={5}
+                    minSimilarity={0.25}
+                    passThreshold={0.25}
+                  />
+                </div>
               </div>
             ) : (
               <div className="text-center py-12">
