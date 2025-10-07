@@ -574,7 +574,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                   {saving ? 'Saving…' : 'Save'}
                 </button>
                 <div data-testid="vf2-save-indicator">
-                  <SaveIndicator saving={saving} dirty={isDirty} />
+                <SaveIndicator saving={saving} dirty={isDirty} />
                 </div>
               </div>
             </div>
@@ -598,17 +598,17 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
         <div className="bg-banyan-bg-base">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div data-testid="vf2-lens-badge">
-              <LensBadge
-                clarity={lensScores.scores?.clarity}
-                alignment={lensScores.scores?.alignment}
-                actionability={lensScores.scores?.actionability}
-                overall={lensScores.scores?.overall}
-                badge={lensScores.badge}
-                message={lensScores.message}
-                feedback={lensScores.scores?.feedback}
-              />
+            <LensBadge
+            clarity={lensScores.scores?.clarity}
+            alignment={lensScores.scores?.alignment}
+            actionability={lensScores.scores?.actionability}
+            overall={lensScores.scores?.overall}
+            badge={lensScores.badge}
+            message={lensScores.message}
+            feedback={lensScores.scores?.feedback}
+          />
             </div>
-          </div>
+        </div>
         </div>
       )}
 
@@ -1140,20 +1140,20 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                       ) : 'Regenerate One-Pager'}
                     </button>
                   </div>
-                  <div 
-                    className="text-banyan-text-default leading-relaxed"
-                    dangerouslySetInnerHTML={{ 
-                      __html: executiveOnePager
-                        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
-                        .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
-                        .replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>') // H3
-                        .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>') // H2
-                        .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>') // H1
-                        .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc list-inside">$1</li>') // List items
-                        .replace(/\n\n/g, '</p><p class="mb-4">') // Paragraphs
-                        .replace(/^(.+)$/gm, (match) => match.startsWith('<') ? match : `<p class="mb-2">${match}</p>`) // Wrap remaining lines
-                    }}
-                  />
+                <div 
+                  className="text-banyan-text-default leading-relaxed"
+                  dangerouslySetInnerHTML={{ 
+                    __html: executiveOnePager
+                      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
+                      .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
+                      .replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>') // H3
+                      .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>') // H2
+                      .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>') // H1
+                      .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc list-inside">$1</li>') // List items
+                      .replace(/\n\n/g, '</p><p class="mb-4">') // Paragraphs
+                      .replace(/^(.+)$/gm, (match) => match.startsWith('<') ? match : `<p class="mb-2">${match}</p>`) // Wrap remaining lines
+                  }}
+                />
                 </div>
               ) : (
                 <div className="text-center py-12">
@@ -1221,7 +1221,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                 <div className="flex items-end justify-between pb-4 border-b border-banyan-border-default">
                   <h3 className="text-lg font-semibold text-banyan-text-default">Quality Assessment</h3>
                   <div className="flex items-center gap-4">
-                    <p className="text-2xl font-bold text-banyan-text-default">{qaResults.overallScore}/10</p>
+                  <p className="text-2xl font-bold text-banyan-text-default">{qaResults.overallScore}/10</p>
                     <button
                       onClick={handleRunQA}
                       disabled={runningQA || !framework?.vision}
@@ -1343,7 +1343,9 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                 <div className="flex items-end justify-between pb-4 border-b border-banyan-border-default">
                   <h3 className="text-lg font-semibold text-banyan-text-default">Lens Analysis</h3>
                   <div className="flex items-center gap-4">
-                    <p className="text-2xl font-bold text-banyan-text-default">{lensScores.overallScore}/10</p>
+                    <p className="text-2xl font-bold text-banyan-text-default">
+                      {lensScores.scores?.overall ?? lensScores.overallScore ?? 0}/10
+                    </p>
                     <button
                       onClick={handleLensScore}
                       disabled={scoringLens || !framework?.vision}
@@ -1354,7 +1356,7 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                         <span className="flex items-center gap-2">
                           <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                           </svg>
                           Running...
                         </span>
@@ -1365,10 +1367,10 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { key: 'clarity', label: 'Clarity', score: lensScores.clarity },
-                    { key: 'alignment', label: 'Alignment', score: lensScores.alignment },
-                    { key: 'consistency', label: 'Consistency', score: lensScores.consistency },
-                    { key: 'actionability', label: 'Actionability', score: lensScores.actionability },
+                    { key: 'clarity', label: 'Clarity', score: lensScores.scores?.clarity ?? lensScores.clarity },
+                    { key: 'alignment', label: 'Alignment', score: lensScores.scores?.alignment ?? lensScores.alignment },
+                    { key: 'consistency', label: 'Consistency', score: lensScores.scores?.consistency ?? lensScores.consistency },
+                    { key: 'actionability', label: 'Actionability', score: lensScores.scores?.actionability ?? lensScores.actionability },
                   ].map(({ key, label, score }) => {
                     const scoreNum = typeof score === 'number' ? score : 0;
                     return (
@@ -1388,14 +1390,24 @@ ${framework.tensions?.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')
                   })}
                 </div>
 
-                {lensScores.insights && lensScores.insights.length > 0 && (
+                {((lensScores.insights && lensScores.insights.length > 0) || (lensScores.scores?.feedback)) && (
                   <div className="mt-6 p-6 bg-banyan-bg-base rounded-lg border border-banyan-border-default">
                     <h4 className="text-sm font-semibold text-banyan-text-default mb-2">Key Insights</h4>
-                    <ul className="list-disc pl-5 space-y-1 text-sm text-banyan-text-default">
-                      {lensScores.insights.map((insight: string, i: number) => (
-                        <li key={i}>{insight}</li>
-                      ))}
-                    </ul>
+                    {lensScores.scores?.feedback ? (
+                      <p className="text-sm text-banyan-text-default">{lensScores.scores.feedback}</p>
+                    ) : lensScores.insights && lensScores.insights.length > 0 ? (
+                      <ul className="list-disc pl-5 space-y-1 text-sm text-banyan-text-default">
+                        {lensScores.insights.map((insight: string, i: number) => (
+                          <li key={i}>{insight}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                )}
+
+                {lensScores.message && (
+                  <div className="p-4 bg-banyan-bg-base rounded-lg border border-banyan-border-default">
+                    <p className="text-sm text-banyan-text-subtle">{lensScores.message}</p>
                   </div>
                 )}
               </div>
