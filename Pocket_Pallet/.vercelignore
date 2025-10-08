@@ -1,5 +1,0 @@
-# Ignore everything in root
-/*
-
-# But allow PP_MVP directory (this is what we want to deploy)
-!/PP_MVP
