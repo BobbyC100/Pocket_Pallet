@@ -1,8 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd PP_MVP/frontend && npm install && npm run build",
-  "outputDirectory": "PP_MVP/frontend/dist",
+  "version": 2,
+  "buildCommand": "cd Pocket_Pallet/PP_MVP/frontend && npm install && npm run build",
+  "outputDirectory": "Pocket_Pallet/PP_MVP/frontend/dist",
+  "installCommand": "cd Pocket_Pallet/PP_MVP/frontend && npm install",
   "framework": "vite",
-  "installCommand": "cd PP_MVP/frontend && npm install"
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]; then exit 0; else exit 1; fi"
 }
 
