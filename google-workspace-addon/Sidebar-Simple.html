@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        margin: 0;
+        background: white;
+      }
+      h2 {
+        color: #2563eb;
+        margin-top: 0;
+      }
+      label {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+      input[type="text"],
+      textarea,
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: #2563eb;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+      .radio-group {
+        margin-top: 15px;
+      }
+      .radio-option {
+        margin: 8px 0;
+      }
+      .radio-option input {
+        margin-right: 8px;
+      }
+      button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 20px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      button:hover {
+        background: #1e40af;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      #loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+      #result {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f0f7ff;
+        border-radius: 4px;
+        display: none;
+      }
+      .error {
+        background: #ffebee;
+        color: #c62828;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Banyan AI Writer</h2>
+    
+    <form id="generateForm" onsubmit="handleSubmit(event)">
+      <label for="title">Document Title *</label>
+      <input type="text" id="title" name="title" placeholder="e.g., Product Strategy Q1 2025" required>
+      
+      <label for="audience">Target Audience</label>
+      <input type="text" id="audience" name="audience" placeholder="e.g., Executive team">
+      
+      <label for="tone">Tone</label>
+      <select id="tone" name="tone">
+        <option value="professional">Professional</option>
+        <option value="casual">Casual</option>
+        <option value="technical">Technical</option>
+        <option value="executive">Executive</option>
+      </select>
+      
+      <label for="context">Additional Context</label>
+      <textarea id="context" name="context" placeholder="Any specific requirements..."></textarea>
+      
+      <div class="radio-group">
+        <label>Output Destination</label>
+        <div class="radio-option">
+          <input type="radio" id="insert_here" name="destination" value="insert_here" checked>
+          <label for="insert_here" style="display: inline; font-weight: normal;">Insert at cursor</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="replace_selection" name="destination" value="replace_selection">
+          <label for="replace_selection" style="display: inline; font-weight: normal;">Replace selected text</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="new_doc" name="destination" value="new_doc">
+          <label for="new_doc" style="display: inline; font-weight: normal;">Create new document</label>
+        </div>
+      </div>
+      
+      <button type="submit" id="generateBtn">Generate Document</button>
+    </form>
+    
+    <div id="loading">
+      <p>⏳ Generating your document...</p>
+      <p style="font-size: 12px; color: #666;">This may take 20-30 seconds</p>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+      function handleSubmit(e) {
+        e.preventDefault();
+        
+        var title = document.getElementById('title').value;
+        var audience = document.getElementById('audience').value;
+        var tone = document.getElementById('tone').value;
+        var context = document.getElementById('context').value;
+        var destination = document.querySelector('input[name="destination"]:checked').value;
+        
+        if (!title.trim()) {
+          showError('Please enter a document title');
+          return;
+        }
+        
+        // Show loading
+        document.getElementById('generateForm').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+        
+        // Call the backend
+        google.script.run
+          .withSuccessHandler(onSuccess)
+          .withFailureHandler(onError)
+          .generateDocument(title, audience, tone, context, destination);
+      }
+      
+      function onSuccess(message) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('result').innerHTML = 
+          '<p style="color: green; font-weight: bold;">✓ ' + message + '</p>' +
+          '<button onclick="resetForm()">Generate Another</button>';
+      }
+      
+      function onError(error) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('generateForm').style.display = 'block';
+        showError(error.message || 'An error occurred. Please try again.');
+      }
+      
+      function showError(message) {
+        var errorDiv = document.createElement('div');
+        errorDiv.className = 'error';
+        errorDiv.textContent = '⚠️ ' + message;
+        document.body.insertBefore(errorDiv, document.getElementById('generateForm'));
+        setTimeout(function() { errorDiv.remove(); }, 5000);
+      }
+      
+      function resetForm() {
+        document.getElementById('generateForm').style.display = 'block';
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('generateForm').reset();
+      }
+    </script>
+  </body>
+</html>
+

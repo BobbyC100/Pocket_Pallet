@@ -9,7 +9,7 @@
 // Constants
 // ============================================================================
 
-const BANYAN_API_BASE = 'https://your-banyan-deployment.vercel.app'; // TODO: Update with actual URL
+const BANYAN_API_BASE = 'https://banyan-pvec.vercel.app';
 const NAMED_RANGE_PREFIX = 'BANYAN_TMP_RANGE';
 const MAX_RETRIES = 3;
 const RETRY_DELAYS = [250, 500, 1000]; // ms, exponential backoff
