@@ -540,6 +540,11 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   const currentPrompt = PROMPT_STEPS[currentStep]
   // Progress starts at 0% and fills as steps are completed
   const progress = (currentStep / PROMPT_STEPS.length) * 100
+  
+  // Check if user has started entering responses
+  const hasStarted = Object.values(responses).some(
+    (value) => typeof value === 'string' && value.trim().length > 0
+  )
 
   return (
     <>
@@ -585,6 +590,7 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         currentStep={currentStep + 1}
         totalSteps={PROMPT_STEPS.length}
         savedLocally={true}
+        hasStarted={hasStarted}
       />
 
       {/* Load Example Button (dev only) */}
