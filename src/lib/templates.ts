@@ -3,7 +3,7 @@ export const PROMPT_STEPS = [
     id: 'vision',
     title: 'What are you building, for whom, and why now?',
     description: 'A single question that merges vision, audience, and urgency. Tell us about the problem, who experiences it, and what makes this the right moment.',
-    placeholder: 'We\'re building a dynamic dispatch layer for mid-market construction contractors who lose 30% of crew time to delivery delays. Cities are tightening curb access and contractors are moving to software-first scheduling — APIs and telematics are finally standardized.',
+    placeholder: 'Describe your product or service, your target customer, and why now is the right time...',
     field: 'vision_audience_timing'
   },
   {
