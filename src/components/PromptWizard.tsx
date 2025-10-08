@@ -572,7 +572,12 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       
       <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Animated Intro Hero (only show on step 0) */}
-      {currentStep === 0 && <IntroHero />}
+      {currentStep === 0 && (
+        <>
+          <IntroHero />
+          <div className="mt-2" /> {/* Spacing between hero and banner */}
+        </>
+      )}
 
       {/* Autosave Banner */}
       <div className="mb-6 flex items-center justify-center gap-2 px-4 py-3 bg-banyan-success/10 border border-banyan-success/30 rounded-lg">
