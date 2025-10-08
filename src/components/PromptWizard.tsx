@@ -9,6 +9,7 @@ import GenerationProgressModal, { GenerationStep } from '@/components/Generation
 import SoftSignupModal from '@/components/SoftSignupModal'
 import PreGenerationSignupModal from '@/components/PreGenerationSignupModal'
 import IntroHero from '@/components/IntroHero'
+import WizardProgress from '@/components/WizardProgress'
 import { consumeSSEStream } from '@/lib/streaming-utils'
 import { trackEvent, trackWizardProgress, trackSignupTouchpoint, trackGeneration, initAnalytics } from '@/lib/analytics'
 
@@ -579,33 +580,12 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         </>
       )}
 
-      {/* Autosave Banner */}
-      <div className="mb-6 flex items-center justify-center gap-2 px-4 py-3 bg-banyan-success/10 border border-banyan-success/30 rounded-lg">
-        <svg className="w-4 h-4 text-banyan-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-        <span className="text-sm font-medium text-banyan-text-default">
-          Your answers are saved locally
-        </span>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-banyan-text-default">
-            Step {currentStep + 1} of {PROMPT_STEPS.length}
-          </span>
-          <span className="text-sm text-banyan-text-subtle">
-            {Math.round(progress)}% Complete
-          </span>
-        </div>
-        <div className="w-full bg-banyan-border-default rounded-full h-2">
-          <div 
-            className="bg-banyan-primary h-2 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
+      {/* Compact Progress with Save Indicator */}
+      <WizardProgress 
+        currentStep={currentStep + 1}
+        totalSteps={PROMPT_STEPS.length}
+        savedLocally={true}
+      />
 
       {/* Load Example Button (dev only) */}
       {process.env.NODE_ENV !== 'production' && (
