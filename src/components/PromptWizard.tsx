@@ -569,6 +569,15 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       />
       
       <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Onboarding Message (only show on step 0) */}
+      {currentStep === 0 && (
+        <div className="mb-6 rounded-xl border border-banyan-border-default p-4 bg-banyan-bg-surface/50">
+          <p className="text-sm text-banyan-text-default">
+            <strong className="font-semibold">Turn vision into clarity.</strong> Answer a few prompts to generate your first strategic brief—complete with vision, framework, and actionable next steps.
+          </p>
+        </div>
+      )}
+
       {/* Autosave Banner */}
       <div className="mb-6 flex items-center justify-center gap-2 px-4 py-3 bg-banyan-success/10 border border-banyan-success/30 rounded-lg">
         <svg className="w-4 h-4 text-banyan-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
