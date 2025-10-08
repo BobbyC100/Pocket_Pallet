@@ -21,17 +21,11 @@ export function AppHeader() {
           className="font-semibold tracking-tight text-gray-900 dark:text-white hover:opacity-90 transition-all duration-150 ease-in-out" 
           aria-label="Banyan Home"
         >
-          Banyan
+          BanyanAI
         </Link>
 
         {/* Right cluster - Desktop */}
         <div className="hidden md:flex items-center gap-6">
-          <Link 
-            href="/demo" 
-            className="text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-150 ease-in-out"
-          >
-            Demo
-          </Link>
           {!isSignedIn ? (
             <>
               <SignInButton mode="modal">
@@ -133,7 +127,6 @@ export function AppHeader() {
         {menuOpen && (
           <div className="md:hidden absolute top-16 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-lg z-40">
             <div className="px-4 py-2 space-y-1">
-              <MobileMenuItem href="/demo" label="Demo" onSelect={() => setMenuOpen(false)} />
               {!isSignedIn ? (
                 <>
                   <SignInButton mode="modal">

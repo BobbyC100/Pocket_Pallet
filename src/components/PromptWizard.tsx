@@ -536,7 +536,8 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   }
 
   const currentPrompt = PROMPT_STEPS[currentStep]
-  const progress = ((currentStep + 1) / PROMPT_STEPS.length) * 100
+  // Progress starts at 0% and fills as steps are completed
+  const progress = (currentStep / PROMPT_STEPS.length) * 100
 
   return (
     <>
@@ -572,8 +573,9 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       {/* Onboarding Message (only show on step 0) */}
       {currentStep === 0 && (
         <div className="mb-6 rounded-xl border border-banyan-border-default p-4 bg-banyan-bg-surface/50">
-          <p className="text-sm text-banyan-text-default">
-            <strong className="font-semibold">Turn vision into clarity.</strong> Answer a few prompts to generate your first strategic brief—complete with vision, framework, and actionable next steps.
+          <h2 className="text-lg font-semibold text-banyan-text-default mb-2">Turn vision into structure.</h2>
+          <p className="text-sm text-banyan-text-subtle">
+            Answer a few guided prompts to generate a strategic brief that connects intent to action—vision, framework, and next steps in one place.
           </p>
         </div>
       )}
