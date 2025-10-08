@@ -606,18 +606,20 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         </div>
       </div>
 
-      {/* Load Example Button */}
-      <div className="mb-6 text-center">
-        <button
-          onClick={loadTestData}
-          className="px-4 py-2 bg-banyan-success hover:bg-banyan-success/80 text-banyan-primary-contrast text-sm font-medium rounded-lg transition-colors duration-200"
-        >
-          Load Example
-        </button>
-        <p className="text-xs text-banyan-text-subtle mt-1">
-          Auto-fills all fields with sample data to see how it works
-        </p>
-      </div>
+      {/* Load Example Button (dev only) */}
+      {process.env.NODE_ENV !== 'production' && (
+        <div className="mb-6 text-center">
+          <button
+            onClick={loadTestData}
+            className="px-4 py-2 bg-banyan-success hover:bg-banyan-success/80 text-banyan-primary-contrast text-sm font-medium rounded-lg transition-colors duration-200"
+          >
+            Load Example
+          </button>
+          <p className="text-xs text-banyan-text-subtle mt-1">
+            Auto-fills all fields with sample data to see how it works
+          </p>
+        </div>
+      )}
 
       {/* Step Content */}
       <div className="bg-banyan-bg-surface rounded-2xl border border-banyan-border-default p-8 mb-8 shadow-banyan-mid">
