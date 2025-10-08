@@ -100,6 +100,19 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
     setStateRestored(true);
   }, [searchParams, stateRestored]);
 
+  // Cleanup: Remove any cached wizard state with "Example:" text
+  useEffect(() => {
+    const cached = localStorage.getItem(WIZARD_STATE_KEY);
+    if (cached && cached.includes('Example:')) {
+      console.log('🧹 Cleaning up old example text from localStorage');
+      localStorage.removeItem(WIZARD_STATE_KEY);
+      // Force a fresh start if we removed cached examples
+      setResponses({});
+      setCurrentStep(0);
+      trackEvent('wizard_cache_cleaned', { reason: 'example_text_found' });
+    }
+  }, []); // Run once on mount
+
   // Persist wizard state to localStorage whenever it changes
   useEffect(() => {
     if (!stateRestored) return;
