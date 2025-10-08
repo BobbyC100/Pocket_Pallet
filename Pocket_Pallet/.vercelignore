@@ -1,14 +1,5 @@
-# Ignore the old Next.js project in root (if it exists)
-/package.json
-/package-lock.json
-/next.config.js
-/next-env.d.ts
-/.next
-/app
-/components
-/lib
-/styles
+# Ignore everything in root
+/*
 
-# Allow PP_MVP directory
+# But allow PP_MVP directory (this is what we want to deploy)
 !/PP_MVP
-
