@@ -20,6 +20,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/generate-brief',
   '/api/vision-framework-v2/generate',
   '/api/vision-framework/generate',
+  '/api/docs-addon/generate',
 ]);
 
 // Define private routes that require authentication

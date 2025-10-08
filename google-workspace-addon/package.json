@@ -1,0 +1,28 @@
+{
+  "name": "banyan-google-docs-addon",
+  "version": "1.0.0",
+  "description": "Google Workspace Add-on for Banyan AI Writer",
+  "scripts": {
+    "setup": "npm install -g @google/clasp && clasp login",
+    "create": "clasp create --type standalone --title 'Banyan AI Writer'",
+    "push": "clasp push",
+    "pull": "clasp pull",
+    "deploy": "clasp deploy --description 'Production deployment'",
+    "open": "clasp open",
+    "logs": "clasp logs",
+    "watch": "clasp push --watch"
+  },
+  "keywords": [
+    "google-docs",
+    "workspace-addon",
+    "apps-script",
+    "banyan",
+    "ai-writer"
+  ],
+  "author": "Banyan Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@google/clasp": "^2.4.2"
+  }
+}
+

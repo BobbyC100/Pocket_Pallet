@@ -1,0 +1,25 @@
+# Clasp
+.clasp.json
+.clasprc.json
+
+# Apps Script
+appsscript.json.backup
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+

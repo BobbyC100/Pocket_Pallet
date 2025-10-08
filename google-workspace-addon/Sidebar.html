@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: 'Google Sans', Roboto, Arial, sans-serif;
+        padding: 16px;
+        margin: 0;
+        background-color: #f8f9fa;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        padding: 20px;
+        margin: -16px -16px 20px -16px;
+        border-radius: 0 0 8px 8px;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 500;
+      }
+
+      .header p {
+        margin: 8px 0 0 0;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        color: #202124;
+      }
+
+      input[type="text"],
+      textarea,
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: inherit;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+      }
+
+      input[type="text"]:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: #2563eb;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .hint {
+        font-size: 12px;
+        color: #5f6368;
+        margin-top: 4px;
+      }
+
+      .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .radio-option {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .radio-option:hover {
+        border-color: #2563eb;
+        background-color: #f0f7ff;
+      }
+
+      .radio-option input[type="radio"] {
+        margin-right: 10px;
+      }
+
+      .radio-option label {
+        margin: 0;
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .button-primary {
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.2s;
+      }
+
+      .button-primary:hover {
+        background: #1e40af;
+      }
+
+      .button-primary:active {
+        background: #1e3a8a;
+      }
+
+      .button-primary:disabled {
+        background: #dadce0;
+        cursor: not-allowed;
+      }
+
+      .status {
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 16px;
+        font-size: 14px;
+      }
+
+      .status.info {
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+
+      .status.success {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      .status.error {
+        background: #ffebee;
+        color: #c62828;
+      }
+
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+      }
+
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #2563eb;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .section-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: #202124;
+        margin: 24px 0 12px 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e8eaed;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Banyan AI Writer</h1>
+      <p>Generate strategic documents powered by AI</p>
+    </div>
+
+    <div id="app">
+      <form id="generateForm">
+        <div class="form-group">
+          <label for="title">Document Title *</label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            placeholder="e.g., Product Strategy Q1 2025"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="audience">Target Audience</label>
+          <input 
+            type="text" 
+            id="audience" 
+            name="audience" 
+            placeholder="e.g., Executive team, investors"
+          >
+          <div class="hint">Who will read this document?</div>
+        </div>
+
+        <div class="form-group">
+          <label for="tone">Tone</label>
+          <select id="tone" name="tone">
+            <option value="professional">Professional</option>
+            <option value="casual">Casual</option>
+            <option value="technical">Technical</option>
+            <option value="executive">Executive</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="context">Additional Context</label>
+          <textarea 
+            id="context" 
+            name="context" 
+            placeholder="Any specific requirements or background information..."
+          ></textarea>
+        </div>
+
+        <div class="section-title">Output Destination</div>
+
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" id="insert_here" name="destination" value="insert_here" checked>
+            <label for="insert_here">Insert at cursor</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="replace_selection" name="destination" value="replace_selection">
+            <label for="replace_selection">Replace selected text</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="new_doc" name="destination" value="new_doc">
+            <label for="new_doc">Create new document</label>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <button type="submit" class="button-primary" id="generateBtn">
+            Generate Document
+          </button>
+        </div>
+      </form>
+
+      <div id="loading" style="display: none;">
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
+        <div class="status info" style="text-align: center;">
+          Generating your document... This may take 30-60 seconds.
+        </div>
+      </div>
+
+      <div id="result" style="display: none;"></div>
+    </div>
+
+    <script>
+      document.getElementById('generateForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+          title: document.getElementById('title').value,
+          audience: document.getElementById('audience').value,
+          tone: document.getElementById('tone').value,
+          context: document.getElementById('context').value,
+          destination: document.querySelector('input[name="destination"]:checked').value
+        };
+
+        // Validate
+        if (!formData.title.trim()) {
+          showError('Please provide a title for your document.');
+          return;
+        }
+
+        if (formData.destination === 'replace_selection') {
+          // Note: In the card version, selection validation happens server-side
+          // For sidebar, we'd need to call Apps Script to check selection
+        }
+
+        // Show loading
+        document.getElementById('generateForm').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+
+        // Call Apps Script backend
+        google.script.run
+          .withSuccessHandler(onGenerateSuccess)
+          .withFailureHandler(onGenerateError)
+          .generateFromSidebar(formData);
+      });
+
+      function onGenerateSuccess(result) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('result').innerHTML = `
+          <div class="status success">
+            ✓ Document generated successfully!
+          </div>
+          <div class="status info">
+            Content has been inserted into your document.
+          </div>
+          <button class="button-primary" onclick="resetForm()">
+            Generate Another
+          </button>
+        `;
+      }
+
+      function onGenerateError(error) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('generateForm').style.display = 'block';
+        showError(error.message || 'An error occurred. Please try again.');
+      }
+
+      function showError(message) {
+        const existingError = document.querySelector('.status.error');
+        if (existingError) {
+          existingError.remove();
+        }
+
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'status error';
+        errorDiv.textContent = '⚠️ ' + message;
+        document.getElementById('app').insertBefore(
+          errorDiv, 
+          document.getElementById('generateForm')
+        );
+
+        setTimeout(() => errorDiv.remove(), 5000);
+      }
+
+      function resetForm() {
+        document.getElementById('generateForm').style.display = 'block';
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('generateForm').reset();
+      }
+    </script>
+  </body>
+</html>
+
