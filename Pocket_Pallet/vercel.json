@@ -5,6 +5,12 @@
   "outputDirectory": "Pocket_Pallet/PP_MVP/frontend/dist",
   "installCommand": "cd Pocket_Pallet/PP_MVP/frontend && npm install",
   "framework": "vite",
-  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]; then exit 0; else exit 1; fi"
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]; then exit 0; else exit 1; fi",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
 
