@@ -1,0 +1,14 @@
+# Ignore the old Next.js project in root (if it exists)
+/package.json
+/package-lock.json
+/next.config.js
+/next-env.d.ts
+/.next
+/app
+/components
+/lib
+/styles
+
+# Allow PP_MVP directory
+!/PP_MVP
+
