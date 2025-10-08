@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd PP_MVP/frontend && npm install && npm run build",
+  "outputDirectory": "PP_MVP/frontend/dist",
+  "framework": "vite",
+  "installCommand": "cd PP_MVP/frontend && npm install"
+}
+
