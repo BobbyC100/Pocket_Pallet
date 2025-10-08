@@ -100,16 +100,34 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
     setStateRestored(true);
   }, [searchParams, stateRestored]);
 
-  // Cleanup: Remove any cached wizard state with "Example:" text
+  // Cleanup: Aggressively remove any cached wizard state with "Example:" text
   useEffect(() => {
-    const cached = localStorage.getItem(WIZARD_STATE_KEY);
-    if (cached && cached.includes('Example:')) {
-      console.log('🧹 Cleaning up old example text from localStorage');
-      localStorage.removeItem(WIZARD_STATE_KEY);
-      // Force a fresh start if we removed cached examples
+    const isExampleText = (str: string) => /example[:\s]/i.test(str);
+    
+    // Check ALL localStorage keys for wizard/banyan-related data
+    const keys = Object.keys(localStorage);
+    const suspectKeys = keys.filter(k =>
+      /wizard|banyan|brief|answers|form|state|draft|vision/i.test(k)
+    );
+
+    let wiped = false;
+    for (const key of suspectKeys) {
+      const value = localStorage.getItem(key) || '';
+      if (isExampleText(value)) {
+        console.log(`🧹 Removing cached example text from: ${key}`);
+        localStorage.removeItem(key);
+        wiped = true;
+      }
+    }
+
+    // If we wiped anything, force a fresh start
+    if (wiped) {
       setResponses({});
       setCurrentStep(0);
-      trackEvent('wizard_cache_cleaned', { reason: 'example_text_found' });
+      trackEvent('wizard_cache_cleaned', { 
+        reason: 'example_text_found',
+        keys_cleaned: suspectKeys.length 
+      });
     }
   }, []); // Run once on mount
 
@@ -164,9 +182,16 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
   }
 
   const handleResponseChange = (field: keyof PromptInput, value: string | number) => {
+    // Safety guard: strip "Example:" prefix if it somehow gets into the value
+    let cleanValue = value;
+    if (typeof value === 'string' && /^example[:\s]/i.test(value.trim())) {
+      cleanValue = value.replace(/^example[:\s]+/i, '').trim();
+      console.warn('⚠️ Stripped "Example:" prefix from user input');
+    }
+    
     setResponses(prev => ({
       ...prev,
-      [field]: value
+      [field]: cleanValue
     }))
   }
 
@@ -633,7 +658,14 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
         </div>
 
         <textarea
-          value={responses[currentPrompt.field as keyof PromptInput] as string || ''}
+          value={(() => {
+            // Safety guard: never display "Example:" text in the textarea
+            const rawValue = responses[currentPrompt.field as keyof PromptInput] as string || '';
+            if (rawValue && /^example[:\s]/i.test(rawValue.trim())) {
+              return rawValue.replace(/^example[:\s]+/i, '').trim();
+            }
+            return rawValue;
+          })()}
           onChange={(e) => handleResponseChange(currentPrompt.field as keyof PromptInput, e.target.value)}
           placeholder={currentPrompt.placeholder}
           className="w-full px-6 py-4 bg-banyan-bg-base border border-banyan-border-default rounded-lg focus:ring-2 focus:ring-banyan-primary focus:border-banyan-primary transition-colors duration-200 resize-none h-96 text-banyan-text-default placeholder:text-banyan-text-subtle"

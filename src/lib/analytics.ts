@@ -12,6 +12,7 @@ export type AnalyticsEvent =
   | 'wizard_completed'
   | 'wizard_state_restored'
   | 'wizard_back_clicked'
+  | 'wizard_cache_cleaned'
   | 'load_example_clicked'
   | 'soft_signup_shown'
   | 'soft_signup_accepted'
