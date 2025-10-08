@@ -8,6 +8,7 @@ import { PromptInput, BriefOutput } from '@/lib/types'
 import GenerationProgressModal, { GenerationStep } from '@/components/GenerationProgressModal'
 import SoftSignupModal from '@/components/SoftSignupModal'
 import PreGenerationSignupModal from '@/components/PreGenerationSignupModal'
+import IntroHero from '@/components/IntroHero'
 import { consumeSSEStream } from '@/lib/streaming-utils'
 import { trackEvent, trackWizardProgress, trackSignupTouchpoint, trackGeneration, initAnalytics } from '@/lib/analytics'
 
@@ -570,15 +571,8 @@ export default function PromptWizard({ onGenerated }: PromptWizardProps) {
       />
       
       <div className="max-w-4xl mx-auto px-4 py-8">
-      {/* Onboarding Message (only show on step 0) */}
-      {currentStep === 0 && (
-        <div className="mb-6 rounded-xl border border-banyan-border-default p-4 bg-banyan-bg-surface/50">
-          <h2 className="text-lg font-semibold text-banyan-text-default mb-2">Turn vision into structure.</h2>
-          <p className="text-sm text-banyan-text-subtle">
-            Answer a few guided prompts to generate a strategic brief that connects intent to action—vision, framework, and next steps in one place.
-          </p>
-        </div>
-      )}
+      {/* Animated Intro Hero (only show on step 0) */}
+      {currentStep === 0 && <IntroHero />}
 
       {/* Autosave Banner */}
       <div className="mb-6 flex items-center justify-center gap-2 px-4 py-3 bg-banyan-success/10 border border-banyan-success/30 rounded-lg">
