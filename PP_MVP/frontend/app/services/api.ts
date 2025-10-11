@@ -106,7 +106,7 @@ export const authService = {
     formData.append('password', password)
     
     try {
-      const response = await api.post('/api/auth/login', formData, {
+      const response = await api.post('/api/v1/auth/login', formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -122,7 +122,7 @@ export const authService = {
 
   register: async (email: string, password: string, username: string): Promise<LoginResponse> => {
     console.log('authService.register called', { email, username })
-    const response = await api.post('/api/auth/register', {
+    const response = await api.post('/api/v1/auth/register', {
       email,
       password,
       username,
@@ -133,7 +133,7 @@ export const authService = {
 
   getCurrentUser: async (): Promise<User> => {
     console.log('authService.getCurrentUser called')
-    const response = await api.get('/api/auth/me')
+    const response = await api.get('/api/v1/auth/me')
     console.log('authService.getCurrentUser response:', response.data)
     return response.data
   },
