@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 44, 39, 36;
+  --background-rgb: 253, 248, 246;
+  --accent-rgb: 168, 93, 74;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 247, 237, 232;
+    --background-rgb: 44, 39, 36;
+    --accent-rgb: 193, 125, 102;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  min-height: 100vh;
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle, organic transitions */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Minimal visual noise - clean focus states */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-wine-500 focus:ring-offset-2;
+  }
+}
+
