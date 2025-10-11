@@ -245,7 +245,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="mt-4 text-sm text-gray-600">
-            Start by capturing a few bottles you've enjoyed. Your palate will begin to take shape.
+            Start by capturing a few bottles you&apos;ve enjoyed. Your palate will begin to take shape.
           </p>
         </div>
       </main>
