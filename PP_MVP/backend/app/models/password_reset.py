@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, DateTime, Boolean
 from sqlalchemy.sql import func
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app.db.base import Base
 
 
@@ -16,5 +16,5 @@ class PasswordReset(Base):
 
     def is_valid(self):
         """Check if token is still valid (not used and not expired)"""
-        return not self.used and datetime.utcnow() < self.expires_at
+        return not self.used and datetime.now(timezone.utc) < self.expires_at
 

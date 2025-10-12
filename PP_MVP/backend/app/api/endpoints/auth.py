@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -130,7 +130,7 @@ def forgot_password(
         id=str(uuid.uuid4()),
         user_id=user.id,
         token=token,
-        expires_at=datetime.utcnow() + timedelta(hours=1),
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
         used=False
     )
     
@@ -201,7 +201,7 @@ def reset_password(
     print(f"✅ PASSWORD RESET SUCCESSFUL")
     print(f"{'='*60}")
     print(f"User: {user.email}")
-    print(f"Time: {datetime.utcnow()}")
+    print(f"Time: {datetime.now(timezone.utc)}")
     print(f"{'='*60}\n")
     
     return ResetPasswordResponse(
