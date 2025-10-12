@@ -1,5 +1,17 @@
 # Pocket Pallet Style Guide
 
+---
+
+## 🚨 GOLDEN RULE
+
+> **Default body text = `text-gray-800` site-wide.**  
+> **Drop to `text-gray-700` only on pure white backgrounds.**  
+> **NEVER use `text-gray-600` on colored backgrounds (wine-50, clay-50, sage-50).**
+
+This rule is enforced globally in `app/layout.tsx` with `className="text-gray-800"`.
+
+---
+
 ## 🎨 Color Palette
 
 ### Background Colors
@@ -21,19 +33,32 @@
 
 ### **CRITICAL: Always Follow These Rules**
 
-| Background | Text Color | Tailwind Class | Contrast Ratio | Use Case |
-|:-----------|:-----------|:---------------|:---------------|:---------|
-| `bg-wine-50` | Dark gray | `text-gray-900` | 16.1:1 ✅ | Headings, titles |
-| `bg-wine-50` | Medium-dark gray | `text-gray-800` | 12.6:1 ✅ | Subheadings |
-| `bg-wine-50` | **MINIMUM** dark gray | `text-gray-700` | 9.7:1 ✅ | **Body text, descriptions** |
-| `bg-wine-50` | ❌ Medium gray | `text-gray-600` | 4.4:1 ❌ | **TOO LIGHT - DO NOT USE** |
-| `bg-white` | Dark gray | `text-gray-900` | 21:1 ✅ | Headings |
-| `bg-white` | Medium-dark gray | `text-gray-700` | 10.5:1 ✅ | Body text |
-| `bg-white` | **MINIMUM** medium gray | `text-gray-600` | 7.2:1 ✅ | Secondary text |
-| `bg-wine-600` | White | `text-white` | 7.4:1 ✅ | Buttons, badges |
+#### **On `bg-wine-50`, `bg-clay-50`, `bg-sage-50` (colored backgrounds):**
 
-### **Golden Rule:**
-> **On `bg-wine-50` (or any light custom background): ALWAYS use `text-gray-700` or darker for body text**
+| Use Case | Tailwind Class | Contrast Ratio | Notes |
+|:---------|:---------------|:---------------|:------|
+| **Body text** | `text-gray-800` (preferred) | 12.6:1 ✅ | **DEFAULT - Use this** |
+| **Body text** | `text-gray-700` (minimum) | 9.7:1 ✅ | Only if gray-800 feels too dark |
+| **Headings** | `text-gray-900` | 16.1:1 ✅ | Always use for h1, h2, h3 |
+| **Muted text** | `text-gray-700` | 9.7:1 ✅ | Do NOT go lower than 700 |
+| ❌ **NEVER USE** | `text-gray-600` | 4.4:1 ❌ | **FAILS WCAG AA** |
+| ❌ **NEVER USE** | `text-gray-500` | 3.1:1 ❌ | **WAY TOO LIGHT** |
+
+#### **On `bg-white` (pure white backgrounds):**
+
+| Use Case | Tailwind Class | Contrast Ratio | Notes |
+|:---------|:---------------|:---------------|:------|
+| **Body text** | `text-gray-800` (preferred) | 12.6:1 ✅ | Consistent with site default |
+| **Body text** | `text-gray-700` (minimum) | 10.5:1 ✅ | Acceptable for body text |
+| **Headings** | `text-gray-900` | 21:1 ✅ | Always use for h1, h2, h3 |
+| **Muted text** | `text-gray-600` | 7.2:1 ✅ | Allowed for small helper text ONLY |
+| ⚠️ **Use sparingly** | `text-gray-500` | 4.6:1 ⚠️ | Barely passes, avoid if possible |
+
+#### **On `bg-wine-600` (buttons, badges):**
+
+| Use Case | Tailwind Class | Contrast Ratio | Notes |
+|:---------|:---------------|:---------------|:------|
+| **Button text** | `text-white` | 7.4:1 ✅ | Standard for all buttons |
 
 ---
 
@@ -173,19 +198,19 @@
 
 ### Method 2: Quick Reference
 
-**On `bg-wine-50`:**
-- ✅ `text-gray-900` (darkest)
-- ✅ `text-gray-800` (very dark)
-- ✅ `text-gray-700` ← **MINIMUM**
-- ❌ `text-gray-600` (too light)
-- ❌ `text-gray-500` (way too light)
+**On `bg-wine-50`, `bg-clay-50`, `bg-sage-50` (any colored background):**
+- ✅ `text-gray-900` (headings)
+- ✅ `text-gray-800` ← **DEFAULT BODY TEXT**
+- ✅ `text-gray-700` (minimum for body text)
+- ❌ `text-gray-600` **FAILS WCAG AA - NEVER USE**
+- ❌ `text-gray-500` **WAY TOO LIGHT - NEVER USE**
 
-**On `bg-white`:**
-- ✅ `text-gray-900`
-- ✅ `text-gray-800`
-- ✅ `text-gray-700`
-- ✅ `text-gray-600` ← **MINIMUM**
-- ⚠️ `text-gray-500` (barely passes, use sparingly)
+**On `bg-white` (pure white only):**
+- ✅ `text-gray-900` (headings)
+- ✅ `text-gray-800` ← **PREFERRED BODY TEXT**
+- ✅ `text-gray-700` (minimum for body text)
+- ✅ `text-gray-600` (muted text only, use sparingly)
+- ⚠️ `text-gray-500` (barely passes, avoid)
 
 ---
 
@@ -302,7 +327,9 @@ Before pushing any UI changes:
 
 **The #1 Rule for Pocket Pallet:**
 
-> On `bg-wine-50` (our main background), ALWAYS use `text-gray-700` or darker for body text. Only use `text-gray-600` on pure white backgrounds.
+> **Default body text = `text-gray-800` site-wide.**  
+> **Drop to `text-gray-700` only on pure white backgrounds.**  
+> **NEVER use `text-gray-600` on colored backgrounds.**
 
-This ensures our wine-inspired design remains accessible to all users. 🍷♿
+This is enforced globally in `app/layout.tsx`. All components inherit `text-gray-800` by default, ensuring our wine-inspired design remains accessible to all users. 🍷♿
 
