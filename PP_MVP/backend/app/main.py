@@ -5,16 +5,7 @@ from app.api.endpoints import auth
 from app.db.base import Base
 from app.db.session import engine
 
-# Create tables (drop ALL tables first to handle schema changes)
-# Using raw SQL to drop everything with CASCADE
-from sqlalchemy import text
-with engine.begin() as conn:
-    # Drop all tables in the public schema
-    conn.execute(text("""
-        DROP SCHEMA IF EXISTS public CASCADE;
-        CREATE SCHEMA public;
-        GRANT ALL ON SCHEMA public TO PUBLIC;
-    """))
+# Create tables if they don't exist
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
