@@ -116,12 +116,13 @@ export default function LoginPage() {
                 <span className="ml-2 text-gray-600">Remember me</span>
               </label>
 
-              <a
-                href="#"
+              <button
+                type="button"
+                onClick={() => router.push('/forgot-password')}
                 className="text-wine-600 hover:text-wine-700 transition-colors"
               >
                 Forgot password?
-              </a>
+              </button>
             </div>
 
             <button
