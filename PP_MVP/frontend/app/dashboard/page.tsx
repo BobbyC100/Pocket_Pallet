@@ -2,17 +2,39 @@
 
 import { useAuth } from '../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 export default function DashboardPage() {
   const { user, loading, logout } = useAuth()
   const router = useRouter()
+  const [wineCount, setWineCount] = useState<number>(0)
+  const [loadingCount, setLoadingCount] = useState(true)
 
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login')
     }
   }, [user, loading, router])
+
+  useEffect(() => {
+    if (user) {
+      fetchWineCount()
+    }
+  }, [user])
+
+  async function fetchWineCount() {
+    try {
+      const response = await axios.get(`${API_URL}/api/v1/wines/count`)
+      setWineCount(response.data)
+    } catch (err) {
+      console.error('Failed to fetch wine count:', err)
+    } finally {
+      setLoadingCount(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -229,11 +251,23 @@ export default function DashboardPage() {
 
         {/* Palate overview - minimal stats */}
         <div className="mt-10 bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-sm font-medium text-gray-700 mb-4">Your Palate</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-medium text-gray-700">Your Collection</h2>
+            {wineCount > 0 && (
+              <button
+                onClick={() => router.push('/wines')}
+                className="text-xs text-wine-600 hover:text-wine-700 font-medium"
+              >
+                View all →
+              </button>
+            )}
+          </div>
           <div className="grid grid-cols-3 gap-6">
             <div>
-              <div className="text-2xl font-light text-gray-900">0</div>
-              <div className="text-xs text-gray-500 mt-1">Bottles tasted</div>
+              <div className="text-2xl font-light text-gray-900">
+                {loadingCount ? '—' : wineCount}
+              </div>
+              <div className="text-xs text-gray-500 mt-1">Bottles</div>
             </div>
             <div>
               <div className="text-2xl font-light text-gray-900">0</div>
@@ -244,9 +278,26 @@ export default function DashboardPage() {
               <div className="text-xs text-gray-500 mt-1">Taste profile</div>
             </div>
           </div>
-          <p className="mt-4 text-sm text-gray-600">
-            Start by capturing a few bottles you&apos;ve enjoyed. Your palate will begin to take shape.
-          </p>
+          {wineCount === 0 ? (
+            <div className="mt-4">
+              <p className="text-sm text-gray-600 mb-3">
+                Start by importing bottles you&apos;ve enjoyed. Your palate will begin to take shape.
+              </p>
+              <button
+                onClick={() => router.push('/imports/new')}
+                className="text-sm text-wine-600 hover:text-wine-700 font-medium"
+              >
+                Import wines →
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => router.push('/wines')}
+              className="mt-4 w-full py-2 text-sm text-wine-600 hover:text-wine-700 border border-wine-200 hover:border-wine-300 rounded-md transition-colors"
+            >
+              Browse your collection
+            </button>
+          )}
         </div>
       </main>
     </div>

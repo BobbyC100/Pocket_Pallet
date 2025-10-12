@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.endpoints import auth, imports
+from app.api.endpoints import auth, imports, wines
 from app.db.base import Base
 from app.db.session import engine
 
@@ -26,6 +26,7 @@ app.add_middleware(
 # Include routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(imports.router, prefix=f"{settings.API_V1_STR}/imports", tags=["imports"])
+app.include_router(wines.router, prefix=f"{settings.API_V1_STR}/wines", tags=["wines"])
 
 
 @app.get("/")
