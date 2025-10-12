@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     AZURE_DOC_INTEL_ENDPOINT: str = ""
     AZURE_DOC_INTEL_KEY: str = ""
     AZURE_DOC_INTEL_MODEL: str = "prebuilt-layout"
+    AZURE_DOC_INTEL_API_VERSION: str = "2023-07-31"  # Try older stable version for better compatibility
     OCR_MIN_CONFIDENCE: float = 0.70
     OCR_GROUPING_MODE: str = "simple"  # "simple" or "smarter"
     

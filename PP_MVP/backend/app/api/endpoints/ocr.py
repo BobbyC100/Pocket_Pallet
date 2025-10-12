@@ -11,8 +11,6 @@ from app.core.config import settings
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-API_VERSION = "2024-07-31"
-
 
 @router.get("/health")
 async def ocr_health_check() -> Dict[str, Any]:
@@ -31,9 +29,9 @@ async def ocr_health_check() -> Dict[str, Any]:
         "configured": configured,
         "endpoint_raw": settings.AZURE_DOC_INTEL_ENDPOINT[:80] + "..." if len(settings.AZURE_DOC_INTEL_ENDPOINT) > 80 else settings.AZURE_DOC_INTEL_ENDPOINT or "Not set",
         "endpoint_cleaned": endpoint[:80] + "..." if len(endpoint) > 80 else endpoint or "Not set",
-        "full_url_sample": f"{endpoint}/formrecognizer/documentModels/{settings.AZURE_DOC_INTEL_MODEL}:analyze?api-version={API_VERSION}" if endpoint else "Not available",
+        "full_url_sample": f"{endpoint}/formrecognizer/documentModels/{settings.AZURE_DOC_INTEL_MODEL}:analyze?api-version={settings.AZURE_DOC_INTEL_API_VERSION}" if endpoint else "Not available",
         "model": settings.AZURE_DOC_INTEL_MODEL,
-        "api_version": API_VERSION,
+        "api_version": settings.AZURE_DOC_INTEL_API_VERSION,
         "min_confidence": settings.OCR_MIN_CONFIDENCE,
         "grouping_mode": settings.OCR_GROUPING_MODE,
         "key_length": len(settings.AZURE_DOC_INTEL_KEY) if settings.AZURE_DOC_INTEL_KEY else 0,
@@ -59,7 +57,7 @@ async def test_azure_connection() -> Dict[str, Any]:
         endpoint = endpoint.split("/formrecognizer")[0]
     
     # Try to list models (lightweight API call)
-    url = f"{endpoint}/formrecognizer/documentModels?api-version={API_VERSION}"
+    url = f"{endpoint}/formrecognizer/documentModels?api-version={settings.AZURE_DOC_INTEL_API_VERSION}"
     headers = {
         "Ocp-Apim-Subscription-Key": settings.AZURE_DOC_INTEL_KEY,
     }
@@ -73,7 +71,7 @@ async def test_azure_connection() -> Dict[str, Any]:
                     "ok": True,
                     "message": "Azure connection successful",
                     "endpoint": endpoint,
-                    "api_version": API_VERSION,
+                    "api_version": settings.AZURE_DOC_INTEL_API_VERSION,
                     "models_available": len(r.json().get("value", [])),
                 }
             else:
@@ -146,7 +144,7 @@ async def ocr_wine_list(file: UploadFile = File(...)) -> Dict[str, Any]:
     if "/formrecognizer" in endpoint:
         endpoint = endpoint.split("/formrecognizer")[0]
     
-    url = f"{endpoint}/formrecognizer/documentModels/{settings.AZURE_DOC_INTEL_MODEL}:analyze?api-version={API_VERSION}"
+    url = f"{endpoint}/formrecognizer/documentModels/{settings.AZURE_DOC_INTEL_MODEL}:analyze?api-version={settings.AZURE_DOC_INTEL_API_VERSION}"
     headers = {
         "Ocp-Apim-Subscription-Key": settings.AZURE_DOC_INTEL_KEY,
         "Content-Type": ct or "application/octet-stream"
@@ -155,7 +153,7 @@ async def ocr_wine_list(file: UploadFile = File(...)) -> Dict[str, Any]:
     logger.info(f"Cleaned endpoint: {endpoint}")
     logger.info(f"Full URL: {url}")
     logger.info(f"Model: {settings.AZURE_DOC_INTEL_MODEL}")
-    logger.info(f"API Version: {API_VERSION}")
+    logger.info(f"API Version: {settings.AZURE_DOC_INTEL_API_VERSION}")
     
     try:
         async with httpx.AsyncClient(timeout=60) as client:
