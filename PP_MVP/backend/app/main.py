@@ -5,7 +5,8 @@ from app.api.endpoints import auth
 from app.db.base import Base
 from app.db.session import engine
 
-# Create tables
+# Create tables (drop first to handle schema changes)
+Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
