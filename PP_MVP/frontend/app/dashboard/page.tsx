@@ -41,7 +41,7 @@ export default function DashboardPage() {
       <div className="flex min-h-screen items-center justify-center bg-wine-50">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-wine-600 border-r-transparent"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-800">Loading...</p>
         </div>
       </div>
     )
@@ -105,7 +105,7 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-normal text-gray-900">
             Welcome back, {user.username || 'friend'}
           </h1>
-          <p className="mt-1.5 text-sm text-gray-600">
+          <p className="mt-1.5 text-sm text-gray-700">
             Your palate is ready to grow
           </p>
         </div>

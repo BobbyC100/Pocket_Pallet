@@ -88,7 +88,7 @@ export default function WinesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-normal text-gray-900">Your Collection</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-700 mt-1">
             {wines.length} {wines.length === 1 ? 'bottle' : 'bottles'} to explore
           </p>
         </div>

@@ -53,7 +53,7 @@ export default function LoginPage() {
           <h2 className="mt-6 text-2xl font-normal tracking-tight text-gray-900">
             Welcome back
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-700">
             Your palate, always with you
           </p>
         </div>

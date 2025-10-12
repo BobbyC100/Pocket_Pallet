@@ -66,7 +66,7 @@ export default function RegisterPage() {
           <h2 className="mt-6 text-2xl font-normal tracking-tight text-gray-900">
             Begin your journey
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-700">
             Build a palate that grows with you
           </p>
         </div>

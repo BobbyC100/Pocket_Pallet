@@ -56,7 +56,7 @@ export default function ImportNewPage() {
           <h1 className="text-3xl font-semibold text-gray-900 mb-2">
             Import Wines
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             Upload a CSV file to add wines to your collection. The file should include columns for name, price, region, grapes, vintage, and notes.
           </p>
         </div>

@@ -22,7 +22,7 @@ export default function Home() {
     <div className="flex min-h-screen items-center justify-center bg-wine-50">
       <div className="text-center">
         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-wine-600 border-r-transparent"></div>
-        <p className="mt-4 text-gray-600">Loading...</p>
+        <p className="mt-4 text-gray-800">Loading...</p>
       </div>
     </div>
   )
