@@ -45,6 +45,13 @@ class Settings(BaseSettings):
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_S3_BUCKET: str = ""
     
+    # Azure Document Intelligence (OCR)
+    AZURE_DOC_INTEL_ENDPOINT: str = ""
+    AZURE_DOC_INTEL_KEY: str = ""
+    AZURE_DOC_INTEL_MODEL: str = "prebuilt-layout"
+    OCR_MIN_CONFIDENCE: float = 0.70
+    OCR_GROUPING_MODE: str = "simple"  # "simple" or "smarter"
+    
     class Config:
         env_file = ".env"
         case_sensitive = True
