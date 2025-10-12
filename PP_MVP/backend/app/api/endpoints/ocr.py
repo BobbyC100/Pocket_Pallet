@@ -21,15 +21,82 @@ async def ocr_health_check() -> Dict[str, Any]:
     """
     configured = bool(settings.AZURE_DOC_INTEL_ENDPOINT and settings.AZURE_DOC_INTEL_KEY)
     
+    # Show cleaned endpoint
+    endpoint = settings.AZURE_DOC_INTEL_ENDPOINT.rstrip("/") if settings.AZURE_DOC_INTEL_ENDPOINT else ""
+    if "/formrecognizer" in endpoint:
+        endpoint = endpoint.split("/formrecognizer")[0]
+    
     return {
         "service": "OCR",
         "configured": configured,
-        "endpoint": settings.AZURE_DOC_INTEL_ENDPOINT[:50] + "..." if settings.AZURE_DOC_INTEL_ENDPOINT else "Not set",
+        "endpoint_raw": settings.AZURE_DOC_INTEL_ENDPOINT[:80] + "..." if len(settings.AZURE_DOC_INTEL_ENDPOINT) > 80 else settings.AZURE_DOC_INTEL_ENDPOINT or "Not set",
+        "endpoint_cleaned": endpoint[:80] + "..." if len(endpoint) > 80 else endpoint or "Not set",
+        "full_url_sample": f"{endpoint}/formrecognizer/documentModels/{settings.AZURE_DOC_INTEL_MODEL}:analyze?api-version={API_VERSION}" if endpoint else "Not available",
         "model": settings.AZURE_DOC_INTEL_MODEL,
+        "api_version": API_VERSION,
         "min_confidence": settings.OCR_MIN_CONFIDENCE,
         "grouping_mode": settings.OCR_GROUPING_MODE,
         "key_length": len(settings.AZURE_DOC_INTEL_KEY) if settings.AZURE_DOC_INTEL_KEY else 0,
     }
+
+
+@router.get("/test-azure-connection")
+async def test_azure_connection() -> Dict[str, Any]:
+    """
+    Test Azure Document Intelligence connection by attempting to access the service.
+    This doesn't process any documents, just validates credentials and endpoint.
+    """
+    if not settings.AZURE_DOC_INTEL_ENDPOINT or not settings.AZURE_DOC_INTEL_KEY:
+        return {
+            "ok": False,
+            "error": "Azure credentials not configured",
+            "configured": False,
+        }
+    
+    # Clean up endpoint
+    endpoint = settings.AZURE_DOC_INTEL_ENDPOINT.rstrip("/")
+    if "/formrecognizer" in endpoint:
+        endpoint = endpoint.split("/formrecognizer")[0]
+    
+    # Try to list models (lightweight API call)
+    url = f"{endpoint}/formrecognizer/documentModels?api-version={API_VERSION}"
+    headers = {
+        "Ocp-Apim-Subscription-Key": settings.AZURE_DOC_INTEL_KEY,
+    }
+    
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            r = await client.get(url, headers=headers)
+            
+            if r.status_code == 200:
+                return {
+                    "ok": True,
+                    "message": "Azure connection successful",
+                    "endpoint": endpoint,
+                    "api_version": API_VERSION,
+                    "models_available": len(r.json().get("value", [])),
+                }
+            else:
+                return {
+                    "ok": False,
+                    "error": f"Azure returned status {r.status_code}",
+                    "detail": r.text[:500],
+                    "endpoint": endpoint,
+                    "url_tested": url,
+                }
+    except httpx.RequestError as e:
+        return {
+            "ok": False,
+            "error": f"Failed to connect to Azure: {str(e)}",
+            "endpoint": endpoint,
+            "url_tested": url,
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "error": f"Unexpected error: {str(e)}",
+            "endpoint": endpoint,
+        }
 
 
 def _avg_conf(*vals: Optional[float]) -> float:
@@ -73,13 +140,22 @@ async def ocr_wine_list(file: UploadFile = File(...)) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail="File too large (max 25MB)")
 
     # 2) Submit to Azure Document Intelligence
-    url = f"{settings.AZURE_DOC_INTEL_ENDPOINT}/formrecognizer/documentModels/{settings.AZURE_DOC_INTEL_MODEL}:analyze?api-version={API_VERSION}"
+    # Clean up endpoint URL (remove trailing slashes and any existing paths)
+    endpoint = settings.AZURE_DOC_INTEL_ENDPOINT.rstrip("/")
+    # Remove /formrecognizer if it's already in the endpoint
+    if "/formrecognizer" in endpoint:
+        endpoint = endpoint.split("/formrecognizer")[0]
+    
+    url = f"{endpoint}/formrecognizer/documentModels/{settings.AZURE_DOC_INTEL_MODEL}:analyze?api-version={API_VERSION}"
     headers = {
         "Ocp-Apim-Subscription-Key": settings.AZURE_DOC_INTEL_KEY,
         "Content-Type": ct or "application/octet-stream"
     }
 
-    logger.info(f"Submitting to Azure: {url}")
+    logger.info(f"Cleaned endpoint: {endpoint}")
+    logger.info(f"Full URL: {url}")
+    logger.info(f"Model: {settings.AZURE_DOC_INTEL_MODEL}")
+    logger.info(f"API Version: {API_VERSION}")
     
     try:
         async with httpx.AsyncClient(timeout=60) as client:
