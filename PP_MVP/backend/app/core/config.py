@@ -52,6 +52,22 @@ class Settings(BaseSettings):
     OCR_MIN_CONFIDENCE: float = 0.70
     OCR_GROUPING_MODE: str = "simple"  # "simple" or "smarter"
     
+    @field_validator("AZURE_DOC_INTEL_KEY")
+    @classmethod
+    def validate_azure_key(cls, v):
+        """Validate Azure Document Intelligence key if provided"""
+        if v and len(v) < 32:
+            raise ValueError("AZURE_DOC_INTEL_KEY must be at least 32 characters if provided")
+        return v
+    
+    @field_validator("AZURE_DOC_INTEL_ENDPOINT")
+    @classmethod
+    def validate_azure_endpoint(cls, v):
+        """Validate Azure endpoint URL if provided"""
+        if v and not v.startswith("https://"):
+            raise ValueError("AZURE_DOC_INTEL_ENDPOINT must start with https://")
+        return v
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

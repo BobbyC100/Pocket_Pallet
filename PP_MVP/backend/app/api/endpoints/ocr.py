@@ -1,5 +1,6 @@
 import re
 import asyncio
+import logging
 from typing import List, Dict, Any, Optional
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
@@ -8,8 +9,27 @@ import httpx
 from app.core.config import settings
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 API_VERSION = "2024-07-31"
+
+
+@router.get("/health")
+async def ocr_health_check() -> Dict[str, Any]:
+    """
+    Check if Azure Document Intelligence is properly configured
+    """
+    configured = bool(settings.AZURE_DOC_INTEL_ENDPOINT and settings.AZURE_DOC_INTEL_KEY)
+    
+    return {
+        "service": "OCR",
+        "configured": configured,
+        "endpoint": settings.AZURE_DOC_INTEL_ENDPOINT[:50] + "..." if settings.AZURE_DOC_INTEL_ENDPOINT else "Not set",
+        "model": settings.AZURE_DOC_INTEL_MODEL,
+        "min_confidence": settings.OCR_MIN_CONFIDENCE,
+        "grouping_mode": settings.OCR_GROUPING_MODE,
+        "key_length": len(settings.AZURE_DOC_INTEL_KEY) if settings.AZURE_DOC_INTEL_KEY else 0,
+    }
 
 
 def _avg_conf(*vals: Optional[float]) -> float:
@@ -26,12 +46,18 @@ async def ocr_wine_list(file: UploadFile = File(...)) -> Dict[str, Any]:
     Returns:
         JSON with extracted wine items including name, vintage, price, size, and confidence scores.
     """
+    logger.info(f"OCR request received for file: {file.filename}, content_type: {file.content_type}")
+    
     # Validate Azure credentials
     if not settings.AZURE_DOC_INTEL_ENDPOINT or not settings.AZURE_DOC_INTEL_KEY:
+        logger.error("Azure credentials not configured")
         raise HTTPException(
             status_code=500,
             detail="Azure Document Intelligence not configured. Set AZURE_DOC_INTEL_ENDPOINT and AZURE_DOC_INTEL_KEY."
         )
+    
+    logger.info(f"Azure endpoint: {settings.AZURE_DOC_INTEL_ENDPOINT}")
+    logger.info(f"Azure model: {settings.AZURE_DOC_INTEL_MODEL}")
     
     # 1) Validate file
     ct = file.content_type or ""
@@ -53,30 +79,49 @@ async def ocr_wine_list(file: UploadFile = File(...)) -> Dict[str, Any]:
         "Content-Type": ct or "application/octet-stream"
     }
 
-    async with httpx.AsyncClient(timeout=60) as client:
-        r = await client.post(url, headers=headers, content=data)
-        if r.status_code not in (200, 202):
-            raise HTTPException(status_code=502, detail=f"Azure analyze failed: {r.text}")
+    logger.info(f"Submitting to Azure: {url}")
+    
+    try:
+        async with httpx.AsyncClient(timeout=60) as client:
+            r = await client.post(url, headers=headers, content=data)
+            logger.info(f"Azure response status: {r.status_code}")
+            
+            if r.status_code not in (200, 202):
+                logger.error(f"Azure analyze failed with status {r.status_code}: {r.text}")
+                raise HTTPException(status_code=502, detail=f"Azure analyze failed: {r.text}")
 
-        # 3) Immediate result or poll
-        result = r.json() if r.status_code == 200 else None
-        if not result:
-            op_url = r.headers.get("operation-location")
-            if not op_url:
-                raise HTTPException(status_code=502, detail="Missing operation-location")
-            
-            # Poll for result
-            for _ in range(30):
-                rr = await client.get(op_url, headers={"Ocp-Apim-Subscription-Key": settings.AZURE_DOC_INTEL_KEY})
-                if rr.status_code == 200:
-                    result = rr.json()
-                    status_ = result.get("status")
-                    if status_ in ("succeeded", "failed", "partiallySucceeded"):
-                        break
-                await asyncio.sleep(1)
-            
-            if not result or result.get("status") not in ("succeeded", "partiallySucceeded"):
-                raise HTTPException(status_code=502, detail="Azure OCR did not complete in time")
+            # 3) Immediate result or poll
+            result = r.json() if r.status_code == 200 else None
+            if not result:
+                op_url = r.headers.get("operation-location")
+                if not op_url:
+                    logger.error("Missing operation-location header")
+                    raise HTTPException(status_code=502, detail="Missing operation-location")
+                
+                logger.info(f"Polling Azure operation: {op_url}")
+                # Poll for result
+                for _ in range(30):
+                    rr = await client.get(op_url, headers={"Ocp-Apim-Subscription-Key": settings.AZURE_DOC_INTEL_KEY})
+                    if rr.status_code == 200:
+                        result = rr.json()
+                        status_ = result.get("status")
+                        logger.info(f"Azure operation status: {status_}")
+                        if status_ in ("succeeded", "failed", "partiallySucceeded"):
+                            break
+                    await asyncio.sleep(1)
+                
+                if not result or result.get("status") not in ("succeeded", "partiallySucceeded"):
+                    logger.error(f"Azure OCR did not complete in time. Status: {result.get('status') if result else 'No result'}")
+                    raise HTTPException(status_code=502, detail="Azure OCR did not complete in time")
+    except httpx.RequestError as e:
+        logger.error(f"HTTP request error: {str(e)}")
+        raise HTTPException(status_code=502, detail=f"Failed to connect to Azure: {str(e)}")
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error during Azure submission: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"OCR processing error: {str(e)}")
 
     # 4) Collect lines from pages
     analyze = result.get("analyzeResult") or {}
