@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class WineBase(BaseModel):
     name: str
+    producer: Optional[str] = None
     price_usd: Optional[float] = None
     url: Optional[str] = None
     region: Optional[str] = None
