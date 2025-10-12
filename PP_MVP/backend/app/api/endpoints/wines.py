@@ -28,7 +28,7 @@ def count_wines(db: Session = Depends(get_db)):
     Get total count of wines in database.
     """
     count = db.query(Wine).count()
-    return {"count": count}
+    return count
 
 
 @router.get("/{wine_id}", response_model=WineResponse)
