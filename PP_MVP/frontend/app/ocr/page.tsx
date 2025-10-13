@@ -56,6 +56,9 @@ export default function OCRPage() {
       
       const j = await r.json();
       setResp(j);
+      
+      // Store results in sessionStorage for review page
+      sessionStorage.setItem('ocr_results', JSON.stringify(j));
     } catch (err: any) {
       setError(err.message || "Failed to process wine list");
     } finally {
@@ -233,16 +236,24 @@ export default function OCRPage() {
             </div>
 
             {/* Actions */}
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-600 mb-3">
-                Next step: Review and import these wines to your collection
+            <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
+              <p className="text-sm text-gray-600">
+                Next step: Review and provide feedback to improve OCR accuracy
               </p>
-              <button
-                onClick={() => router.push("/imports/new")}
-                className="text-sm text-wine-600 hover:text-wine-700 font-medium"
-              >
-                Go to Manual Import →
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => router.push("/imports/review")}
+                  className="flex-1 bg-wine-600 text-white px-4 py-2 rounded-lg hover:bg-wine-700 font-medium"
+                >
+                  Review & Improve Results →
+                </button>
+                <button
+                  onClick={() => router.push("/imports/new")}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                >
+                  Manual Import
+                </button>
+              </div>
             </div>
           </div>
         )}
