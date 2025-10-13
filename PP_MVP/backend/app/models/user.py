@@ -17,5 +17,6 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    ocr_feedbacks = relationship("OcrFeedback", back_populates="user")
+    # Temporarily disabled to unblock OCR uploads
+    # ocr_feedbacks = relationship("OcrFeedback", back_populates="user")
 

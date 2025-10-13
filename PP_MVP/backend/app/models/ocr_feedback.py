@@ -44,9 +44,10 @@ class OcrFeedback(Base):
     corrected_price = Column(String, nullable=True)
     
     # Metadata
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     # Relationships
-    user = relationship("User", back_populates="ocr_feedbacks")
+    # Temporarily disabled to unblock OCR uploads
+    # user = relationship("User", back_populates="ocr_feedbacks")
 
