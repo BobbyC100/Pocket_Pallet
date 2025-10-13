@@ -1,0 +1,157 @@
+Pocket Pallet — PR 1 (Data + Matching) — Tests & Instructions
+=============================================================
+
+This TXT bundles the **tiny unit test** (normalize helper) and a **smoke test** for the new
+`/api/v1/match` endpoint. Paste files as noted, then run `pytest`.
+
+------------------------------------------------------------
+Files to Add (in backend repo)
+------------------------------------------------------------
+1) requirements.txt
+   - Ensure this line exists:
+     rapidfuzz==3.9.6
+
+2) app/utils/normalize.py
+   - (Already added in PR 1; referenced by tests)
+
+3) tests/test_normalize.py      <-- NEW (unit test)
+4) tests/test_match_endpoint.py <-- NEW (smoke test)
+
+If you don’t already have a `tests/` folder at the backend root, create it.
+
+------------------------------------------------------------
+tests/test_normalize.py  (copy/paste)
+------------------------------------------------------------
+import pytest
+from app.utils.normalize import normalize_name
+
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        ("Gatinois \"Grand Cru\" Brut Réserve", "gatinois grand cru brut reserve"),
+        ("  Raventós   i   Blanc  ", "raventos i blanc"),
+        ("Cuvée de Réserve!!!", "cuvee de reserve"),
+        ("Niepoort Nat Cool Vinho Verde Branco", "niepoort nat cool vinho verde branco"),
+        ("", ""),
+        (None, ""),
+    ],
+)
+def test_normalize_name_basic(raw, expected):
+    assert normalize_name(raw) == expected
+
+def test_normalize_idempotent():
+    s = "Agrapart & Fils \"Terroirs\" Extra Brut"
+    once = normalize_name(s)
+    twice = normalize_name(once)
+    assert once == twice
+
+------------------------------------------------------------
+tests/test_match_endpoint.py  (copy/paste)
+------------------------------------------------------------
+# Smoke test for /api/v1/match using a temporary in-memory SQLite DB.
+# It overrides FastAPI's get_db dependency and inserts a couple of wines
+# with normalized names so the endpoint can find them.
+
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from app.main import app
+from app.db.base import Base
+from app.db.session import get_db
+from app.models.wine import Wine
+from app.utils.normalize import normalize_name
+
+@pytest.fixture(scope="module")
+def test_db():
+    # In-memory SQLite for a fast smoke test
+    engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    Base.metadata.create_all(bind=engine)
+    try:
+        yield TestingSessionLocal
+    finally:
+        Base.metadata.drop_all(bind=engine)
+        engine.dispose()
+
+@pytest.fixture(scope="module")
+def client(test_db):
+    def _override_get_db():
+        db = test_db()
+        try:
+            yield db
+        finally:
+            db.close()
+
+    # Override the app's DB dependency
+    app.dependency_overrides[get_db] = _override_get_db
+    with TestClient(app) as c:
+        yield c
+    app.dependency_overrides.clear()
+
+@pytest.fixture(scope="module", autouse=True)
+def seed_data(test_db):
+    # Insert a couple of wines
+    db = test_db()
+    wines = [
+        Wine(name="Gatinois \"Grand Cru\" Brut Réserve", normalized_name=normalize_name("Gatinois \"Grand Cru\" Brut Réserve")),
+        Wine(name="Raventós i Blanc Conca del Riu Anoia Brut Nature", normalized_name=normalize_name("Raventós i Blanc Conca del Riu Anoia Brut Nature")),
+    ]
+    db.add_all(wines)
+    db.commit()
+    db.close()
+
+def test_match_endpoint_exact(client):
+    payload = [
+        {"name": "Gatinois Grand Cru Brut Reserve"},
+    ]
+    resp = client.post("/api/v1/match", json=payload)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert isinstance(data, list) and len(data) == 1
+    item = data[0]
+    assert item["status"] in {"MATCH", "REVIEW"}
+    assert item["input_name"] == payload[0]["name"]
+
+def test_match_endpoint_fuzzy(client):
+    payload = [
+        {"name": "Raventos i Blanc Conca del Riu Anoia Brut Nature"},
+    ]
+    resp = client.post("/api/v1/match", json=payload)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data and data[0]["status"] in {"MATCH", "REVIEW"}
+
+def test_match_endpoint_new(client):
+    payload = [{"name": "Totally New Wine 2022"}]
+    resp = client.post("/api/v1/match", json=payload)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data and data[0]["status"] in {"NEW", "REVIEW", "MATCH"}  # allow fuzzy upgrades
+
+------------------------------------------------------------
+How to Run
+------------------------------------------------------------
+# from PP_MVP/backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+pip install pytest
+
+# run tests
+pytest -q
+
+# (Optional) run a single test file
+pytest -q tests/test_match_endpoint.py
+
+------------------------------------------------------------
+Notes
+------------------------------------------------------------
+- The smoke test uses SQLite in-memory; it doesn’t hit your real DB.
+- If your app mounts routers at a different prefix than `/api/v1/match`,
+  adjust the test URL accordingly.
+- For production, ensure `normalized_name` is set on import and via a backfill
+  script for existing rows so matching behaves consistently.
+
+-- END --
