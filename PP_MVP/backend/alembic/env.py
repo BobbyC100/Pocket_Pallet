@@ -11,6 +11,19 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from app.db.base import Base
 
+import os
+from dotenv import load_dotenv
+
+# Load .env sitting next to alembic.ini
+load_dotenv()
+
+from alembic import context
+config = context.config
+
+# If DATABASE_URL is set (via .env or real env), inject it into alembic.ini at runtime
+db_url = os.getenv("DATABASE_URL")
+if db_url:
+    config.set_main_option("sqlalchemy.url", db_url)
 # this is the Alembic Config object
 config = context.config
 
