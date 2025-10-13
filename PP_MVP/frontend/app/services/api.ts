@@ -75,6 +75,24 @@ class ApiService {
 const apiService = new ApiService()
 const api = apiService.getClient()
 
+/**
+ * Set authentication token for API requests
+ * Call this after login to ensure all requests include the JWT
+ */
+export function setAuthToken(token?: string) {
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', token);
+    }
+  } else {
+    delete api.defaults.headers.common['Authorization'];
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+    }
+  }
+}
+
 // Types
 export interface User {
   id: string
