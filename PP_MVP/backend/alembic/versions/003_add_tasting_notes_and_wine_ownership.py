@@ -1,7 +1,7 @@
 """add tasting_notes table and wine ownership fields
 
-Revision ID: add_tasting_notes_and_wine_ownership
-Revises: add_ocr_feedback_table
+Revision ID: c3d4e5f6g7h8
+Revises: b2c3d4e5f6g7
 Create Date: 2025-10-13
 
 """
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'add_tasting_notes_and_wine_ownership'
-down_revision = 'add_ocr_feedback_table'
+revision = 'c3d4e5f6g7h8'
+down_revision = 'b2c3d4e5f6g7'
 branch_labels = None
 depends_on = None
 

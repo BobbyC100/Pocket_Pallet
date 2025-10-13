@@ -1,6 +1,6 @@
 """add producer column to wines
 
-Revision ID: add_producer_column
+Revision ID: a1b2c3d4e5f6
 Revises: 
 Create Date: 2025-10-12
 """
@@ -8,7 +8,7 @@ from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = 'add_producer_column'
+revision = 'a1b2c3d4e5f6'
 down_revision = None
 branch_labels = None
 depends_on = None

@@ -1,7 +1,7 @@
 """add_ocr_feedback_table
 
-Revision ID: add_ocr_feedback_table
-Revises: add_producer_column
+Revision ID: b2c3d4e5f6g7
+Revises: a1b2c3d4e5f6
 Create Date: 2025-10-12 22:00:00.000000
 
 """
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'add_ocr_feedback_table'
-down_revision = 'add_producer_column'
+revision = 'b2c3d4e5f6g7'
+down_revision = 'a1b2c3d4e5f6'
 branch_labels = None
 depends_on = None
 
