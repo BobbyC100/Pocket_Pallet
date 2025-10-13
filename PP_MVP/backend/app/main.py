@@ -41,5 +41,9 @@ def root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"}
+    return {
+        "status": "healthy",
+        "cors_origins": settings.CORS_ORIGINS if isinstance(settings.CORS_ORIGINS, list) else [settings.CORS_ORIGINS],
+        "frontend_url": settings.FRONTEND_URL,
+    }
 

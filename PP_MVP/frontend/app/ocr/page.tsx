@@ -44,13 +44,27 @@ export default function OCRPage() {
     setError("");
 
     try {
+      // Create an AbortController for timeout (90 seconds for Azure OCR processing)
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 90000);
+
       const r = await fetch(`${API_URL}/api/v1/ocr/wine-list`, {
         method: "POST",
         body: fd,
+        signal: controller.signal,
+        mode: 'cors',
+        credentials: 'omit',
       });
       
+      clearTimeout(timeout);
+      
       if (!r.ok) {
-        const errorData = await r.json();
+        let errorData;
+        try {
+          errorData = await r.json();
+        } catch {
+          throw new Error(`HTTP error! status: ${r.status}`);
+        }
         throw new Error(errorData.detail || `HTTP error! status: ${r.status}`);
       }
       
@@ -60,7 +74,16 @@ export default function OCRPage() {
       // Store results in sessionStorage for review page
       sessionStorage.setItem('ocr_results', JSON.stringify(j));
     } catch (err: any) {
-      setError(err.message || "Failed to process wine list");
+      if (err.name === 'AbortError') {
+        setError("Request timed out. The wine list may be too large or Azure OCR is slow. Please try again.");
+      } else if (err.message.includes('CORS')) {
+        setError("Connection error: CORS policy blocked the request. Please check backend CORS settings.");
+      } else if (err.message.includes('Failed to fetch')) {
+        setError("Cannot reach the server. Please check your internet connection and that the backend is running.");
+      } else {
+        setError(err.message || "Failed to process wine list");
+      }
+      console.error('OCR upload error:', err);
     } finally {
       setLoading(false);
     }
