@@ -31,11 +31,12 @@ export default function OcrReviewPage() {
   const [stats, setStats] = useState<any>(null);
   const [submitting, setSubmitting] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login');
-    }
-  }, [user, authLoading, router]);
+  // Auth check disabled for MVP - OCR review works without login
+  // useEffect(() => {
+  //   if (!authLoading && !user) {
+  //     router.push('/login');
+  //   }
+  // }, [user, authLoading, router]);
 
   useEffect(() => {
     if (user) {
@@ -79,6 +80,15 @@ export default function OcrReviewPage() {
   const handleAccept = async (item: EditedItem) => {
     setSubmitting(item.id);
     try {
+      // For MVP: skip backend feedback if not logged in
+      if (!user) {
+        console.log('Accept feedback (not saved - no user):', item);
+        // Remove item from review list
+        setItems(items.filter(i => i.id !== item.id));
+        setSubmitting(null);
+        return;
+      }
+
       await api.post('/api/v1/ocr/feedback', {
         raw_text: item.raw,
         confidence: item.confidence,
@@ -108,6 +118,15 @@ export default function OcrReviewPage() {
   const handleSaveEdit = async (item: EditedItem) => {
     setSubmitting(item.id);
     try {
+      // For MVP: skip backend feedback if not logged in
+      if (!user) {
+        console.log('Edit feedback (not saved - no user):', item);
+        // Remove item from review list
+        setItems(items.filter(i => i.id !== item.id));
+        setSubmitting(null);
+        return;
+      }
+
       await api.post('/api/v1/ocr/feedback', {
         raw_text: item.raw,
         confidence: item.confidence,
@@ -134,6 +153,15 @@ export default function OcrReviewPage() {
   const handleReject = async (item: EditedItem) => {
     setSubmitting(item.id);
     try {
+      // For MVP: skip backend feedback if not logged in
+      if (!user) {
+        console.log('Reject feedback (not saved - no user):', item);
+        // Remove item from review list
+        setItems(items.filter(i => i.id !== item.id));
+        setSubmitting(null);
+        return;
+      }
+
       await api.post('/api/v1/ocr/feedback', {
         raw_text: item.raw,
         confidence: item.confidence,
