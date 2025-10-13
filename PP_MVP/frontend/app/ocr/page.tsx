@@ -52,8 +52,7 @@ export default function OCRPage() {
         method: "POST",
         body: fd,
         signal: controller.signal,
-        mode: 'cors',
-        credentials: 'omit',
+        // Do NOT set Content-Type manually for FormData - browser handles it
       });
       
       clearTimeout(timeout);

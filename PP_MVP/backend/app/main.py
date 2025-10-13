@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import json
+import os
 from app.core.config import settings
 from app.api.endpoints import auth, imports, wines, ocr
 from app.db.base import Base
@@ -14,10 +16,25 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-# Set up CORS
+# Bulletproof CORS setup
+# Read from env, support both JSON list and comma-separated strings
+origins_env = os.getenv("CORS_ORIGINS", "http://localhost:3000")
+if origins_env.startswith("["):
+    try:
+        ALLOW_ORIGINS = json.loads(origins_env)
+    except Exception:
+        ALLOW_ORIGINS = ["http://localhost:3000"]
+else:
+    ALLOW_ORIGINS = [o.strip() for o in origins_env.split(",") if o.strip()]
+
+# Allow Vercel preview deployments via regex
+ALLOW_ORIGIN_REGEX = r"https://pocket-pallet-.*\.vercel\.app"
+
+# IMPORTANT: CORS middleware must be added BEFORE routers
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=ALLOW_ORIGINS,
+    allow_origin_regex=ALLOW_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,7 +60,9 @@ def root():
 def health_check():
     return {
         "status": "healthy",
-        "cors_origins": settings.CORS_ORIGINS if isinstance(settings.CORS_ORIGINS, list) else [settings.CORS_ORIGINS],
+        "cors_origins": ALLOW_ORIGINS,
+        "cors_regex": ALLOW_ORIGIN_REGEX,
         "frontend_url": settings.FRONTEND_URL,
+        "api_base": settings.API_V1_STR,
     }
 
