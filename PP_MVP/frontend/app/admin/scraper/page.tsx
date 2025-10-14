@@ -686,7 +686,7 @@ export default function AdminScraperPage() {
                   placeholder="e.g., a.next-page"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-wine-600"
                 />
-                <p className="mt-1 text-xs text-gray-700">CSS selector for the "Next Page" button</p>
+                <p className="mt-1 text-xs text-gray-700">CSS selector for the &quot;Next Page&quot; button</p>
               </div>
 
               {/* Use Playwright */}
