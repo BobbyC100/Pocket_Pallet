@@ -13,6 +13,21 @@ type Source = {
   base_url: string;
   enabled: boolean;
   last_run_at: string | null;
+  product_link_selector: string | null;
+  pagination_next_selector: string | null;
+  use_playwright: boolean;
+};
+
+type ScrapeJob = {
+  job_id: string;
+  source_id: number;
+  status: string;
+  products_found: number;
+  wines_created: number;
+  snapshots_created: number;
+  error: string | null;
+  started_at: string;
+  completed_at: string | null;
 };
 
 type ScrapedWine = {
@@ -54,6 +69,8 @@ export default function AdminScraperPage() {
     use_playwright: false,
     enabled: true
   });
+  const [activeJobs, setActiveJobs] = useState<Map<number, ScrapeJob>>(new Map());
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
 
   // Check auth
   useEffect(() => {
@@ -165,6 +182,98 @@ export default function AdminScraperPage() {
       setError(err?.response?.data?.detail || 'Failed to create source');
     } finally {
       setCreateLoading(false);
+    }
+  };
+
+  const handleRunScrape = async (sourceId: number) => {
+    setActionLoading(sourceId);
+    setError(null);
+
+    try {
+      const res = await api.post('/api/v1/scraper/scrape', {
+        source_id: sourceId,
+        max_pages: 5
+      });
+      
+      const job = res.data as ScrapeJob;
+      setActiveJobs(prev => new Map(prev).set(sourceId, job));
+      
+      // Poll job status
+      pollJobStatus(job.job_id, sourceId);
+    } catch (err: any) {
+      console.error('Failed to start scrape:', err);
+      setError(err?.response?.data?.detail || 'Failed to start scrape job');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const pollJobStatus = async (jobId: string, sourceId: number) => {
+    const maxAttempts = 60; // Poll for up to 5 minutes
+    let attempts = 0;
+
+    const poll = async () => {
+      try {
+        const res = await api.get(`/api/v1/scraper/jobs/${jobId}`);
+        const job = res.data as ScrapeJob;
+        
+        setActiveJobs(prev => new Map(prev).set(sourceId, job));
+        
+        if (job.status === 'completed' || job.status === 'failed') {
+          // Reload sources to update last_run_at
+          loadSources();
+          return;
+        }
+        
+        if (attempts < maxAttempts) {
+          attempts++;
+          setTimeout(poll, 5000); // Poll every 5 seconds
+        }
+      } catch (err) {
+        console.error('Failed to poll job status:', err);
+      }
+    };
+
+    poll();
+  };
+
+  const handleToggleEnabled = async (sourceId: number, currentEnabled: boolean) => {
+    setActionLoading(sourceId);
+    setError(null);
+
+    try {
+      await api.patch(`/api/v1/scraper/sources/${sourceId}`, {
+        enabled: !currentEnabled
+      });
+      
+      // Reload sources
+      await loadSources();
+    } catch (err: any) {
+      console.error('Failed to toggle source:', err);
+      setError(err?.response?.data?.detail || 'Failed to update source');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteSource = async (sourceId: number, sourceName: string) => {
+    if (!confirm(`Are you sure you want to delete "${sourceName}"? This cannot be undone.`)) {
+      return;
+    }
+
+    setActionLoading(sourceId);
+    setError(null);
+
+    try {
+      await api.delete(`/api/v1/scraper/sources/${sourceId}`);
+      
+      // Reload sources
+      await loadSources();
+    } catch (err: any) {
+      console.error('Failed to delete source:', err);
+      setError(err?.response?.data?.detail || 'Failed to delete source');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -314,45 +423,104 @@ export default function AdminScraperPage() {
               {loading ? (
                 <div className="text-center py-8 text-gray-700">Loading sources...</div>
               ) : sources.length === 0 ? (
-                <div className="text-center py-8 text-gray-700">No sources configured yet.</div>
+                <div className="text-center py-8 text-gray-700">
+                  <p className="mb-4">No sources configured yet.</p>
+                  <Button onClick={() => setShowCreateForm(true)}>Create Your First Source</Button>
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead>
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">ID</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Name</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">URL</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Last Run</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Job Status</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {sources.map((source) => (
-                        <tr key={source.id}>
-                          <td className="px-4 py-3 text-sm text-gray-900">{source.id}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{source.name}</td>
-                          <td className="px-4 py-3 text-sm text-gray-700 truncate max-w-xs">
-                            <a href={source.base_url} target="_blank" rel="noopener noreferrer" className="text-wine-600 hover:underline">
-                              {source.base_url}
-                            </a>
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              source.enabled
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
-                              {source.enabled ? 'Enabled' : 'Disabled'}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-700">
-                            {source.last_run_at 
-                              ? new Date(source.last_run_at).toLocaleString()
-                              : 'Never'}
-                          </td>
-                        </tr>
-                      ))}
+                      {sources.map((source) => {
+                        const job = activeJobs.get(source.id);
+                        const isLoading = actionLoading === source.id;
+                        
+                        return (
+                          <tr key={source.id}>
+                            <td className="px-4 py-3 text-sm text-gray-900">
+                              <div className="font-medium">{source.name}</div>
+                              <div className="text-xs text-gray-700">ID: {source.id}</div>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-700 max-w-xs truncate">
+                              <a href={source.base_url} target="_blank" rel="noopener noreferrer" className="text-wine-600 hover:underline">
+                                {source.base_url}
+                              </a>
+                            </td>
+                            <td className="px-4 py-3 text-sm">
+                              <button
+                                onClick={() => handleToggleEnabled(source.id, source.enabled)}
+                                disabled={isLoading}
+                                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer hover:opacity-80 ${
+                                  source.enabled
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-gray-100 text-gray-800'
+                                }`}
+                              >
+                                {source.enabled ? 'Enabled' : 'Disabled'}
+                              </button>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-700">
+                              {source.last_run_at 
+                                ? new Date(source.last_run_at).toLocaleString()
+                                : 'Never'}
+                            </td>
+                            <td className="px-4 py-3 text-sm">
+                              {job ? (
+                                <div className="space-y-1">
+                                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                    job.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                    job.status === 'failed' ? 'bg-red-100 text-red-800' :
+                                    'bg-blue-100 text-blue-800'
+                                  }`}>
+                                    {job.status}
+                                  </span>
+                                  {job.status === 'completed' && (
+                                    <div className="text-xs text-gray-700">
+                                      {job.wines_created} wines, {job.products_found} products
+                                    </div>
+                                  )}
+                                  {job.error && (
+                                    <div className="text-xs text-red-600 truncate max-w-xs">
+                                      {job.error}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-gray-500">—</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-right space-x-2">
+                              <Button
+                                size="sm"
+                                onClick={() => handleRunScrape(source.id)}
+                                disabled={!source.enabled || isLoading}
+                                className="mr-2"
+                              >
+                                {isLoading ? 'Starting...' : '▶ Run'}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDeleteSource(source.id, source.name)}
+                                disabled={isLoading}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                Delete
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
