@@ -180,12 +180,19 @@ export default function DashboardPage() {
   return (
     <div className="container mx-auto max-w-6xl px-4 py-8">
       <header className="mb-8">
-        <Link href="/dashboard" className="inline-flex items-center gap-2 text-2xl font-semibold tracking-tight">
-          Pocket Pallet
-        </Link>
-        <p className="text-gray-700 mt-1">
-          Everything you&apos;ve added via label photos or OCR lives here. Add tasting notes to teach Pocket Pallet your palate.
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <Link href="/dashboard" className="inline-flex items-center gap-2 text-2xl font-semibold tracking-tight">
+              Pocket Pallet
+            </Link>
+            <p className="text-gray-700 mt-1">
+              Everything you&apos;ve added via label photos or OCR lives here. Add tasting notes to teach Pocket Pallet your palate.
+            </p>
+          </div>
+          <Link href="/admin/scraper" className="text-sm text-wine-600 hover:text-wine-700 hover:underline">
+            Admin →
+          </Link>
+        </div>
       </header>
 
       {/* Primary actions */}
