@@ -1,55 +1,168 @@
-'use client';
+"use client";
 
-import { useAuth } from '../contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import api from '../services/api';
-import WineCard from '../components/WineCard';
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { Camera, ScanText, Rows3, Plus } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "../contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import api from "../services/api";
 
+// If you already have strongly-typed Wine in your app, swap this out.
 type Wine = {
-  id: number;
+  id: string | number;
   name: string;
+  producer?: string | null;
   region?: string | null;
-  vintage?: string | null;
-  price_usd?: number | null;
-  notes?: string | null;
-  status?: string | null;
-  rating?: number | null;
+  image_url?: string | null;
 };
 
-export default function DashboardPage() {
-  const { user, loading, logout } = useAuth();
-  const router = useRouter();
-  const [wines, setWines] = useState<Wine[]>([]);
-  const [loadingWines, setLoadingWines] = useState(true);
+// ---- Tiles ---------------------------------------------------------------
+function ActionTile({
+  href,
+  title,
+  subtitle,
+  icon: Icon,
+  testId,
+}: {
+  href: string;
+  title: string;
+  subtitle: string;
+  icon: any;
+  testId?: string;
+}) {
+  return (
+    <Link href={href} data-testid={testId} className="group block">
+      <Card className="h-full transition-colors hover:bg-accent/50">
+        <CardHeader className="flex flex-row items-center gap-4">
+          <div className="rounded-2xl bg-wine-100 text-wine-600 p-4 shrink-0">
+            <Icon className="h-6 w-6" />
+          </div>
+          <div>
+            <CardTitle className="text-xl tracking-tight">{title}</CardTitle>
+            <p className="text-sm text-gray-700 mt-1">{subtitle}</p>
+          </div>
+        </CardHeader>
+      </Card>
+    </Link>
+  );
+}
 
+// ---- Recent Wines --------------------------------------------------------
+function RecentlyAdded({ items }: { items: Wine[] }) {
+  if (!items.length) return null;
+  return (
+    <div className="mt-8">
+      <div className="flex items-baseline justify-between">
+        <h3 className="text-lg font-semibold tracking-tight">Recently added</h3>
+        <Link href="/wines" className="text-sm text-wine-600 hover:underline">
+          View all
+        </Link>
+      </div>
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {items.slice(0, 6).map((w) => (
+          <Card key={w.id} className="overflow-hidden">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden">
+                {w.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={w.image_url} alt={w.name} className="h-full w-full object-cover" />
+                ) : (
+                  <Rows3 className="h-5 w-5 text-gray-500" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium truncate">{w.name}</p>
+                <p className="text-sm text-gray-700 truncate">
+                  {[w.producer, w.region].filter(Boolean).join(" · ") || "—"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---- Empty State ---------------------------------------------------------
+function EmptyState() {
+  return (
+    <Card className="mt-8">
+      <CardContent className="p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-base font-semibold">No wines yet</h3>
+            <p className="text-sm text-gray-700 mt-1">
+              Add your first bottle by snapping a photo of the label or scanning a wine list.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link href="/upload-wine">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Add a wine
+              </Button>
+            </Link>
+            <Link href="/scan">
+              <Button variant="outline">
+                <ScanText className="mr-2 h-4 w-4" /> Scan list
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ---- Main Page -----------------------------------------------------------
+export default function DashboardPage() {
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const [wines, setWines] = useState<Wine[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Redirect if not authenticated
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       router.push('/login');
     }
-  }, [user, loading, router]);
+  }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (user) {
-      fetchMyWines();
+    if (!user) return;
+    
+    let cancelled = false;
+
+    async function load() {
+      try {
+        setError(null);
+        // Using your existing API endpoint
+        const res = await api.get("/api/v1/wines/my");
+        const data = res.data;
+        const items: Wine[] = Array.isArray(data) ? data : data.items ?? [];
+        if (!cancelled) setWines(items);
+      } catch (e: any) {
+        if (!cancelled) setError(e?.message ?? "Failed to load wines");
+      }
     }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
-  const fetchMyWines = async () => {
-    setLoadingWines(true);
-    try {
-      const response = await api.get('/api/v1/wines/my?limit=20');
-      setWines(response.data);
-    } catch (error) {
-      console.error('Failed to fetch wines:', error);
-      //  If endpoint fails, fallback to empty
-      setWines([]);
-    } finally {
-      setLoadingWines(false);
-    }
-  };
+  const hasWines = useMemo(() => (wines?.length ?? 0) > 0, [wines]);
 
-  if (loading) {
+  // Show loading spinner while checking auth
+  if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-wine-50">
         <div className="text-center">
@@ -65,109 +178,60 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-wine-50">
-      {/* Navigation Header */}
-      <nav className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">
-                Pocket Pallet
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                Welcome, {user.username || user.email}
-              </span>
-              <button
-                onClick={() => {
-                  logout();
-                  router.push('/login');
-                }}
-                className="text-sm text-wine-600 hover:text-wine-700"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="container mx-auto max-w-6xl px-4 py-8">
+      <header className="mb-8">
+        <Link href="/dashboard" className="inline-flex items-center gap-2 text-2xl font-semibold tracking-tight">
+          Pocket Pallet
+        </Link>
+        <p className="text-gray-700 mt-1">
+          Everything you&apos;ve added via label photos or OCR lives here. Add tasting notes to teach Pocket Pallet your palate.
+        </p>
+      </header>
 
-      {/* Dashboard Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-8">
-          <h2 className="text-3xl font-serif font-semibold text-gray-900 mb-2">
-            My Wines
-          </h2>
-          <p className="text-gray-700">
-            Everything you&apos;ve added via import or OCR lives here. Add tasting notes to teach Pocket Pallet your palate.
-          </p>
-        </div>
+      {/* Primary actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {/* Re-use existing routes/components */}
+        <ActionTile
+          href="/upload-wine" // existing single-label upload flow
+          title="Add a Wine"
+          subtitle="Upload a single label"
+          icon={Camera}
+          testId="tile-add-wine"
+        />
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <button
-            onClick={() => router.push('/imports/new')}
-            className="bg-white rounded-lg border border-gray-200 p-6 hover:border-wine-300 hover:shadow-sm transition-all text-left group"
-          >
-            <div className="w-12 h-12 rounded-full bg-wine-100 flex items-center justify-center mb-4 group-hover:bg-wine-200 transition-colors">
-              <svg className="w-6 h-6 text-wine-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Import Wines</h3>
-            <p className="text-sm text-gray-700">Upload CSV</p>
-          </button>
+        <ActionTile
+          href="/scan" // existing OCR list scanner
+          title="Scan Wine List"
+          subtitle="OCR extract"
+          icon={ScanText}
+          testId="tile-scan"
+        />
 
-          <button
-            onClick={() => router.push('/ocr')}
-            className="bg-white rounded-lg border border-gray-200 p-6 hover:border-wine-300 hover:shadow-sm transition-all text-left group"
-          >
-            <div className="w-12 h-12 rounded-full bg-wine-100 flex items-center justify-center mb-4 group-hover:bg-wine-200 transition-colors">
-              <svg className="w-6 h-6 text-wine-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Scan Wine List</h3>
-            <p className="text-sm text-gray-700">OCR extract</p>
-          </button>
+        <ActionTile
+          href="/wines"
+          title="Browse All"
+          subtitle="View full collection"
+          icon={Rows3}
+          testId="tile-browse"
+        />
+      </div>
 
-          <button
-            onClick={() => router.push('/wines')}
-            className="bg-white rounded-lg border border-gray-200 p-6 hover:border-wine-300 hover:shadow-sm transition-all text-left group"
-          >
-            <div className="w-12 h-12 rounded-full bg-wine-100 flex items-center justify-center mb-4 group-hover:bg-wine-200 transition-colors">
-              <svg className="w-6 h-6 text-wine-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Browse All</h3>
-            <p className="text-sm text-gray-700">View full collection</p>
-          </button>
-        </div>
+      {/* Data states */}
+      {wines === null && !error && (
+        <Card className="mt-8">
+          <CardContent className="p-6 text-sm text-gray-700">Loading your wines…</CardContent>
+        </Card>
+      )}
 
-        {/* My Wines Grid */}
-        {loadingWines ? (
-          <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-4 border-wine-600 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        ) : wines.length === 0 ? (
-          <div className="rounded-md border border-gray-200 bg-white p-6">
-            <p className="text-gray-800">No wines yet.</p>
-            <p className="text-gray-700 mt-1">Try uploading via CSV or OCR—new wines will show up here automatically.</p>
-          </div>
-        ) : (
-          <div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Recently Added ({wines.length})</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {wines.map((wine) => (
-                <WineCard key={wine.id} wine={wine} onSaved={fetchMyWines} />
-              ))}
-            </div>
-          </div>
-        )}
-      </main>
+      {error && (
+        <Card className="mt-8 border-red-300">
+          <CardContent className="p-6 text-sm text-red-700">
+            Couldn&apos;t load wines: {error}
+          </CardContent>
+        </Card>
+      )}
+
+      {wines && (hasWines ? <RecentlyAdded items={wines} /> : <EmptyState />)}
     </div>
   );
 }
