@@ -144,3 +144,18 @@ class ScrapeJobResponse(BaseModel):
     started_at: datetime
     completed_at: Optional[datetime] = None
 
+
+# ===== AI Selector Detection Schemas =====
+class DetectSelectorsRequest(BaseModel):
+    url: str
+
+
+class DetectSelectorsResponse(BaseModel):
+    url: str
+    suggested_name: Optional[str] = None
+    product_link_selector: Optional[str] = None
+    pagination_next_selector: Optional[str] = None
+    requires_playwright: bool = False
+    confidence: str  # "high", "medium", "low"
+    notes: Optional[str] = None
+

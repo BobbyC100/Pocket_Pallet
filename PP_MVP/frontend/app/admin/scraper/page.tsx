@@ -60,6 +60,7 @@ export default function AdminScraperPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [createLoading, setCreateLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -69,6 +70,7 @@ export default function AdminScraperPage() {
     use_playwright: false,
     enabled: true
   });
+  const [aiDetecting, setAiDetecting] = useState(false);
   const [activeJobs, setActiveJobs] = useState<Map<number, ScrapeJob>>(new Map());
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
@@ -161,7 +163,13 @@ export default function AdminScraperPage() {
     setError(null);
 
     try {
-      await api.post('/api/v1/scraper/sources', formData);
+      if (editingSource) {
+        // Update existing source
+        await api.patch(`/api/v1/scraper/sources/${editingSource.id}`, formData);
+      } else {
+        // Create new source
+        await api.post('/api/v1/scraper/sources', formData);
+      }
       
       // Reset form
       setFormData({
@@ -173,15 +181,68 @@ export default function AdminScraperPage() {
         enabled: true
       });
       setShowCreateForm(false);
+      setEditingSource(null);
       
       // Reload sources
       await loadSources();
       setActiveTab('sources');
     } catch (err: any) {
-      console.error('Failed to create source:', err);
-      setError(err?.response?.data?.detail || 'Failed to create source');
+      console.error('Failed to save source:', err);
+      setError(err?.response?.data?.detail || 'Failed to save source');
     } finally {
       setCreateLoading(false);
+    }
+  };
+
+  const handleEditSource = (source: Source) => {
+    setEditingSource(source);
+    setFormData({
+      name: source.name,
+      base_url: source.base_url,
+      product_link_selector: source.product_link_selector || '',
+      pagination_next_selector: source.pagination_next_selector || '',
+      use_playwright: source.use_playwright,
+      enabled: source.enabled
+    });
+    setShowCreateForm(true);
+  };
+
+  const handleAiDetect = async () => {
+    if (!formData.base_url) {
+      setError('Please enter a URL first');
+      return;
+    }
+
+    setAiDetecting(true);
+    setError(null);
+
+    try {
+      const res = await api.post('/api/v1/scraper/detect-selectors', {
+        url: formData.base_url
+      });
+      
+      const detected = res.data;
+      
+      // Update form with detected selectors
+      setFormData({
+        ...formData,
+        name: formData.name || detected.suggested_name || '',
+        product_link_selector: detected.product_link_selector || '',
+        pagination_next_selector: detected.pagination_next_selector || '',
+        use_playwright: detected.requires_playwright || false
+      });
+
+      // Show success message
+      if (detected.confidence === 'high') {
+        setError(null);
+      } else {
+        setError(`✓ Detected selectors (${detected.confidence} confidence). Please review before saving.`);
+      }
+    } catch (err: any) {
+      console.error('AI detection failed:', err);
+      setError(err?.response?.data?.detail || 'Failed to detect selectors. Please enter them manually.');
+    } finally {
+      setAiDetecting(false);
     }
   };
 
@@ -511,6 +572,15 @@ export default function AdminScraperPage() {
                               <Button
                                 size="sm"
                                 variant="outline"
+                                onClick={() => handleEditSource(source)}
+                                disabled={isLoading}
+                                className="mr-2"
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
                                 onClick={() => handleDeleteSource(source.id, source.name)}
                                 disabled={isLoading}
                                 className="text-red-600 hover:text-red-700"
@@ -620,12 +690,19 @@ export default function AdminScraperPage() {
         )}
       </main>
 
-      {/* Create Source Modal */}
+      {/* Create/Edit Source Modal */}
       {showCreateForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Create Scraper Source</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {editingSource ? 'Edit Scraper Source' : 'Create Scraper Source'}
+              </h2>
+              {!editingSource && (
+                <p className="mt-1 text-sm text-gray-700">
+                  Paste a wine retailer URL and let AI detect the selectors for you! 🤖
+                </p>
+              )}
             </div>
             
             <form onSubmit={handleCreateSource} className="p-6 space-y-4">
@@ -649,14 +726,27 @@ export default function AdminScraperPage() {
                 <label className="block text-sm font-medium text-gray-900 mb-1">
                   Base URL *
                 </label>
-                <input
-                  type="url"
-                  required
-                  value={formData.base_url}
-                  onChange={(e) => setFormData({ ...formData, base_url: e.target.value })}
-                  placeholder="https://example.com/wines"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-wine-600"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    required
+                    value={formData.base_url}
+                    onChange={(e) => setFormData({ ...formData, base_url: e.target.value })}
+                    placeholder="https://www.monarchwinemerchants.com/collections/wine/Champagne"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-wine-600"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleAiDetect}
+                    disabled={aiDetecting || !formData.base_url}
+                    variant="outline"
+                  >
+                    {aiDetecting ? '🤖 Detecting...' : '🤖 AI Detect'}
+                  </Button>
+                </div>
+                <p className="mt-1 text-xs text-gray-700">
+                  Paste a wine retailer collection page URL, then click AI Detect
+                </p>
               </div>
 
               {/* Product Link Selector */}
@@ -733,7 +823,10 @@ export default function AdminScraperPage() {
                   disabled={createLoading}
                   className="flex-1"
                 >
-                  {createLoading ? 'Creating...' : 'Create Source'}
+                  {createLoading 
+                    ? (editingSource ? 'Updating...' : 'Creating...') 
+                    : (editingSource ? 'Update Source' : 'Create Source')
+                  }
                 </Button>
               </div>
             </form>

@@ -22,8 +22,11 @@ from app.schemas.scraper import (
     ProductResponse,
     ScrapeJobRequest,
     ScrapeJobResponse,
+    DetectSelectorsRequest,
+    DetectSelectorsResponse,
 )
 from app.services.scraper_service import WineScraperService
+from app.services.selector_detector import SelectorDetectorService
 
 
 router = APIRouter()
@@ -269,4 +272,23 @@ def list_products(
 
     products = query.offset(skip).limit(limit).all()
     return products
+
+
+# ===== AI Selector Detection =====
+
+@router.post("/detect-selectors", response_model=DetectSelectorsResponse)
+async def detect_selectors(
+    payload: DetectSelectorsRequest,
+    current_user: User = Depends(require_admin),
+):
+    """Use AI to detect CSS selectors for a wine retailer page (admin only)."""
+    try:
+        detector = SelectorDetectorService()
+        result = await detector.detect_selectors(payload.url)
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to detect selectors: {str(e)}"
+        )
 
