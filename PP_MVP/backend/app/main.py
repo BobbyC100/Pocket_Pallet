@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import json
 import os
 from app.core.config import settings
-from app.api.endpoints import auth, imports, wines, ocr, tasting_notes, scraper
+from app.api.endpoints import auth, imports, wines, ocr, tasting_notes, scraper, dedupe_admin
 from app.db.base import Base
 from app.db.session import engine
 
@@ -47,6 +47,7 @@ app.include_router(wines.router, prefix=f"{settings.API_V1_STR}/wines", tags=["w
 app.include_router(ocr.router, prefix=f"{settings.API_V1_STR}/ocr", tags=["ocr"])
 app.include_router(tasting_notes.router, prefix=f"{settings.API_V1_STR}/tasting-notes", tags=["tasting_notes"])
 app.include_router(scraper.router, prefix=f"{settings.API_V1_STR}/scraper", tags=["scraper"])
+app.include_router(dedupe_admin.router, prefix=f"{settings.API_V1_STR}/dedupe", tags=["dedupe"])
 
 
 @app.get("/")

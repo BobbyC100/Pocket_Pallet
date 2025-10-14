@@ -26,3 +26,6 @@ rapidfuzz==3.9.6
 
 # Web Scraping
 beautifulsoup4==4.12.3
+
+# AI / ML
+openai==1.54.0

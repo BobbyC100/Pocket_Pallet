@@ -10,7 +10,7 @@ Tables:
 """
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, JSON, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, JSON, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.base import Base
@@ -48,9 +48,16 @@ class ScrapedWine(Base):
     style = Column(String, index=True)  # e.g., "Red", "White", "Sparkling"
     grapes = Column(String)  # Comma-separated or JSON
     volume_ml = Column(Integer)  # e.g., 750, 1500
-    block_key = Column(String, index=True)  # For deduplication/matching
+    block_key = Column(String, index=True)  # For deduplication/matching (deprecated - use dedupe_block)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
+    
+    # Normalization and deduplication
+    norm_producer = Column(Text, nullable=True, index=True)  # Normalized producer name
+    norm_cuvee = Column(Text, nullable=True)  # Normalized cuvee/wine name
+    dedupe_block = Column(Text, nullable=True, index=True)  # Blocking key for dedupe
+    is_active = Column(Boolean, default=True, nullable=False, index=True)  # False if duplicate
+    duplicate_of = Column(Integer, ForeignKey("scraped_wines.id", ondelete="SET NULL"), nullable=True, index=True)  # Points to master wine if duplicate
 
     # Relationships
     products = relationship("Product", back_populates="wine")
