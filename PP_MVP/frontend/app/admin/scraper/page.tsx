@@ -44,6 +44,16 @@ export default function AdminScraperPage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    base_url: '',
+    product_link_selector: '',
+    pagination_next_selector: '',
+    use_playwright: false,
+    enabled: true
+  });
 
   // Check auth
   useEffect(() => {
@@ -126,6 +136,36 @@ export default function AdminScraperPage() {
     if (tab === 'sources' && sources.length === 0) loadSources();
     if (tab === 'wines' && wines.length === 0) loadWines();
     if (tab === 'products' && products.length === 0) loadProducts();
+  };
+
+  const handleCreateSource = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateLoading(true);
+    setError(null);
+
+    try {
+      await api.post('/api/v1/scraper/sources', formData);
+      
+      // Reset form
+      setFormData({
+        name: '',
+        base_url: '',
+        product_link_selector: '',
+        pagination_next_selector: '',
+        use_playwright: false,
+        enabled: true
+      });
+      setShowCreateForm(false);
+      
+      // Reload sources
+      await loadSources();
+      setActiveTab('sources');
+    } catch (err: any) {
+      console.error('Failed to create source:', err);
+      setError(err?.response?.data?.detail || 'Failed to create source');
+    } finally {
+      setCreateLoading(false);
+    }
   };
 
   if (authLoading) {
@@ -263,7 +303,12 @@ export default function AdminScraperPage() {
         {activeTab === 'sources' && (
           <Card>
             <CardHeader>
-              <CardTitle>Scraper Sources</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Scraper Sources</CardTitle>
+                <Button onClick={() => setShowCreateForm(true)}>
+                  + Create Source
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -406,6 +451,127 @@ export default function AdminScraperPage() {
           </Card>
         )}
       </main>
+
+      {/* Create Source Modal */}
+      {showCreateForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Create Scraper Source</h2>
+            </div>
+            
+            <form onSubmit={handleCreateSource} className="p-6 space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-1">
+                  Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g., Wine.com Red Wines"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-wine-600"
+                />
+              </div>
+
+              {/* Base URL */}
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-1">
+                  Base URL *
+                </label>
+                <input
+                  type="url"
+                  required
+                  value={formData.base_url}
+                  onChange={(e) => setFormData({ ...formData, base_url: e.target.value })}
+                  placeholder="https://example.com/wines"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-wine-600"
+                />
+              </div>
+
+              {/* Product Link Selector */}
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-1">
+                  Product Link Selector (CSS)
+                </label>
+                <input
+                  type="text"
+                  value={formData.product_link_selector}
+                  onChange={(e) => setFormData({ ...formData, product_link_selector: e.target.value })}
+                  placeholder="e.g., .product-card a.product-link"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-wine-600"
+                />
+                <p className="mt-1 text-xs text-gray-700">CSS selector to find product links on the page</p>
+              </div>
+
+              {/* Pagination Selector */}
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-1">
+                  Pagination Next Selector (CSS)
+                </label>
+                <input
+                  type="text"
+                  value={formData.pagination_next_selector}
+                  onChange={(e) => setFormData({ ...formData, pagination_next_selector: e.target.value })}
+                  placeholder="e.g., a.next-page"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-wine-600"
+                />
+                <p className="mt-1 text-xs text-gray-700">CSS selector for the "Next Page" button</p>
+              </div>
+
+              {/* Use Playwright */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="use_playwright"
+                  checked={formData.use_playwright}
+                  onChange={(e) => setFormData({ ...formData, use_playwright: e.target.checked })}
+                  className="h-4 w-4 text-wine-600 border-gray-300 rounded focus:ring-wine-600"
+                />
+                <label htmlFor="use_playwright" className="ml-2 text-sm text-gray-900">
+                  Use Playwright (for JavaScript-rendered content)
+                </label>
+              </div>
+
+              {/* Enabled */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="enabled"
+                  checked={formData.enabled}
+                  onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
+                  className="h-4 w-4 text-wine-600 border-gray-300 rounded focus:ring-wine-600"
+                />
+                <label htmlFor="enabled" className="ml-2 text-sm text-gray-900">
+                  Enabled
+                </label>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-4 border-t border-gray-200">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowCreateForm(false)}
+                  disabled={createLoading}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createLoading}
+                  className="flex-1"
+                >
+                  {createLoading ? 'Creating...' : 'Create Source'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

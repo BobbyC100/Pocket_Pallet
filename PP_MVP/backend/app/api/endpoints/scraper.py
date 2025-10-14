@@ -31,11 +31,10 @@ router = APIRouter()
 
 # Simple admin check - you can make this more sophisticated
 def is_admin(user: User) -> bool:
-    """Check if user is admin. For MVP, check email domain or specific users."""
-    # TODO: Implement proper admin role system
-    # For now, use email check or create an is_admin field in User model
-    admin_emails = ["bobbyciccaglione@gmail.com", "admin@pocketpallet.com"]
-    return user.email in admin_emails
+    """Check if user is admin. For MVP, all logged-in users are admins."""
+    # TODO: Implement proper admin role system with User.is_admin field
+    # For now, any authenticated user has admin access
+    return True  # MVP: all users are admins
 
 
 def require_admin(current_user: User = Depends(get_current_user)) -> User:
