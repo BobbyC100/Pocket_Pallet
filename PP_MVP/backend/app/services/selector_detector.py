@@ -31,8 +31,11 @@ class SelectorDetectorService:
         4. Parse and validate suggestions
         """
         
-        # Fetch page HTML
-        html = await self._fetch_html(url)
+        try:
+            # Fetch page HTML
+            html = await self._fetch_html(url)
+        except Exception as e:
+            raise Exception(f"Failed to fetch URL: {str(e)}")
         
         # Extract key HTML snippets
         snippets = self._extract_key_snippets(html)

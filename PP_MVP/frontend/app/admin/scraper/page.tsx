@@ -71,6 +71,8 @@ export default function AdminScraperPage() {
     enabled: true
   });
   const [aiDetecting, setAiDetecting] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResults, setTestResults] = useState<any>(null);
   const [activeJobs, setActiveJobs] = useState<Map<number, ScrapeJob>>(new Map());
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
@@ -215,6 +217,7 @@ export default function AdminScraperPage() {
 
     setAiDetecting(true);
     setError(null);
+    setTestResults(null);
 
     try {
       const res = await api.post('/api/v1/scraper/detect-selectors', {
@@ -236,13 +239,47 @@ export default function AdminScraperPage() {
       if (detected.confidence === 'high') {
         setError(null);
       } else {
-        setError(`✓ Detected selectors (${detected.confidence} confidence). Please review before saving.`);
+        setError(`✓ Detected selectors (${detected.confidence} confidence). Test before saving.`);
       }
     } catch (err: any) {
       console.error('AI detection failed:', err);
       setError(err?.response?.data?.detail || 'Failed to detect selectors. Please enter them manually.');
     } finally {
       setAiDetecting(false);
+    }
+  };
+
+  const handleTestSelectors = async () => {
+    if (!formData.base_url || !formData.product_link_selector) {
+      setError('Please enter URL and Product Link Selector first');
+      return;
+    }
+
+    setTesting(true);
+    setError(null);
+    setTestResults(null);
+
+    try {
+      const res = await api.post('/api/v1/scraper/test-selectors', {
+        url: formData.base_url,
+        product_link_selector: formData.product_link_selector,
+        pagination_next_selector: formData.pagination_next_selector
+      });
+      
+      setTestResults(res.data);
+      
+      if (res.data.success && res.data.products_found > 0) {
+        setError(`✅ Success! Found ${res.data.products_found} products. Ready to scrape.`);
+      } else if (res.data.success && res.data.products_found === 0) {
+        setError(`⚠️ Found 0 products. Selectors are likely incorrect. Check the examples below.`);
+      } else {
+        setError(`❌ Test failed: ${res.data.error || 'Unknown error'}`);
+      }
+    } catch (err: any) {
+      console.error('Test failed:', err);
+      setError(err?.response?.data?.detail || 'Failed to test selectors.');
+    } finally {
+      setTesting(false);
     }
   };
 
@@ -754,13 +791,23 @@ export default function AdminScraperPage() {
                 <label className="block text-sm font-medium text-gray-900 mb-1">
                   Product Link Selector (CSS)
                 </label>
-                <input
-                  type="text"
-                  value={formData.product_link_selector}
-                  onChange={(e) => setFormData({ ...formData, product_link_selector: e.target.value })}
-                  placeholder="e.g., .product-card a.product-link"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-wine-600"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={formData.product_link_selector}
+                    onChange={(e) => setFormData({ ...formData, product_link_selector: e.target.value })}
+                    placeholder="e.g., .product-item a.product-item__title"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-wine-600"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleTestSelectors}
+                    disabled={testing || !formData.base_url || !formData.product_link_selector}
+                    variant="outline"
+                  >
+                    {testing ? '🧪 Testing...' : '🧪 Test'}
+                  </Button>
+                </div>
                 <p className="mt-1 text-xs text-gray-700">CSS selector to find product links on the page</p>
               </div>
 
@@ -806,6 +853,39 @@ export default function AdminScraperPage() {
                   Enabled
                 </label>
               </div>
+
+              {/* Test Results */}
+              {testResults && testResults.success && (
+                <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2">Test Results</h3>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="font-medium text-gray-900">Products Found:</span>{' '}
+                      <span className={testResults.products_found > 0 ? 'text-green-600' : 'text-red-600'}>
+                        {testResults.products_found}
+                      </span>
+                    </div>
+                    {testResults.product_examples && testResults.product_examples.length > 0 && (
+                      <div>
+                        <span className="font-medium text-gray-900">Examples:</span>
+                        <ul className="mt-1 ml-4 list-disc text-gray-700">
+                          {testResults.product_examples.map((ex: any, i: number) => (
+                            <li key={i} className="truncate">
+                              {ex.text} <span className="text-xs text-gray-500">({ex.href})</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <div>
+                      <span className="font-medium text-gray-900">Pagination:</span>{' '}
+                      <span className={testResults.pagination_found ? 'text-green-600' : 'text-gray-500'}>
+                        {testResults.pagination_found ? `Found (${testResults.pagination_href})` : 'Not found'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Buttons */}
               <div className="flex gap-3 pt-4 border-t border-gray-200">

@@ -292,3 +292,70 @@ async def detect_selectors(
             detail=f"Failed to detect selectors: {str(e)}"
         )
 
+
+@router.post("/test-selectors")
+async def test_selectors(
+    payload: dict,
+    current_user: User = Depends(require_admin),
+):
+    """Test CSS selectors on a page without running a full scrape (admin only)."""
+    try:
+        import httpx
+        from bs4 import BeautifulSoup
+        
+        url = payload.get("url")
+        product_selector = payload.get("product_link_selector", "")
+        pagination_selector = payload.get("pagination_next_selector", "")
+        
+        # Fetch page
+        async with httpx.AsyncClient(follow_redirects=True, timeout=15.0) as client:
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+            html = response.text
+        
+        # Parse with BeautifulSoup
+        soup = BeautifulSoup(html, 'html.parser')
+        
+        # Test product selector
+        product_count = 0
+        product_examples = []
+        if product_selector:
+            products = soup.select(product_selector)
+            product_count = len(products)
+            product_examples = [
+                {
+                    "href": p.get('href', ''),
+                    "text": p.get_text().strip()[:100]
+                }
+                for p in products[:3]  # First 3 examples
+            ]
+        
+        # Test pagination selector
+        pagination_found = False
+        pagination_href = None
+        if pagination_selector:
+            next_link = soup.select_one(pagination_selector)
+            if next_link:
+                pagination_found = True
+                pagination_href = next_link.get('href', '')
+        
+        return {
+            "success": True,
+            "url": url,
+            "product_selector": product_selector,
+            "products_found": product_count,
+            "product_examples": product_examples,
+            "pagination_selector": pagination_selector,
+            "pagination_found": pagination_found,
+            "pagination_href": pagination_href,
+            "message": f"Found {product_count} products" + (" and pagination" if pagination_found else "")
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "message": "Failed to test selectors. Check URL and selectors."
+        }
+
