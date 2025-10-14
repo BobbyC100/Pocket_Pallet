@@ -149,3 +149,4 @@ The app connects to the backend API at the URL specified in `NEXT_PUBLIC_API_URL
 
 Private - All rights reserved
 
+# Vercel Deployment Test
