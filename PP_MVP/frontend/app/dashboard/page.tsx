@@ -100,7 +100,7 @@ export default function DashboardPage() {
             My Wines
           </h2>
           <p className="text-gray-700">
-            Everything you've added via import or OCR lives here. Add tasting notes to teach Pocket Pallet your palate.
+            Everything you&apos;ve added via import or OCR lives here. Add tasting notes to teach Pocket Pallet your palate.
           </p>
         </div>
 
