@@ -392,18 +392,31 @@ async def parse_products(
     async def run_parsing():
         """Background task to parse products into wines."""
         try:
-            # Query products that don't have associated scraped wines
+            # Query products that don't have associated scraped wines yet
             query = db.query(Product).filter(
-                ~Product.id.in_(
-                    db.query(ScrapedWine.product_id).filter(ScrapedWine.product_id.isnot(None))
-                )
+                Product.wine_id.is_(None),  # No wine associated yet
+                Product.title_raw.isnot(None),
+                Product.title_raw != '',
+                # Filter out junk collection pages
+                Product.title_raw != 'Collection:Wine',
+                Product.title_raw != 'Wine',
+                Product.title_raw != 'Sparkling',
+                Product.title_raw != 'Champagne',
+                Product.title_raw != 'Pink',
+                Product.title_raw != 'Orange',
+                Product.title_raw != 'White',
+                Product.title_raw != 'Red',
+                Product.title_raw != 'Unicorn Wines',
+                Product.title_raw != 'Staff Favorites',
+                Product.title_raw != 'Merch + Lifestyle',
+                Product.title_raw != 'Gifts'
             )
             
             if source_id:
                 query = query.filter(Product.source_id == source_id)
             
-            # Get products with non-empty titles and latest snapshots
-            products = query.filter(Product.title_raw.isnot(None), Product.title_raw != '').all()
+            # Get products with valid wine titles
+            products = query.all()
             
             job_data["status"] = "running"
             processed = 0
@@ -428,12 +441,14 @@ async def parse_products(
                         appellation=parsed.get("appellation"),
                         volume_ml=parsed.get("bottle_size_ml", 750),
                         style=parsed.get("style"),
-                        product_id=product.id,
                         created_at=datetime.utcnow()
                     )
                     
                     db.add(wine)
                     db.flush()
+                    
+                    # Link product to wine
+                    product.wine_id = wine.id
                     
                     created += 1
                     processed += 1
@@ -489,13 +504,15 @@ def get_parser_status(
     last_wine = db.query(ScrapedWine).order_by(ScrapedWine.created_at.desc()).first()
     last_parse_at = last_wine.created_at if last_wine else None
     
-    # Count unparsed products (products without associated wines)
+    # Count unparsed products (products WITHOUT wine_id and WITH valid titles)
     unparsed_count = db.query(Product).filter(
-        ~Product.id.in_(
-            db.query(ScrapedWine.product_id).filter(ScrapedWine.product_id.isnot(None))
-        ),
+        Product.wine_id.is_(None),  # No associated wine yet
         Product.title_raw.isnot(None),
-        Product.title_raw != ''
+        Product.title_raw != '',
+        Product.title_raw != 'Collection:Wine',  # Filter out junk collection pages
+        Product.title_raw != 'Wine',
+        Product.title_raw != 'Sparkling',
+        Product.title_raw != 'Champagne'
     ).count()
     
     return {
