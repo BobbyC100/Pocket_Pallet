@@ -22,13 +22,14 @@ class ApiService {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`
         }
-        console.log('API Request:', {
-          method: config.method,
-          url: config.url,
-          baseURL: config.baseURL,
-          fullURL: `${config.baseURL}${config.url}`,
-          hasAuth: !!token
-        })
+        // Only log in development mode
+        if (process.env.NODE_ENV === 'development') {
+          console.log('API Request:', {
+            method: config.method,
+            url: config.url,
+            hasAuth: !!token
+          })
+        }
         return config
       },
       (error) => {
@@ -40,14 +41,17 @@ class ApiService {
     // Add response interceptor for error handling
     this.client.interceptors.response.use(
       (response) => {
-        console.log('API Response:', {
-          status: response.status,
-          url: response.config.url,
-          data: response.data
-        })
+        // Only log in development mode
+        if (process.env.NODE_ENV === 'development') {
+          console.log('API Response:', {
+            status: response.status,
+            url: response.config.url
+          })
+        }
         return response
       },
       (error) => {
+        // Always log errors
         console.error('API Response Error:', {
           message: error.message,
           response: error.response?.data,
