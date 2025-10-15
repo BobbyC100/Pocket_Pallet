@@ -73,6 +73,7 @@ export default function AdminScraperPage() {
   const [aiDetecting, setAiDetecting] = useState(false);
   const [testing, setTesting] = useState(false);
   const [testResults, setTestResults] = useState<any>(null);
+  const [modalError, setModalError] = useState<string | null>(null);
   const [activeJobs, setActiveJobs] = useState<Map<number, ScrapeJob>>(new Map());
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
@@ -206,17 +207,19 @@ export default function AdminScraperPage() {
       use_playwright: source.use_playwright,
       enabled: source.enabled
     });
+    setModalError(null);
+    setTestResults(null);
     setShowCreateForm(true);
   };
 
   const handleAiDetect = async () => {
     if (!formData.base_url) {
-      setError('Please enter a URL first');
+      setModalError('Please enter a URL first');
       return;
     }
 
     setAiDetecting(true);
-    setError(null);
+    setModalError(null);
     setTestResults(null);
 
     try {
@@ -237,13 +240,13 @@ export default function AdminScraperPage() {
 
       // Show success message
       if (detected.confidence === 'high') {
-        setError(null);
+        setModalError(null);
       } else {
-        setError(`✓ Detected selectors (${detected.confidence} confidence). Test before saving.`);
+        setModalError(`✓ Detected selectors (${detected.confidence} confidence). Test before saving.`);
       }
     } catch (err: any) {
       console.error('AI detection failed:', err);
-      setError(err?.response?.data?.detail || 'Failed to detect selectors. Please enter them manually.');
+      setModalError(err?.response?.data?.detail || 'Failed to detect selectors. Please enter them manually.');
     } finally {
       setAiDetecting(false);
     }
@@ -251,12 +254,12 @@ export default function AdminScraperPage() {
 
   const handleTestSelectors = async () => {
     if (!formData.base_url || !formData.product_link_selector) {
-      setError('Please enter URL and Product Link Selector first');
+      setModalError('Please enter URL and Product Link Selector first');
       return;
     }
 
     setTesting(true);
-    setError(null);
+    setModalError(null);
     setTestResults(null);
 
     try {
@@ -269,15 +272,15 @@ export default function AdminScraperPage() {
       setTestResults(res.data);
       
       if (res.data.success && res.data.products_found > 0) {
-        setError(`✅ Success! Found ${res.data.products_found} products. Ready to scrape.`);
+        setModalError(`✅ Success! Found ${res.data.products_found} products. Ready to scrape.`);
       } else if (res.data.success && res.data.products_found === 0) {
-        setError(`⚠️ Found 0 products. Selectors are likely incorrect. Check the examples below.`);
+        setModalError(`⚠️ Found 0 products. Selectors are likely incorrect. Check the examples below.`);
       } else {
-        setError(`❌ Test failed: ${res.data.error || 'Unknown error'}`);
+        setModalError(`❌ Test failed: ${res.data.error || 'Unknown error'}`);
       }
     } catch (err: any) {
       console.error('Test failed:', err);
-      setError(err?.response?.data?.detail || 'Failed to test selectors.');
+      setModalError(err?.response?.data?.detail || 'Failed to test selectors.');
     } finally {
       setTesting(false);
     }
@@ -741,6 +744,19 @@ export default function AdminScraperPage() {
                 </p>
               )}
             </div>
+            
+            {/* Modal Error/Success Messages */}
+            {modalError && (
+              <div className={`mx-6 mt-4 p-3 rounded-md border ${
+                modalError.startsWith('✅') || modalError.startsWith('✓')
+                  ? 'bg-green-50 border-green-200 text-green-800'
+                  : modalError.startsWith('⚠️')
+                  ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                  : 'bg-red-50 border-red-200 text-red-800'
+              }`}>
+                <p className="text-sm">{modalError}</p>
+              </div>
+            )}
             
             <form onSubmit={handleCreateSource} className="p-6 space-y-4">
               {/* Name */}
