@@ -76,6 +76,8 @@ export default function AdminScraperPage() {
   const [modalError, setModalError] = useState<string | null>(null);
   const [activeJobs, setActiveJobs] = useState<Map<number, ScrapeJob>>(new Map());
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [parserStatus, setParserStatus] = useState<any>(null);
+  const [parsing, setParsing] = useState(false);
 
   // Check auth
   useEffect(() => {
@@ -88,6 +90,7 @@ export default function AdminScraperPage() {
   useEffect(() => {
     if (user) {
       loadStats();
+      loadParserStatus();
     }
   }, [user]);
 
@@ -111,6 +114,38 @@ export default function AdminScraperPage() {
       setError(err?.response?.data?.detail || 'Failed to load data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadParserStatus = async () => {
+    try {
+      const res = await api.get('/api/v1/scraper/parser-status');
+      setParserStatus(res.data);
+    } catch (err: any) {
+      console.error('Failed to load parser status:', err);
+    }
+  };
+
+  const handleParseProducts = async () => {
+    setParsing(true);
+    setError(null);
+
+    try {
+      const res = await api.post('/api/v1/scraper/parse-products');
+      
+      // Show success message
+      alert(`✅ ${res.data.message || 'Wine parsing started!'}\n\nThis runs in the background. Refresh the page in a minute to see results.`);
+      
+      // Reload status after a moment
+      setTimeout(() => {
+        loadParserStatus();
+        loadStats();
+      }, 2000);
+    } catch (err: any) {
+      console.error('Failed to start parsing:', err);
+      setError(err?.response?.data?.detail || 'Failed to start wine parsing');
+    } finally {
+      setParsing(false);
     }
   };
 
@@ -446,64 +481,116 @@ export default function AdminScraperPage() {
 
         {/* Stats Tab */}
         {activeTab === 'stats' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Sources</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-semibold text-gray-900">
-                  {stats?.total_sources || 0}
-                </div>
-                <p className="text-sm text-gray-700 mt-1">Retailer websites</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="mt-4"
-                  onClick={() => handleTabChange('sources')}
-                >
-                  View Sources
-                </Button>
-              </CardContent>
-            </Card>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Sources</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-semibold text-gray-900">
+                    {stats?.total_sources || 0}
+                  </div>
+                  <p className="text-sm text-gray-700 mt-1">Retailer websites</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-4"
+                    onClick={() => handleTabChange('sources')}
+                  >
+                    View Sources
+                  </Button>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Scraped Wines</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-semibold text-gray-900">
-                  {stats?.total_wines || 0}
-                </div>
-                <p className="text-sm text-gray-700 mt-1">Wines in catalog</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="mt-4"
-                  onClick={() => handleTabChange('wines')}
-                >
-                  View Wines
-                </Button>
-              </CardContent>
-            </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Scraped Wines</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-semibold text-gray-900">
+                    {stats?.total_wines || 0}
+                  </div>
+                  <p className="text-sm text-gray-700 mt-1">Wines in catalog</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-4"
+                    onClick={() => handleTabChange('wines')}
+                  >
+                    View Wines
+                  </Button>
+                </CardContent>
+              </Card>
 
-            <Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Products</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-semibold text-gray-900">
+                    {stats?.total_products || 0}
+                  </div>
+                  <p className="text-sm text-gray-700 mt-1">Product listings</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-4"
+                    onClick={() => handleTabChange('products')}
+                  >
+                    View Products
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* AI Wine Parser Card */}
+            <Card className="border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white">
               <CardHeader>
-                <CardTitle className="text-lg">Products</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  🤖 AI Wine Parser
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-semibold text-gray-900">
-                  {stats?.total_products || 0}
+              <CardContent className="space-y-4">
+                <p className="text-sm text-gray-700">
+                  Parse scraped products into structured wine entries using GPT-4o-mini. 
+                  Extracts producer, vintage, cuvée, region, and more.
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-900">Unparsed Products:</span>{' '}
+                    <span className="text-emerald-600 font-semibold">
+                      {parserStatus?.unparsed_products || 0}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-900">Last Parse:</span>{' '}
+                    <span className="text-gray-700">
+                      {parserStatus?.last_parse_at 
+                        ? new Date(parserStatus.last_parse_at).toLocaleString()
+                        : 'Never'}
+                    </span>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-700 mt-1">Product listings</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="mt-4"
-                  onClick={() => handleTabChange('products')}
+
+                <Button
+                  onClick={handleParseProducts}
+                  disabled={parsing || !parserStatus?.ready_to_parse}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
-                  View Products
+                  {parsing 
+                    ? '🤖 Parsing...' 
+                    : parserStatus?.ready_to_parse
+                      ? '🚀 Run AI Wine Parsing'
+                      : '✓ All Products Parsed'
+                  }
                 </Button>
+
+                <p className="text-xs text-gray-600">
+                  💡 <span className="font-medium">Tip:</span> Run a scrape first to collect products, 
+                  then use this parser to convert them into wine entries.
+                </p>
               </CardContent>
             </Card>
           </div>

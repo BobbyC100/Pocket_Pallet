@@ -359,3 +359,150 @@ async def test_selectors(
             "message": "Failed to test selectors. Check URL and selectors."
         }
 
+
+# ===== AI Wine Parsing =====
+
+@router.post("/parse-products")
+async def parse_products(
+    background_tasks: BackgroundTasks,
+    source_id: int = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """
+    Trigger AI parsing of scraped products into structured wine entries (admin only).
+    
+    Runs as a background task. Processes products that don't have associated wines yet.
+    """
+    from app.services.wine_parser import parse_wine_name
+    
+    # Create a parsing job in the background
+    job_id = str(uuid.uuid4())
+    job_data = {
+        "job_id": job_id,
+        "status": "started",
+        "products_processed": 0,
+        "wines_created": 0,
+        "errors": [],
+        "started_at": datetime.utcnow(),
+        "completed_at": None,
+    }
+    _active_jobs[f"parse_{job_id}"] = job_data
+    
+    async def run_parsing():
+        """Background task to parse products into wines."""
+        try:
+            # Query products that don't have associated scraped wines
+            query = db.query(Product).filter(
+                ~Product.id.in_(
+                    db.query(ScrapedWine.product_id).filter(ScrapedWine.product_id.isnot(None))
+                )
+            )
+            
+            if source_id:
+                query = query.filter(Product.source_id == source_id)
+            
+            # Get products with non-empty titles and latest snapshots
+            products = query.filter(Product.title_raw.isnot(None), Product.title_raw != '').all()
+            
+            job_data["status"] = "running"
+            processed = 0
+            created = 0
+            
+            for product in products:
+                try:
+                    # Get latest snapshot for pricing info
+                    snapshot = db.query(ProductSnapshot).filter(
+                        ProductSnapshot.product_id == product.id
+                    ).order_by(ProductSnapshot.fetched_at.desc()).first()
+                    
+                    # Parse wine name with AI
+                    parsed = await parse_wine_name(product.title_raw)
+                    
+                    # Create ScrapedWine entry
+                    wine = ScrapedWine(
+                        producer=parsed.get("producer"),
+                        cuvee=parsed.get("cuvee") or parsed.get("producer"),  # Fallback to producer if no cuvee
+                        vintage=str(parsed.get("vintage")) if parsed.get("vintage") else "NV",
+                        region=parsed.get("region"),
+                        appellation=parsed.get("appellation"),
+                        volume_ml=parsed.get("bottle_size_ml", 750),
+                        style=parsed.get("style"),
+                        product_id=product.id,
+                        created_at=datetime.utcnow()
+                    )
+                    
+                    db.add(wine)
+                    db.flush()
+                    
+                    created += 1
+                    processed += 1
+                    
+                    # Commit every 10 wines to avoid losing progress
+                    if created % 10 == 0:
+                        db.commit()
+                        
+                except Exception as e:
+                    job_data["errors"].append(f"Product {product.id}: {str(e)}")
+                    processed += 1
+                    continue
+            
+            # Final commit
+            db.commit()
+            
+            job_data["status"] = "completed"
+            job_data["products_processed"] = processed
+            job_data["wines_created"] = created
+            job_data["completed_at"] = datetime.utcnow()
+            
+        except Exception as e:
+            job_data["status"] = "failed"
+            job_data["error"] = str(e)
+            job_data["completed_at"] = datetime.utcnow()
+            db.rollback()
+    
+    # Start background task
+    background_tasks.add_task(run_parsing)
+    
+    return {
+        "job_id": job_id,
+        "status": "started",
+        "message": "Wine parsing started in background"
+    }
+
+
+@router.get("/parser-status")
+def get_parser_status(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """
+    Get wine parser statistics (admin only).
+    
+    Returns counts and last parse time.
+    """
+    # Count total products and wines
+    total_products = db.query(Product).count()
+    total_wines = db.query(ScrapedWine).count()
+    
+    # Get last wine created timestamp
+    last_wine = db.query(ScrapedWine).order_by(ScrapedWine.created_at.desc()).first()
+    last_parse_at = last_wine.created_at if last_wine else None
+    
+    # Count unparsed products (products without associated wines)
+    unparsed_count = db.query(Product).filter(
+        ~Product.id.in_(
+            db.query(ScrapedWine.product_id).filter(ScrapedWine.product_id.isnot(None))
+        ),
+        Product.title_raw.isnot(None),
+        Product.title_raw != ''
+    ).count()
+    
+    return {
+        "total_products": total_products,
+        "total_wines": total_wines,
+        "unparsed_products": unparsed_count,
+        "last_parse_at": last_parse_at,
+        "ready_to_parse": unparsed_count > 0
+    }
+
