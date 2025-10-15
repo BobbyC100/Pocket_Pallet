@@ -10,6 +10,7 @@ class ApiService {
   constructor() {
     this.client = axios.create({
       baseURL: API_URL,
+      timeout: 10000, // 10 second timeout
       headers: {
         'Content-Type': 'application/json',
       },
@@ -18,17 +19,20 @@ class ApiService {
     // Add request interceptor to include auth token
     this.client.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('token')
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`
-        }
-        // Only log in development mode
-        if (process.env.NODE_ENV === 'development') {
-          console.log('API Request:', {
-            method: config.method,
-            url: config.url,
-            hasAuth: !!token
-          })
+        // Only access localStorage in browser environment
+        if (typeof window !== 'undefined') {
+          const token = localStorage.getItem('token')
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`
+          }
+          // Only log in development mode
+          if (process.env.NODE_ENV === 'development') {
+            console.log('API Request:', {
+              method: config.method,
+              url: config.url,
+              hasAuth: !!token
+            })
+          }
         }
         return config
       },

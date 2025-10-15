@@ -21,6 +21,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check if user is logged in on mount
     const checkAuth = async () => {
       try {
+        // Ensure we're in browser environment
+        if (typeof window === 'undefined') {
+          setLoading(false)
+          return
+        }
+
         const token = localStorage.getItem('token')
         if (token) {
           const userData = await authService.getCurrentUser()
@@ -28,7 +34,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         console.error('Auth check failed:', error)
-        localStorage.removeItem('token')
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token')
+        }
       } finally {
         setLoading(false)
       }
