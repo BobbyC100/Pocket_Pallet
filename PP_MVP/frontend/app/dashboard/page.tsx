@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Camera, ScanText, Rows3, Plus } from "lucide-react";
+import { Camera, ScanText, Rows3, Plus, Store } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -220,6 +220,14 @@ export default function DashboardPage() {
           subtitle="View full collection"
           icon={Rows3}
           testId="tile-browse"
+        />
+
+        <ActionTile
+          href="/merchants"
+          title="Discover Merchants"
+          subtitle="Explore wine shops & bistros"
+          icon={Store}
+          testId="tile-merchants"
         />
       </div>
 
