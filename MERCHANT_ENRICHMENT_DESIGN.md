@@ -155,10 +155,16 @@ WHERE google_sync_status = 'success';
 │  [Natural Wine] [Small Plates] [Dog Friendly]          │
 │  [Outdoor Seating]                                      │
 │                                                          │
-│  📸 Photo Gallery                                       │
-│  [Photo 1] [Photo 2] [Photo 3] [Photo 4] [Photo 5]    │
+│  📸 Photo Mosaic (3×3 Grid)                             │
+│  ┌─────┬─────┬─────┐                                   │
+│  │ P1  │ P2  │ P3  │  (Google Places Photos)          │
+│  ├─────┼─────┼─────┤                                   │
+│  │ P4  │ P5  │ P6  │                                   │
+│  ├─────┼─────┼─────┤                                   │
+│  │ P7  │ P8  │ SV  │  (SV = Street View with badge)   │
+│  └─────┴─────┴─────┘                                   │
 │                                                          │
-│  📍 View on Google Maps                                 │
+│  🔗 View full profile on Google                        │
 │                                                          │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -303,29 +309,106 @@ WHERE google_sync_status = 'success';
 - Website: Google first (more reliable), fallback to manual
 - Instagram: Manual only (Google doesn't provide this)
 
-#### F. Photo Gallery
+#### F. Photo Mosaic with Street View Integration
+
+**Street View Helper:**
 ```tsx
-<PhotoGallery>
-  {merchant.google_meta?.photos?.slice(0, 6).map((photo, idx) => (
-    <Photo
-      key={idx}
-      src={getGooglePhotoUrl(photo.photo_reference, 400)}
-      alt={`${merchant.name} photo ${idx + 1}`}
-      onClick={() => openLightbox(idx)}
-    />
-  ))}
-</PhotoGallery>
+const streetViewUrl = (lat: number, lng: number, size = 800, fov = 85) =>
+  `https://maps.googleapis.com/maps/api/streetview?size=${size}x${size}&location=${lat},${lng}&fov=${fov}&pitch=0&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
 
 function getGooglePhotoUrl(ref: string, width: number) {
   return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${width}&photoreference=${ref}&key=${GOOGLE_API_KEY}`;
 }
 ```
 
+**Mosaic Assembly:**
+```tsx
+// Build mosaic with Google photos + Street View
+const buildMosaic = () => {
+  let images: string[] = [];
+  
+  // Add Google Places photos (6-8 photos)
+  if (merchant.google_meta?.photos) {
+    images = merchant.google_meta.photos
+      .slice(0, 7)
+      .map(photo => getGooglePhotoUrl(photo.photo_reference, 800));
+  }
+  
+  // Append Street View as final square tile
+  if (merchant.geo?.lat && merchant.geo?.lng) {
+    images.push(streetViewUrl(merchant.geo.lat, merchant.geo.lng));
+  }
+  
+  return images;
+};
+
+const images = buildMosaic();
+const lastIsStreetView = merchant.geo?.lat && merchant.geo?.lng;
+```
+
+**Mosaic Component:**
+```tsx
+<PhotoMosaic className="grid grid-cols-3 gap-2">
+  {images.map((src, i) => (
+    <figure 
+      key={i} 
+      className="relative aspect-square overflow-hidden rounded-md cursor-pointer hover:opacity-90 transition"
+      onClick={() => openLightbox(i)}
+    >
+      <img
+        src={src}
+        alt={lastIsStreetView && i === images.length - 1 
+          ? `Street view of ${merchant.name}` 
+          : `${merchant.name} photo ${i + 1}`}
+        loading="lazy"
+        className="object-cover w-full h-full"
+        onError={(e) => {
+          // Gracefully remove failed Street View
+          if (lastIsStreetView && i === images.length - 1) {
+            e.currentTarget.parentElement?.remove();
+          }
+        }}
+      />
+      
+      {/* Street View badge */}
+      {lastIsStreetView && i === images.length - 1 && (
+        <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+          Street View
+        </span>
+      )}
+    </figure>
+  ))}
+</PhotoMosaic>
+
+{/* View on Google Profile Link */}
+<a
+  href={merchant.google_meta?.url || merchant.source_url}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mt-3"
+>
+  <svg width="16" height="16" fill="currentColor" className="opacity-70" viewBox="0 0 24 24">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+  </svg>
+  View full profile on Google
+</a>
+```
+
 **Features:**
-- Show first 6 photos
-- Click to open lightbox/modal for full view
-- Lazy load for performance
-- Fallback if no photos available
+- **Square crop (1:1)**: All images including Street View are 800x800
+- **Field of view**: 85° for natural framing
+- **Street View badge**: Clear visual indicator on last tile
+- **Error handling**: Failed Street View removes gracefully
+- **Google profile link**: Direct link below mosaic
+- **Lazy loading**: All images load lazily for performance
+- **Lightbox**: Click any image to open full view
+- **Consistent grid**: 3-column mosaic on desktop, responsive on mobile
+
+**Street View Parameters:**
+- `size=800x800`: Square aspect ratio
+- `fov=85`: Slightly narrower than default (90°)
+- `pitch=0`: Horizon centered
+- Falls back gracefully if not available
 
 #### G. Tags & Categories
 ```tsx
