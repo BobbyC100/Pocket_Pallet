@@ -533,7 +533,7 @@ export default function MerchantDetailPage() {
             color: '#999'
           }}>
             <p className="text-lg">No wines parsed yet. Check back soon!</p>
-            <p className="text-sm mt-2">We're working on connecting wine inventory to merchant profiles.</p>
+            <p className="text-sm mt-2">We&apos;re working on connecting wine inventory to merchant profiles.</p>
           </div>
         </section>
 
