@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: pocket-pallet-api
+    env: python
+    region: oregon
+    buildCommand: cd PP_MVP/backend && pip install -r requirements.txt
+    startCommand: cd PP_MVP/backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://pocket-pallet-pnhynn1lh-bobbyai.vercel.app,http://localhost:3000
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+        sync: false
+
