@@ -81,6 +81,49 @@ class GooglePlacesService:
             logger.error(f"Failed to fetch place details for {place_id}: {str(e)}")
             raise
     
+    def map_place_to_google_meta(self, result: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Map Place Details result to google_meta format as specified.
+        
+        Args:
+            result: Raw Place Details API response
+            
+        Returns:
+            Structured google_meta dict with all enrichment fields
+        """
+        permanently_closed = (
+            result.get("business_status") == "CLOSED_PERMANENTLY" or
+            bool(result.get("permanently_closed"))
+        )
+        
+        photos = [
+            {
+                "photo_reference": p.get("photo_reference"),
+                "width": p.get("width"),
+                "height": p.get("height"),
+            }
+            for p in (result.get("photos") or [])
+        ]
+        
+        return {
+            "place_id": result.get("place_id"),
+            "formatted_address": result.get("formatted_address"),
+            "opening_hours": result.get("opening_hours"),
+            "photos": photos,
+            "types": result.get("types", []),
+            "price_level": result.get("price_level"),
+            "business_status": result.get("business_status"),
+            "website": result.get("website"),
+            "formatted_phone_number": result.get("formatted_phone_number"),
+            "international_phone_number": result.get("international_phone_number"),
+            "current_popularity": result.get("current_popularity"),
+            "live_wait_time": result.get("live_wait_time"),
+            "permanently_closed": permanently_closed,
+            "rating": result.get("rating"),
+            "user_ratings_total": result.get("user_ratings_total"),
+            "url": result.get("url"),
+        }
+    
     def normalize_google_data(self, place_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Normalize Google Place data to Pocket Pallet schema.
@@ -298,12 +341,12 @@ class GooglePlacesService:
             else:
                 merchant, updated_fields = self.merge_data(merchant, normalized)
             
-            # Update sync metadata
+            # Store structured google_meta using the spec format
             merchant.google_place_id = place_id
-            merchant.google_meta = place_data
+            merchant.google_meta = self.map_place_to_google_meta(place_data)
             merchant.google_last_synced = datetime.utcnow()
             merchant.google_sync_status = 'success'
-            merchant.last_synced = datetime.utcnow()
+            merchant.last_synced_at = datetime.utcnow()
             
             db.commit()
             db.refresh(merchant)
