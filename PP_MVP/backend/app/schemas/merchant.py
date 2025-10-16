@@ -22,6 +22,8 @@ class MerchantBase(BaseModel):
     hero_image: Optional[str] = None
     gallery_images: Optional[List[str]] = None
     source_url: Optional[str] = None
+    google_place_id: Optional[str] = None
+    google_sync_status: Optional[str] = None
 
 
 class MerchantCreate(MerchantBase):
@@ -44,12 +46,16 @@ class MerchantUpdate(BaseModel):
     hero_image: Optional[str] = None
     gallery_images: Optional[List[str]] = None
     source_url: Optional[str] = None
+    google_place_id: Optional[str] = None
+    google_sync_status: Optional[str] = None
 
 
 class MerchantResponse(MerchantBase):
     """Schema for merchant responses."""
     id: str
     last_synced: Optional[datetime] = None
+    google_meta: Optional[Dict[str, Any]] = None
+    google_last_synced: Optional[datetime] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
 
@@ -80,4 +86,15 @@ class MerchantImportResponse(BaseModel):
     updated: int
     skipped: int
     errors: List[str] = []
+
+
+class GoogleSyncResponse(BaseModel):
+    """Schema for Google Place sync result."""
+    status: str  # success, failed, pending
+    merchant_id: str
+    google_place_id: Optional[str] = None
+    sync_timestamp: Optional[datetime] = None
+    fields_updated: Optional[List[str]] = None
+    error: Optional[str] = None
+    google_meta: Optional[Dict[str, Any]] = None
 

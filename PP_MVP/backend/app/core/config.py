@@ -69,6 +69,11 @@ class Settings(BaseSettings):
             raise ValueError("AZURE_DOC_INTEL_ENDPOINT must start with https://")
         return v
     
+    # Google Places API (for merchant enrichment)
+    GOOGLE_PLACES_API_KEY: str = ""
+    GOOGLE_PLACES_AUTO_SYNC: bool = False  # Auto-sync every 30 days
+    GOOGLE_PLACES_SYNC_INTERVAL_DAYS: int = 30
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

@@ -20,6 +20,7 @@ type Merchant = {
   about: string | null;
   hero_image: string | null;
   contact: { website?: string; phone?: string; instagram?: string } | null;
+  source_url: string | null;
   created_at: string;
 };
 
@@ -245,8 +246,8 @@ export default function MerchantDetailPage() {
                           const product = products.find(p => p.wine_id === wine.id);
                           if (product?.product_url) {
                             window.open(product.product_url, '_blank');
-                          } else {
-                            window.open(merchant.base_url, '_blank');
+                          } else if (merchant.source_url) {
+                            window.open(merchant.source_url, '_blank');
                           }
                         }}
                       >

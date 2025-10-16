@@ -1,0 +1,166 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [-58.4320259, -34.5732242],
+        "type": "Point"
+      },
+      "properties": {
+        "date": "2025-01-24T11:27:17Z",
+        "google_maps_url": "http://maps.google.com/?cid=5816261256227932988",
+        "location": {
+          "address": "Arévalo 2771, C1426 DJA, Cdad. Autónoma de Buenos Aires, Argentina",
+          "name": "Lou & Fid",
+          "country_code": "AR"
+        }
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [4.9282077, 52.3845414],
+        "type": "Point"
+      },
+      "properties": {
+        "date": "2024-09-26T07:33:40Z",
+        "google_maps_url": "http://maps.google.com/?cid=14396064057554639992",
+        "location": {
+          "address": "Aambeeldstraat 10, 1021 KB Amsterdam, Netherlands",
+          "country_code": "NL",
+          "name": "Restaurant Barracuda Amsterdam"
+        }
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [139.7031981, 35.6572730],
+        "type": "Point"
+      },
+      "properties": {
+        "date": "2024-01-14T15:23:33Z",
+        "google_maps_url": "http://maps.google.com/?cid=12241045898322553148",
+        "location": {
+          "address": "3 Chome-21-3 Shibuya, Tokyo 150-0002, Japan",
+          "country_code": "JP",
+          "name": "Shibuya Stream Hotel"
+        }
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [2.3384826, 48.8673812],
+        "type": "Point"
+      },
+      "properties": {
+        "date": "2023-12-29T08:57:39Z",
+        "google_maps_url": "http://maps.google.com/?cid=5762208545785350277",
+        "location": {
+          "address": "5 Rue Vivienne, 75002 Paris, France",
+          "country_code": "FR",
+          "name": "Bibliothèque nationale de France (BnF) | Richelieu"
+        }
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [2.3828351, 48.8730712],
+        "type": "Point"
+      },
+      "properties": {
+        "date": "2020-02-22T21:45:38Z",
+        "google_maps_url": "http://maps.google.com/?cid=5887751861485103404",
+        "location": {
+          "address": "3 Rue Jouye-Rouve, 75020 Paris, France",
+          "country_code": "FR",
+          "name": "Le Baratin"
+        }
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [-99.1597082, 19.4173563],
+        "type": "Point"
+      },
+      "properties": {
+        "date": "2019-01-17T17:23:51Z",
+        "google_maps_url": "http://maps.google.com/?cid=5036605571310068968",
+        "location": {
+          "address": "C. Orizaba 125, Roma Nte., Cuauhtémoc, 06760 Ciudad de México, CDMX, Mexico",
+          "country_code": "MX",
+          "name": "Frutos Prohibidos - ROMA"
+        }
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [-99.1691102, 19.4161419],
+        "type": "Point"
+      },
+      "properties": {
+        "date": "2017-01-15T06:16:06Z",
+        "google_maps_url": "http://maps.google.com/?cid=64332860598099119",
+        "location": {
+          "address": "Av. Álvaro Obregón 298-B, Hipódromo, Cuauhtémoc, 06100 Ciudad de México, CDMX, Mexico",
+          "country_code": "MX",
+          "name": "La Lavanderia Nocturna"
+        }
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [-73.9610211, 40.7169982],
+        "type": "Point"
+      },
+      "properties": {
+        "date": "2014-07-28T13:47:58Z",
+        "google_maps_url": "http://maps.google.com/?cid=4597278484439625393",
+        "location": {
+          "address": "76 N 4th St Store A, Brooklyn, NY 11249, United States",
+          "country_code": "US",
+          "name": "Blue Bottle Coffee"
+        }
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [-73.9932167, 40.7246306],
+        "type": "Point"
+      },
+      "properties": {
+        "date": "2014-05-21T23:34:17Z",
+        "google_maps_url": "http://maps.google.com/?cid=15456869662499767560",
+        "location": {
+          "address": "288 Elizabeth St, New York, NY 10012, United States",
+          "country_code": "US",
+          "name": "Tom and Jerry's"
+        }
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [-73.9904330, 40.6937710],
+        "type": "Point"
+      },
+      "properties": {
+        "date": "2014-04-16T17:44:04Z",
+        "google_maps_url": "http://maps.google.com/?cid=14601224087566602287",
+        "location": {
+          "address": "Brooklyn, NY 11201, United States",
+          "country_code": "US",
+          "name": "Borough Hall"
+        }
+      },
+      "type": "Feature"
+    }
+  ]
+}
+

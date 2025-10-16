@@ -8,7 +8,7 @@ Separate from scraper Sources (which are technical scraping configs).
 import uuid
 from datetime import datetime
 from sqlalchemy import Column, String, Text, DateTime, JSON
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID as PG_UUID
 from sqlalchemy.sql import func
 from app.db.base import Base
 
@@ -17,7 +17,7 @@ class Merchant(Base):
     """Real-world wine venue with rich metadata."""
     __tablename__ = "merchants"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
+    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     name = Column(String(255), nullable=False, index=True)
     slug = Column(String(255), nullable=False, unique=True, index=True)
     type = Column(String(50), nullable=True, index=True)  # wine_shop, bistro, bar
@@ -39,7 +39,13 @@ class Merchant(Base):
     
     # Import tracking
     source_url = Column(String(500), nullable=True)  # Google Maps URL
-    last_synced = Column(DateTime, nullable=True)
+    last_synced_at = Column(DateTime, nullable=True)
+    
+    # Google Places sync
+    google_place_id = Column(String(255), nullable=True, index=True)  # Google Place ID
+    google_meta = Column(JSONB, nullable=True)  # Raw Place Details API response
+    google_last_synced = Column(DateTime, nullable=True)  # Last successful sync
+    google_sync_status = Column(String(50), nullable=True, default='never_synced')  # success, failed, pending, never_synced
     
     # Timestamps
     created_at = Column(DateTime, server_default=func.now(), nullable=False)

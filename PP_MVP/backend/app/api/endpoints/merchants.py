@@ -4,7 +4,7 @@ API endpoints for merchant management.
 Public endpoints for browsing merchants, admin endpoints for CRUD operations.
 """
 
-from typing import List
+from typing import List, Dict, Any
 import uuid
 import re
 from datetime import datetime
@@ -21,7 +21,10 @@ from app.schemas.merchant import (
     MerchantResponse,
     MerchantImportRequest,
     MerchantImportResponse,
+    GoogleSyncResponse,
 )
+from app.services.google_places import GooglePlacesService
+from app.core.config import settings
 
 
 router = APIRouter()
@@ -231,4 +234,107 @@ def import_merchants(
     db.commit()
     
     return MerchantImportResponse(**stats)
+
+
+@router.post("/{merchant_id}/google-sync", response_model=GoogleSyncResponse)
+def sync_merchant_with_google(
+    merchant_id: str,
+    place_id: str,
+    force_overwrite: bool = False,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """
+    Sync a merchant with Google Places data (admin only).
+    
+    This endpoint enriches merchant data by fetching details from Google Places API.
+    By default, it only fills in empty fields. Use force_overwrite=true to replace existing data.
+    
+    Args:
+        merchant_id: Merchant ID or slug
+        place_id: Google Place ID (e.g., "ChIJ8T1Z9XuxwoARah7YaygWXpA")
+        force_overwrite: If true, overwrites existing data (default: false)
+    
+    Returns:
+        Sync status, updated fields list, and enriched data
+    """
+    # Check if Google API is configured
+    if not settings.GOOGLE_PLACES_API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google Places API key not configured. Set GOOGLE_PLACES_API_KEY in environment."
+        )
+    
+    # Find merchant by ID or slug
+    merchant = db.query(Merchant).filter(
+        (Merchant.id == merchant_id) | (Merchant.slug == merchant_id)
+    ).first()
+    
+    if not merchant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Merchant not found"
+        )
+    
+    # Initialize Google Places service
+    try:
+        google_service = GooglePlacesService(api_key=settings.GOOGLE_PLACES_API_KEY)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(e)
+        )
+    
+    # Perform sync
+    sync_status, google_meta, error, updated_fields = google_service.sync_merchant(
+        db=db,
+        merchant_id=merchant.id,
+        place_id=place_id,
+        force_overwrite=force_overwrite
+    )
+    
+    if sync_status == 'failed':
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Google sync failed: {error}"
+        )
+    
+    return GoogleSyncResponse(
+        status=sync_status,
+        merchant_id=merchant.id,
+        google_place_id=place_id,
+        sync_timestamp=datetime.utcnow(),
+        fields_updated=updated_fields,
+        error=error,
+        google_meta=google_meta
+    )
+
+
+@router.get("/{merchant_id}/google-sync-status", response_model=Dict[str, Any])
+def get_google_sync_status(
+    merchant_id: str,
+    db: Session = Depends(get_db),
+):
+    """
+    Get Google sync status for a merchant (public).
+    
+    Returns sync metadata including last sync time and status.
+    """
+    merchant = db.query(Merchant).filter(
+        (Merchant.id == merchant_id) | (Merchant.slug == merchant_id)
+    ).first()
+    
+    if not merchant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Merchant not found"
+        )
+    
+    return {
+        'merchant_id': merchant.id,
+        'google_place_id': merchant.google_place_id,
+        'google_sync_status': merchant.google_sync_status or 'never_synced',
+        'google_last_synced': merchant.google_last_synced,
+        'has_google_data': merchant.google_meta is not None
+    }
 
