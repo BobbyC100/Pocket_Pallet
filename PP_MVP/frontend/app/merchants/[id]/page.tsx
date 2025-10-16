@@ -5,14 +5,22 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import MerchantStreetView from '@/components/MerchantStreetView';
 import api from '@/app/services/api';
 
 type Merchant = {
-  id: number;
+  id: string;
   name: string;
-  base_url: string;
-  enabled: boolean;
-  last_run_at: string | null;
+  slug: string;
+  type: string | null;
+  address: string | null;
+  geo: { lat: number; lng: number } | null;
+  country_code: string | null;
+  tags: string[] | null;
+  about: string | null;
+  hero_image: string | null;
+  contact: { website?: string; phone?: string; instagram?: string } | null;
+  created_at: string;
 };
 
 type Wine = {
@@ -36,7 +44,7 @@ type Product = {
 export default function MerchantDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const merchantId = parseInt(params.id as string);
+  const merchantId = params.id as string; // Can be ID or slug
 
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const [wines, setWines] = useState<Wine[]>([]);
@@ -54,23 +62,13 @@ export default function MerchantDetailPage() {
     setLoading(true);
     setError(null);
     try {
-      // Fetch merchant details
-      const merchantRes = await api.get(`/api/v1/scraper/sources/${merchantId}`);
+      // Fetch merchant details from new merchants API
+      const merchantRes = await api.get(`/api/v1/merchants/${merchantId}`);
       setMerchant(merchantRes.data);
 
-      // Fetch all wines
-      const winesRes = await api.get('/api/v1/scraper/wines?limit=1000');
-      const allWines = winesRes.data;
-
-      // Fetch products for this merchant
-      const productsRes = await api.get(`/api/v1/scraper/products?source_id=${merchantId}&limit=1000`);
-      const merchantProducts = productsRes.data;
-      setProducts(merchantProducts);
-
-      // Filter wines that belong to this merchant's products
-      const wineIds = new Set(merchantProducts.map((p: Product) => p.wine_id).filter(Boolean));
-      const merchantWines = allWines.filter((w: Wine) => wineIds.has(w.id));
-      setWines(merchantWines);
+      // TODO: Link merchants to scraper sources to show wine inventory
+      // For now, we'll show empty state or fetch by merchant name
+      // This will be connected once we add merchant_id to sources table
 
     } catch (err: any) {
       console.error('Failed to load merchant:', err);
@@ -122,16 +120,26 @@ export default function MerchantDetailPage() {
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="absolute bottom-8 left-8 text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)] max-w-2xl">
           <h1 className="text-4xl md:text-5xl font-serif font-semibold">{merchant.name}</h1>
-          <p className="text-lg md:text-xl mt-2">{getMerchantType(merchant.name)}</p>
+          <p className="text-lg md:text-xl mt-2">
+            {merchant.type === 'bistro' && 'French Bistro · Natural Wine'}
+            {merchant.type === 'bar' && 'Wine Bar · Natural Wine'}
+            {merchant.type === 'wine_shop' && 'Wine Shop · Natural Wine'}
+            {!merchant.type && 'Wine Merchant · Natural Wine'}
+          </p>
+          {merchant.address && (
+            <p className="text-sm md:text-base mt-2 opacity-90">{merchant.address}</p>
+          )}
           <div className="flex flex-wrap gap-3 mt-4">
-            <a
-              href={merchant.base_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 rounded-md text-sm border border-white/70 bg-white/10 backdrop-blur hover:bg-white/20 transition"
-            >
-              Visit Website
-            </a>
+            {merchant.contact?.website && (
+              <a
+                href={merchant.contact.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-md text-sm border border-white/70 bg-white/10 backdrop-blur hover:bg-white/20 transition"
+              >
+                Visit Website
+              </a>
+            )}
             <Link
               href="/merchants"
               className="px-4 py-2 rounded-md text-sm border border-white/70 bg-white/10 backdrop-blur hover:bg-white/20 transition"
@@ -139,9 +147,15 @@ export default function MerchantDetailPage() {
               ← All Merchants
             </Link>
           </div>
-          <p className="text-sm mt-3 opacity-90">
-            {wines.length} {wines.length === 1 ? 'wine' : 'wines'} available
-          </p>
+          {merchant.tags && merchant.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {merchant.tags.map((tag, i) => (
+                <span key={i} className="text-xs px-2 py-1 rounded-full bg-white/20 backdrop-blur">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -247,23 +261,33 @@ export default function MerchantDetailPage() {
         )}
       </section>
 
+      {/* Street View Section */}
+      {merchant.geo && merchant.geo.lat && merchant.geo.lng && (
+        <MerchantStreetView 
+          lat={merchant.geo.lat} 
+          lng={merchant.geo.lng} 
+          merchantName={merchant.name}
+        />
+      )}
+
       {/* About Section */}
       <section className="px-6 md:px-20 py-10 bg-white">
         <div className="max-w-3xl mx-auto text-center">
           <h3 className="text-2xl font-semibold mb-4">About {merchant.name}</h3>
           <p className="text-neutral-700 leading-relaxed mb-6">
-            {merchant.name} is a curated wine merchant specializing in natural wines. 
-            Discover unique bottles from small producers and family vineyards.
+            {merchant.about || `${merchant.name} is a curated wine merchant specializing in natural wines. Discover unique bottles from small producers and family vineyards.`}
           </p>
           <div className="flex justify-center gap-4">
-            <a
-              href={merchant.base_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-3 bg-wine-600 text-white rounded-md hover:bg-wine-700 transition"
-            >
-              Visit Website
-            </a>
+            {merchant.contact?.website && (
+              <a
+                href={merchant.contact.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-3 bg-wine-600 text-white rounded-md hover:bg-wine-700 transition"
+              >
+                Visit Website
+              </a>
+            )}
             <Link
               href="/merchants"
               className="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
