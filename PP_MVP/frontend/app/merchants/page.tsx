@@ -7,13 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import api from '@/app/services/api';
 
 type Merchant = {
-  id: number;
+  id: string;
   name: string;
-  base_url: string;
-  enabled: boolean;
-  last_run_at: string | null;
-  wine_count?: number;
-  product_count?: number;
+  slug: string;
+  type: string | null;
+  address: string | null;
+  geo: { lat: number; lng: number } | null;
+  country_code: string | null;
+  tags: string[] | null;
+  contact: { website?: string } | null;
+  created_at: string;
 };
 
 export default function MerchantsPage() {
@@ -30,31 +33,9 @@ export default function MerchantsPage() {
     setLoading(true);
     setError(null);
     try {
-      // Fetch all sources (merchants)
-      const sourcesRes = await api.get('/api/v1/scraper/sources?limit=100');
-      const sources = sourcesRes.data;
-
-      // Fetch wine counts for each merchant
-      const winesRes = await api.get('/api/v1/scraper/wines?limit=1000');
-      const wines = winesRes.data;
-
-      // Fetch product counts
-      const productsRes = await api.get('/api/v1/scraper/products?limit=1000');
-      const products = productsRes.data;
-
-      // Count wines and products per source
-      const merchantsWithCounts = sources.map((source: Merchant) => {
-        const sourceProducts = products.filter((p: any) => p.source_id === source.id);
-        const sourceWineIds = new Set(sourceProducts.map((p: any) => p.wine_id).filter(Boolean));
-        
-        return {
-          ...source,
-          product_count: sourceProducts.length,
-          wine_count: sourceWineIds.size
-        };
-      });
-
-      setMerchants(merchantsWithCounts.filter((m: Merchant) => m.enabled));
+      // Fetch merchants from new API
+      const res = await api.get('/api/v1/merchants?limit=100');
+      setMerchants(res.data);
     } catch (err: any) {
       console.error('Failed to load merchants:', err);
       setError(err?.response?.data?.detail || 'Failed to load merchants');
@@ -63,9 +44,10 @@ export default function MerchantsPage() {
     }
   };
 
-  const getMerchantType = (url: string): string => {
-    if (url.includes('buvons')) return 'Bistro & Shop';
-    if (url.includes('monarch')) return 'Wine Shop';
+  const getMerchantType = (type: string | null): string => {
+    if (type === 'bistro') return 'Bistro & Shop';
+    if (type === 'bar') return 'Wine Bar';
+    if (type === 'wine_shop') return 'Wine Shop';
     return 'Wine Merchant';
   };
 
@@ -121,47 +103,54 @@ export default function MerchantsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {merchants.map((merchant) => (
-              <Link key={merchant.id} href={`/merchants/${merchant.id}`}>
+              <Link key={merchant.id} href={`/merchants/${merchant.slug || merchant.id}`}>
                 <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-wine-300">
                   <CardHeader>
                     <CardTitle className="text-xl text-gray-900">
                       {merchant.name}
                     </CardTitle>
                     <p className="text-sm text-gray-600 mt-1">
-                      {getMerchantType(merchant.base_url)}
+                      {getMerchantType(merchant.type)}
                     </p>
+                    {merchant.address && (
+                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                        {merchant.address}
+                      </p>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {/* Wine Count */}
-                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">Wines Available</span>
-                        <span className="text-lg font-semibold text-wine-600">
-                          {merchant.wine_count || 0}
-                        </span>
-                      </div>
+                      {/* Tags */}
+                      {merchant.tags && merchant.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {merchant.tags.slice(0, 3).map((tag, i) => (
+                            <span
+                              key={i}
+                              className="text-xs px-2 py-1 rounded-full bg-wine-100 text-wine-800"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
-                      {/* Product Count */}
-                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">Product Listings</span>
-                        <span className="text-sm font-medium text-gray-700">
-                          {merchant.product_count || 0}
-                        </span>
-                      </div>
-
-                      {/* Last Updated */}
-                      {merchant.last_run_at && (
-                        <div className="pt-2">
-                          <p className="text-xs text-gray-500">
-                            Updated {new Date(merchant.last_run_at).toLocaleDateString()}
-                          </p>
+                      {/* Location */}
+                      {merchant.geo && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span className="text-xs">
+                            {merchant.country_code || 'Location available'}
+                          </span>
                         </div>
                       )}
 
                       {/* View Button */}
-                      <div className="pt-2">
+                      <div className="pt-2 mt-2 border-t border-gray-100">
                         <span className="text-sm text-wine-600 font-medium hover:text-wine-700">
-                          View Wines →
+                          View Details →
                         </span>
                       </div>
                     </div>
