@@ -53,7 +53,7 @@ class MerchantUpdate(BaseModel):
 class MerchantResponse(MerchantBase):
     """Schema for merchant responses."""
     id: str
-    last_synced: Optional[datetime] = None
+    last_synced_at: Optional[datetime] = None
     google_meta: Optional[Dict[str, Any]] = None
     google_last_synced: Optional[datetime] = None
     created_at: datetime
