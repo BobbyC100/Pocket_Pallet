@@ -159,6 +159,14 @@ export default function LoginPage() {
               )}
             </button>
 
+            {loading && (
+              <div className="rounded-md bg-blue-50 border border-blue-100 p-3">
+                <p className="text-xs text-blue-800">
+                  ⏳ First login may take 30-60 seconds while the server wakes up...
+                </p>
+              </div>
+            )}
+
             <div className="text-center text-sm pt-2">
               <span className="text-gray-600">New to Pocket Pallet? </span>
               <a

@@ -10,7 +10,7 @@ class ApiService {
   constructor() {
     this.client = axios.create({
       baseURL: API_URL,
-      timeout: 10000, // 10 second timeout
+      timeout: 60000, // 60 second timeout to handle Render cold starts
       headers: {
         'Content-Type': 'application/json',
       },
