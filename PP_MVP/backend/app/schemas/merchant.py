@@ -2,9 +2,10 @@
 Pydantic schemas for Merchant model.
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
-from pydantic import BaseModel, Field
+from uuid import UUID
+from pydantic import BaseModel, Field, field_serializer
 
 
 class MerchantBase(BaseModel):
@@ -52,12 +53,17 @@ class MerchantUpdate(BaseModel):
 
 class MerchantResponse(MerchantBase):
     """Schema for merchant responses."""
-    id: str
+    id: Union[str, UUID]
     last_synced_at: Optional[datetime] = None
     google_meta: Optional[Dict[str, Any]] = None
     google_last_synced: Optional[datetime] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
+
+    @field_serializer('id')
+    def serialize_id(self, value: Union[str, UUID]) -> str:
+        """Convert UUID to string for JSON serialization."""
+        return str(value)
 
     class Config:
         from_attributes = True
