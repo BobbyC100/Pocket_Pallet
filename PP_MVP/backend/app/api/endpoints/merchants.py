@@ -81,12 +81,17 @@ def get_merchant(
     db: Session = Depends(get_db),
 ):
     """Get a specific merchant by ID or slug (public)."""
-    # Try by ID first
-    merchant = db.query(Merchant).filter(Merchant.id == merchant_id).first()
+    # Try by slug first (most common case)
+    merchant = db.query(Merchant).filter(Merchant.slug == merchant_id).first()
     
-    # Try by slug if not found
+    # Try by UUID if not found and merchant_id looks like a UUID
     if not merchant:
-        merchant = db.query(Merchant).filter(Merchant.slug == merchant_id).first()
+        try:
+            merchant_uuid = uuid.UUID(merchant_id)
+            merchant = db.query(Merchant).filter(Merchant.id == merchant_uuid).first()
+        except ValueError:
+            # Not a valid UUID, skip
+            pass
     
     if not merchant:
         raise HTTPException(
