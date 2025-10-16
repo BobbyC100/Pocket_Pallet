@@ -33,8 +33,8 @@ export default function MerchantsPage() {
     setLoading(true);
     setError(null);
     try {
-      // Fetch merchants from new API
-      const res = await api.get('/api/v1/merchants?limit=100');
+      // Fetch merchants from new API (trailing slash is required by FastAPI)
+      const res = await api.get('/api/v1/merchants/?limit=100');
       setMerchants(res.data);
     } catch (err: any) {
       console.error('Failed to load merchants:', err);
