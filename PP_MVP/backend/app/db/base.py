@@ -9,4 +9,5 @@ from app.models.password_reset import PasswordReset  # noqa
 from app.models.ocr_feedback import OcrFeedback  # noqa
 from app.models.tasting_note import TastingNote  # noqa
 from app.models.scraper import Source, ScrapedWine, Product, ProductSnapshot, ProductImage  # noqa
+from app.models.merchant import Merchant  # noqa
 
