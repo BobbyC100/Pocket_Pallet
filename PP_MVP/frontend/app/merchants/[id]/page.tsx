@@ -439,64 +439,70 @@ export default function MerchantDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
           {/* Left Column - Meta → Description → Tips */}
           <div className="relative">
-            {/* At a Glance Section */}
-            <div className="mb-8 sticky top-0 py-4 z-10">
-              {/* Top Row: Type pill · Cost · Open/Closed status */}
-              <div className="flex flex-wrap items-center gap-3 text-sm mb-6" style={{ color: '#666' }}>
-                {/* Type Pill */}
+            {/* At a Glance Section - Compact & Aligned */}
+            <section className="mb-6 sticky top-0 py-3 z-10">
+              {/* 2-column definition list for perfect alignment */}
+              <dl className="grid grid-cols-[100px_1fr] gap-x-4 gap-y-2 text-sm">
+                {/* Type */}
                 {typeLabel && (
-                  <span 
-                    className="px-3 py-1 rounded-full text-xs border"
-                    style={{ 
-                      borderColor: '#D6D3CD',
-                      color: '#555'
-                    }}
-                  >
-                    {typeLabel}
-                  </span>
+                  <>
+                    <dt style={{ color: '#888' }}>Type</dt>
+                    <dd>
+                      <span 
+                        className="inline-block px-2 py-1 rounded-full text-xs border"
+                        style={{ 
+                          borderColor: '#D6D3CD',
+                          color: '#555'
+                        }}
+                      >
+                        {typeLabel}
+                      </span>
+                    </dd>
+                  </>
                 )}
 
                 {/* Cost */}
                 {googleMeta?.price_level && (
-                  <span>
-                    <span className="font-medium" style={{ color: '#444' }}>Cost:</span> {'$'.repeat(googleMeta.price_level)}
-                  </span>
+                  <>
+                    <dt style={{ color: '#888' }}>Cost</dt>
+                    <dd style={{ color: '#555' }}>
+                      {'$'.repeat(googleMeta.price_level)}
+                    </dd>
+                  </>
                 )}
 
-                {/* Open/Closed Status Pill */}
+                {/* Status */}
                 {googleMeta?.opening_hours?.open_now !== undefined && (
-                  <span 
-                    className="px-3 py-1 rounded-full text-xs font-medium"
-                    style={{
-                      backgroundColor: googleMeta.opening_hours.open_now ? '#D4EDDA' : '#F8D7DA',
-                      color: googleMeta.opening_hours.open_now ? '#155724' : '#721C24'
-                    }}
-                  >
-                    {googleMeta.opening_hours.open_now ? 'Open now' : 'Closed'}
-                  </span>
+                  <>
+                    <dt style={{ color: '#888' }}>Status</dt>
+                    <dd>
+                      <span 
+                        className="inline-block px-2 py-1 rounded-full text-xs font-medium"
+                        style={{
+                          backgroundColor: googleMeta.opening_hours.open_now ? '#D4EDDA' : '#F8D7DA',
+                          color: googleMeta.opening_hours.open_now ? '#155724' : '#721C24'
+                        }}
+                      >
+                        {googleMeta.opening_hours.open_now ? 'Open now' : 'Closed'}
+                      </span>
+                    </dd>
+                  </>
                 )}
-              </div>
 
-              {/* Labeled Definition List */}
-              <dl className="space-y-3 text-sm">
                 {/* Vibe */}
                 {getVibe() && (
-                  <div className="flex gap-4">
-                    <dt className="w-24 shrink-0 font-medium" style={{ color: '#888' }}>
-                      Vibe
-                    </dt>
+                  <>
+                    <dt style={{ color: '#888' }}>Vibe</dt>
                     <dd className="italic" style={{ color: '#555' }}>
                       {getVibe()}
                     </dd>
-                  </div>
+                  </>
                 )}
 
                 {/* Known For */}
                 {getKnownFor().length > 0 && (
-                  <div className="flex gap-4">
-                    <dt className="w-24 shrink-0 font-medium" style={{ color: '#888' }}>
-                      Known for
-                    </dt>
+                  <>
+                    <dt style={{ color: '#888' }}>Known for</dt>
                     <dd className="flex flex-wrap gap-2">
                       {getKnownFor().slice(0, 4).map((item, i) => (
                         <span 
@@ -516,15 +522,13 @@ export default function MerchantDetailPage() {
                         </span>
                       )}
                     </dd>
-                  </div>
+                  </>
                 )}
 
                 {/* Good to Know */}
                 {getGoodToKnow().length > 0 && (
-                  <div className="flex gap-4">
-                    <dt className="w-24 shrink-0 font-medium" style={{ color: '#888' }}>
-                      Good to know
-                    </dt>
+                  <>
+                    <dt style={{ color: '#888' }}>Good to know</dt>
                     <dd className="flex flex-wrap gap-2">
                       {getGoodToKnow().map((tip, i) => (
                         <span 
@@ -539,10 +543,10 @@ export default function MerchantDetailPage() {
                         </span>
                       ))}
                     </dd>
-                  </div>
+                  </>
                 )}
               </dl>
-            </div>
+            </section>
 
             {/* Description Section - Line Clamped */}
             <div className="mb-8">
