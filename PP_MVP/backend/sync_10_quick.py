@@ -103,7 +103,7 @@ def main():
                     
                     update_query = text("""
                         UPDATE merchants
-                        SET google_meta = :meta::jsonb,
+                        SET google_meta = CAST(:meta AS jsonb),
                             google_sync_status = 'synced',
                             last_synced_at = NOW()
                         WHERE id = :id
