@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/app/services/api';
@@ -64,6 +64,19 @@ export default function MerchantDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [mapsOpen, setMapsOpen] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [shouldShowToggle, setShouldShowToggle] = useState(false);
+  const descriptionRef = useRef<HTMLDivElement>(null);
+
+  // Check if description is long enough to need truncation
+  useEffect(() => {
+    if (descriptionRef.current) {
+      const lineHeight = parseInt(window.getComputedStyle(descriptionRef.current).lineHeight);
+      const maxHeight = descriptionRef.current.scrollHeight;
+      const visibleHeight = descriptionRef.current.clientHeight;
+      setShouldShowToggle(maxHeight > visibleHeight + lineHeight);
+    }
+  }, [merchant]);
 
   useEffect(() => {
     if (merchantId) {
@@ -319,31 +332,87 @@ export default function MerchantDetailPage() {
       <div className="max-w-6xl mx-auto px-6 py-8 md:py-10">
         {/* Two-Column Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-          {/* Left Column - About */}
-          <div className="space-y-6">
-            <div>
+          {/* Left Column - Meta → Description → Tips */}
+          <div className="relative">
+            {/* Meta Section - Always Visible */}
+            <div className="space-y-4 mb-8 sticky top-0 bg-white/95 backdrop-blur-sm py-4 z-10">
+              {/* Type Header */}
               {typeLabel && (
-                <h2 className="text-3xl md:text-4xl font-serif mb-6 tracking-tight" style={{ 
+                <h2 className="text-3xl md:text-4xl font-serif tracking-tight" style={{ 
                   fontFamily: 'Georgia, "Playfair Display", serif',
                   color: '#222'
                 }}>
                   {typeLabel}
                 </h2>
               )}
-              
-              {/* Magazine-style Intro Paragraph */}
-              <p className="text-lg leading-relaxed mb-6" style={{ 
-                color: '#333',
-                fontSize: '19px',
-                lineHeight: '1.8',
-                maxWidth: '65ch',
-                fontFamily: 'Inter, "Work Sans", sans-serif'
-              }}>
-                {googleMeta?.editorial_summary || merchant.about || 
-                  `${merchant.name} is a curated destination for natural wine enthusiasts. Discover unique bottles from small producers and family vineyards, carefully selected for their character and authenticity.`}
-              </p>
-              
-              {/* Feature List - Removed for cleaner design */}
+
+              {/* Meta Tags - Compact, Editorial Style */}
+              <div className="flex flex-wrap gap-3 text-sm" style={{ color: '#666' }}>
+                {/* Price Level */}
+                {googleMeta?.price_level && (
+                  <span className="flex items-center gap-1">
+                    {'$'.repeat(googleMeta.price_level)}
+                  </span>
+                )}
+                
+                {/* Rating */}
+                {googleMeta?.rating && (
+                  <span className="flex items-center gap-1">
+                    ⭐ {googleMeta.rating}
+                  </span>
+                )}
+                
+                {/* Hours Status */}
+                {googleMeta?.opening_hours?.open_now !== undefined && (
+                  <span className={googleMeta.opening_hours.open_now ? 'text-green-700' : 'text-red-700'}>
+                    {googleMeta.opening_hours.open_now ? 'Open now' : 'Closed'}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Description Section - Line Clamped */}
+            <div className="mb-8">
+              <div className="relative">
+                <div
+                  ref={descriptionRef}
+                  id="merchant-description"
+                  className={`text-lg leading-relaxed ${
+                    descriptionExpanded ? '' : 'line-clamp-5 lg:line-clamp-5 md:line-clamp-6 sm:line-clamp-8'
+                  }`}
+                  style={{ 
+                    color: '#333',
+                    fontSize: '19px',
+                    lineHeight: '1.8',
+                    fontFamily: 'Inter, "Work Sans", sans-serif'
+                  }}
+                >
+                  {googleMeta?.editorial_summary || merchant.about || 
+                    `${merchant.name} is a curated destination for natural wine enthusiasts. Discover unique bottles from small producers and family vineyards, carefully selected for their character and authenticity.`}
+                </div>
+                
+                {/* Gradient Fade - Only when clamped */}
+                {!descriptionExpanded && shouldShowToggle && (
+                  <div 
+                    className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(to bottom, transparent, white)'
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* View More/Less Toggle */}
+              {shouldShowToggle && (
+                <button
+                  onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+                  aria-expanded={descriptionExpanded}
+                  aria-controls="merchant-description"
+                  className="mt-3 text-sm text-blue-600 hover:underline font-medium transition-colors motion-reduce:transition-none"
+                >
+                  {descriptionExpanded ? 'View less ↑' : 'View more ↓'}
+                </button>
+              )}
             </div>
           </div>
           
