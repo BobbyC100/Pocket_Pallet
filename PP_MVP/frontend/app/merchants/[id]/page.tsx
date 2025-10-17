@@ -439,113 +439,104 @@ export default function MerchantDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
           {/* Left Column - Meta → Description → Tips */}
           <div className="relative">
-            {/* At a Glance Section - Compact & Aligned */}
-            <section className="mb-6 sticky top-0 py-3 z-10">
-              {/* 2-column definition list for perfect alignment */}
-              <dl className="grid grid-cols-[100px_1fr] gap-x-4 gap-y-2 text-sm">
+            {/* At a Glance Section - Pill Grid */}
+            <section className="mb-6 pt-2" aria-labelledby="at-a-glance">
+              <h2 
+                id="at-a-glance" 
+                className="mb-3 text-sm font-medium"
+                style={{ color: '#6b7280' }}
+              >
+                At a glance
+              </h2>
+
+              {/* Responsive pill grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                 {/* Type */}
                 {typeLabel && (
-                  <>
-                    <dt style={{ color: '#888' }}>Type</dt>
-                    <dd>
-                      <span 
-                        className="inline-block px-2 py-1 rounded-full text-xs border"
-                        style={{ 
-                          borderColor: '#D6D3CD',
-                          color: '#555'
-                        }}
-                      >
-                        {typeLabel}
-                      </span>
-                    </dd>
-                  </>
+                  <span 
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    style={{
+                      borderColor: '#e5e7eb',
+                      backgroundColor: '#fafafa',
+                      color: '#374151'
+                    }}
+                  >
+                    {typeLabel}
+                  </span>
                 )}
 
                 {/* Cost */}
                 {googleMeta?.price_level && (
-                  <>
-                    <dt style={{ color: '#888' }}>Cost</dt>
-                    <dd style={{ color: '#555' }}>
-                      {'$'.repeat(googleMeta.price_level)}
-                    </dd>
-                  </>
+                  <span 
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    style={{
+                      borderColor: '#e5e7eb',
+                      backgroundColor: '#fafafa',
+                      color: '#374151'
+                    }}
+                  >
+                    {'$'.repeat(googleMeta.price_level)}
+                  </span>
                 )}
 
                 {/* Status */}
                 {googleMeta?.opening_hours?.open_now !== undefined && (
-                  <>
-                    <dt style={{ color: '#888' }}>Status</dt>
-                    <dd>
-                      <span 
-                        className="inline-block px-2 py-1 rounded-full text-xs font-medium"
-                        style={{
-                          backgroundColor: googleMeta.opening_hours.open_now ? '#D4EDDA' : '#F8D7DA',
-                          color: googleMeta.opening_hours.open_now ? '#155724' : '#721C24'
-                        }}
-                      >
-                        {googleMeta.opening_hours.open_now ? 'Open now' : 'Closed'}
-                      </span>
-                    </dd>
-                  </>
+                  <span 
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    style={{
+                      borderColor: googleMeta.opening_hours.open_now ? '#86efac' : '#fecaca',
+                      backgroundColor: googleMeta.opening_hours.open_now ? '#dcfce7' : '#fef2f2',
+                      color: googleMeta.opening_hours.open_now ? '#15803d' : '#b91c1c'
+                    }}
+                  >
+                    {googleMeta.opening_hours.open_now ? 'Open' : 'Closed'}
+                  </span>
                 )}
 
                 {/* Vibe */}
                 {getVibe() && (
-                  <>
-                    <dt style={{ color: '#888' }}>Vibe</dt>
-                    <dd className="italic" style={{ color: '#555' }}>
-                      {getVibe()}
-                    </dd>
-                  </>
+                  <span 
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    style={{
+                      borderColor: '#e5e7eb',
+                      backgroundColor: '#fafafa',
+                      color: '#374151'
+                    }}
+                  >
+                    {getVibe()}
+                  </span>
                 )}
 
-                {/* Known For */}
-                {getKnownFor().length > 0 && (
-                  <>
-                    <dt style={{ color: '#888' }}>Known for</dt>
-                    <dd className="flex flex-wrap gap-2">
-                      {getKnownFor().slice(0, 4).map((item, i) => (
-                        <span 
-                          key={i}
-                          className="px-2 py-1 rounded-full text-xs border"
-                          style={{ 
-                            borderColor: '#D6D3CD',
-                            color: '#555'
-                          }}
-                        >
-                          {item}
-                        </span>
-                      ))}
-                      {getKnownFor().length > 4 && (
-                        <span className="text-xs" style={{ color: '#888' }}>
-                          +{getKnownFor().length - 4} more
-                        </span>
-                      )}
-                    </dd>
-                  </>
-                )}
+                {/* Known For - each as its own pill */}
+                {getKnownFor().slice(0, 4).map((item, i) => (
+                  <span 
+                    key={`known-${i}`}
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    style={{
+                      borderColor: '#e5e7eb',
+                      backgroundColor: '#fafafa',
+                      color: '#374151'
+                    }}
+                  >
+                    {item}
+                  </span>
+                ))}
 
-                {/* Good to Know */}
-                {getGoodToKnow().length > 0 && (
-                  <>
-                    <dt style={{ color: '#888' }}>Good to know</dt>
-                    <dd className="flex flex-wrap gap-2">
-                      {getGoodToKnow().map((tip, i) => (
-                        <span 
-                          key={i}
-                          className="px-2 py-1 rounded-full text-xs"
-                          style={{ 
-                            backgroundColor: '#E8E4DE',
-                            color: '#555'
-                          }}
-                        >
-                          {tip}
-                        </span>
-                      ))}
-                    </dd>
-                  </>
-                )}
-              </dl>
+                {/* Good to Know - each as its own pill */}
+                {getGoodToKnow().map((tip, i) => (
+                  <span 
+                    key={`tip-${i}`}
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    style={{
+                      borderColor: '#e5e7eb',
+                      backgroundColor: '#fafafa',
+                      color: '#374151'
+                    }}
+                  >
+                    {tip}
+                  </span>
+                ))}
+              </div>
             </section>
 
             {/* Description Section - Line Clamped */}
