@@ -514,17 +514,16 @@ export default function MerchantDetailPage() {
             </div>
             
             {/* View on Google Link */}
-            <a
-              href={googleMeta?.url || merchant.source_url || '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-blue-600 hover:underline mt-6 text-left"
-            >
-              <svg width="16" height="16" fill="currentColor" className="opacity-70" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
-              View Google Profile
-            </a>
+            <div className="mt-4 pt-3 border-t" style={{ borderColor: '#E8E4DE' }}>
+              <a
+                href={googleMeta?.url || merchant.source_url || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline block text-left text-sm"
+              >
+                View Google Profile
+              </a>
+            </div>
           </section>
                     </div>
 
