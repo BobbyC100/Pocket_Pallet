@@ -285,25 +285,12 @@ export default function MerchantDetailPage() {
                   `${merchant.name} is a curated destination for natural wine enthusiasts. Discover unique bottles from small producers and family vineyards, carefully selected for their character and authenticity.`}
               </p>
               
-              {/* Feature List */}
-              {merchant.tags && merchant.tags.length > 0 && (
-                <div className="space-y-2">
-                  {merchant.tags
-                    .filter(tag => !tag.toLowerCase().includes('imported from google'))
-                    .slice(0, 3)
-                    .map((tag, i) => (
-                      <div key={i} className="flex items-center gap-2 text-base" style={{ color: '#555' }}>
-                        <span style={{ color: '#D6A55B' }}>•</span>
-                        <span>{tag}</span>
-                      </div>
-                    ))}
-                </div>
-              )}
+              {/* Feature List - Removed for cleaner design */}
             </div>
           </div>
           
           {/* Right Column - Anchor Image */}
-          <div>
+                    <div>
             {galleryImages.length > 0 && (
               <div className="rounded-2xl overflow-hidden shadow-lg">
                 <img
@@ -371,22 +358,21 @@ export default function MerchantDetailPage() {
           {/* Hours */}
           {googleMeta?.opening_hours?.weekday_text && (
             <section>
-              <h2 className="text-xl font-serif mb-4" style={{ 
+              <h2 className="text-lg font-serif mb-3" style={{ 
                 fontFamily: 'Georgia, "Playfair Display", serif'
               }}>
                 Hours
               </h2>
-              <div className="space-y-2 text-sm" style={{ color: '#555' }}>
+              <div className="space-y-0.5 text-sm" style={{ color: '#555', lineHeight: '1.5' }}>
                 {googleMeta.opening_hours.weekday_text.map((text, i) => {
                   const [day, hours] = text.split(': ');
                   const isToday = new Date().getDay() === i;
                   return (
                     <div 
                       key={i} 
-                      className={`flex justify-between py-1.5 px-3 rounded ${isToday ? 'font-semibold' : ''}`}
+                      className={`flex justify-between py-0.5 ${isToday ? 'font-semibold' : ''}`}
                       style={{ 
                         color: isToday ? '#D6A55B' : '#555',
-                        backgroundColor: isToday ? '#FBF6EE' : 'transparent'
                       }}
                     >
                       <span>{day}</span>
@@ -394,46 +380,37 @@ export default function MerchantDetailPage() {
                     </div>
                   );
                 })}
-              </div>
+                        </div>
             </section>
           )}
           
           {/* Contact & Address */}
           <section>
-            <h2 className="text-xl font-serif mb-4" style={{ 
+            <h2 className="text-lg font-serif mb-3" style={{ 
               fontFamily: 'Georgia, "Playfair Display", serif'
             }}>
               Contact & Address
             </h2>
             
-            <address className="not-italic space-y-4 text-sm" style={{ color: '#555' }}>
+            <address className="not-italic space-y-2 text-sm" style={{ color: '#555', lineHeight: '1.5' }}>
               {/* Address */}
               {(googleMeta?.formatted_address || merchant.address) && (
-                <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#D6A55B' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <div>
-                    <p className="mb-2">{googleMeta?.formatted_address || merchant.address}</p>
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${merchant.geo?.lat},${merchant.geo?.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline text-xs"
-                    >
-                      Get Directions →
-                    </a>
-                  </div>
+                <div>
+                  <p className="mb-1">{googleMeta?.formatted_address || merchant.address}</p>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${merchant.geo?.lat},${merchant.geo?.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline text-xs"
+                  >
+                    Get Directions →
+                  </a>
                 </div>
               )}
               
               {/* Phone */}
               {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
-                <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#D6A55B' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
+                <div>
                   <a 
                     href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
                     className="text-blue-600 hover:underline"
@@ -445,10 +422,7 @@ export default function MerchantDetailPage() {
               
               {/* Website */}
               {(googleMeta?.website || merchant.contact?.website) && (
-                <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#D6A55B' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                  </svg>
+                <div>
                   <a
                     href={googleMeta?.website || merchant.contact?.website}
                     target="_blank"
@@ -462,10 +436,7 @@ export default function MerchantDetailPage() {
               
               {/* Instagram */}
               {merchant.contact?.instagram && (
-                <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#D6A55B' }} fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                  </svg>
+                <div>
                   <a
                     href={`https://instagram.com/${merchant.contact.instagram.replace('@', '')}`}
                     target="_blank"
@@ -491,7 +462,7 @@ export default function MerchantDetailPage() {
               View full profile on Google
             </a>
           </section>
-        </div>
+                    </div>
 
         {/* Subtle Section Divider */}
         <div className="border-t mb-16" style={{ borderColor: '#E8E4DE' }}></div>
@@ -510,7 +481,7 @@ export default function MerchantDetailPage() {
             color: '#1E40AF'
           }}>
             Menu rotates — last verified {Math.floor(Math.random() * 30)} days ago.
-          </div>
+                  </div>
           
           <div className="mt-6 p-12 text-center border-2 border-dashed rounded-xl" style={{
             borderColor: '#E8E4DE',
@@ -520,12 +491,12 @@ export default function MerchantDetailPage() {
             <p className="text-lg">No wines parsed yet. Check back soon!</p>
             <p className="text-sm mt-2">We&apos;re working on connecting wine inventory to merchant profiles.</p>
           </div>
-        </section>
+      </section>
 
         {/* Back to Merchants */}
         <div className="text-center pt-8 border-t" style={{ borderColor: '#E8E4DE' }}>
-          <Link 
-            href="/merchants"
+            <Link
+              href="/merchants"
             className="inline-flex items-center gap-2 text-sm hover:underline"
             style={{ color: '#D6A55B' }}
           >
