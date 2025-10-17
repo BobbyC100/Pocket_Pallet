@@ -199,7 +199,7 @@ export default function MerchantDetailPage() {
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#FAF6EF', color: '#222' }}>
       {/* Hero Section - Above the Fold */}
-      <section className="relative w-full overflow-hidden" style={{ height: '70vh', minHeight: '70vh' }}>
+      <section className="relative w-full overflow-hidden" style={{ height: '60vh', minHeight: '60vh' }}>
         <img
           src={getHeroImage()}
           alt={merchant.name}
@@ -288,12 +288,15 @@ export default function MerchantDetailPage() {
               {/* Feature List */}
               {merchant.tags && merchant.tags.length > 0 && (
                 <div className="space-y-2">
-                  {merchant.tags.slice(0, 3).map((tag, i) => (
-                    <div key={i} className="flex items-center gap-2 text-base" style={{ color: '#555' }}>
-                      <span style={{ color: '#D6A55B' }}>•</span>
-                      <span>{tag}</span>
-                    </div>
-                  ))}
+                  {merchant.tags
+                    .filter(tag => !tag.toLowerCase().includes('imported from google'))
+                    .slice(0, 3)
+                    .map((tag, i) => (
+                      <div key={i} className="flex items-center gap-2 text-base" style={{ color: '#555' }}>
+                        <span style={{ color: '#D6A55B' }}>•</span>
+                        <span>{tag}</span>
+                      </div>
+                    ))}
                 </div>
               )}
             </div>
