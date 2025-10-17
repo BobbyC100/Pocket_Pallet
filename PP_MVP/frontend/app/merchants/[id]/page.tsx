@@ -583,7 +583,7 @@ export default function MerchantDetailPage() {
             </div>
             
             {/* View on Google Link */}
-            <div className="mt-4 pt-3 border-t" style={{ borderColor: '#E8E4DE' }}>
+            <div className="mt-2">
               <a
                 href={googleMeta?.url || merchant.source_url || '#'}
                 target="_blank"
