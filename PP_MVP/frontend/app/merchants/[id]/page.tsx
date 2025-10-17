@@ -212,7 +212,7 @@ export default function MerchantDetailPage() {
     }
     
     // Quick lunch: counter service, quick, takeaway
-    if (summary.match(/counter service|quick|grab.*go|takeaway|lunch|fast/i) || types.has('meal_takeaway')) {
+    if (summary.match(/counter service|quick|grab.*go|take\s*away|lunch|fast/i) || types.has('meal_takeaway')) {
       return 'quick lunch';
     }
     
@@ -252,7 +252,8 @@ export default function MerchantDetailPage() {
     const foodPatterns = [
       /(?:fresh|grilled|crispy|fried|smoked|marinated|house-made|homemade|authentic)\s+(\w+(?:\s+\w+)?)/gi,
       /(?:their|its|famous|known for|signature)\s+([a-z]+\s+(?:tacos?|fish|shrimp|wine|beer|cocktails?|dishes?|pizza|burgers?|sandwiches?))/gi,
-      /(seafood|fish|tacos?|burritos?|quesadillas?|margaritas?|cerveza|beer|wine|cocktails?)\s+(?:selection|menu|list)/gi
+      /(?:selection|menu|list)\s+(?:of\s+)?(seafood|fish|tacos?|burritos?|quesadillas?|margaritas?|cerveza|beer|wine|cocktails?)/gi,
+      /(seafood|fish)\s+(tacos?|burritos?|dishes?)/gi
     ];
     
     foodPatterns.forEach(pattern => {
