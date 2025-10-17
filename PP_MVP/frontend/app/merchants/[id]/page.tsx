@@ -63,6 +63,7 @@ export default function MerchantDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [mapsOpen, setMapsOpen] = useState(false);
 
   useEffect(() => {
     if (merchantId) {
@@ -100,31 +101,31 @@ export default function MerchantDetailPage() {
     return '/images/wine-shop-hero.jpg'; // Fallback
   };
 
-  // Helper: Build photo mosaic (6-8 photos + Street View)
-  const buildGallery = (): Array<{ url: string; caption?: string }> => {
+  // Helper: Build photo mosaic (Street View FIRST, then Google photos)
+  const buildGallery = (): string[] => {
     if (!merchant) return [];
     
-    const images: Array<{ url: string; caption?: string }> = [];
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!apiKey) return [];
 
-    // Add 6-8 Google Places photos (skip first if used as hero)
-    if (merchant.google_meta?.photos && apiKey) {
-      const startIndex = !merchant.hero_image ? 1 : 0;
-      const photoUrls = merchant.google_meta.photos
-        .slice(startIndex, startIndex + 8)
-        .map((photo) => ({
-          url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${apiKey}`,
-          caption: undefined
-        }));
-      images.push(...photoUrls);
+    const images: string[] = [];
+
+    // Street View FIRST
+    if (merchant.geo?.lat && merchant.geo?.lng) {
+      images.push(
+        `https://maps.googleapis.com/maps/api/streetview?size=800x800&location=${merchant.geo.lat},${merchant.geo.lng}&fov=85&pitch=0&key=${apiKey}`
+      );
     }
 
-    // Append Street View as final tile
-    if (merchant.geo?.lat && merchant.geo?.lng && apiKey) {
-      images.push({
-        url: `https://maps.googleapis.com/maps/api/streetview?size=800x800&location=${merchant.geo.lat},${merchant.geo.lng}&fov=85&pitch=0&key=${apiKey}`,
-        caption: 'Street View'
-      });
+    // Then Google Places photos (skip first if used as hero, show up to 6)
+    if (merchant.google_meta?.photos) {
+      const startIndex = !merchant.hero_image ? 1 : 0;
+      const photoUrls = merchant.google_meta.photos
+        .slice(startIndex, startIndex + 6)
+        .map((photo) => 
+          `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${apiKey}`
+        );
+      images.push(...photoUrls);
     }
 
     return images;
@@ -142,12 +143,25 @@ export default function MerchantDetailPage() {
     }
   };
 
-  // Helper: Get merchant type description
-  const getMerchantType = () => {
-    if (merchant?.type === 'bistro') return 'Wine Bar & Restaurant';
-    if (merchant?.type === 'bar') return 'Wine Bar';
-    if (merchant?.type === 'wine_shop') return 'Wine Shop';
-    return 'Wine Merchant';
+  // Helper: Humanize merchant type from Google types
+  const humanizeType = (types?: string[], fallback?: string | null) => {
+    if (fallback) return fallback;
+    if (!types || !types.length) return null;
+
+    const t = new Set(types);
+
+    // Bars / Wine
+    if (t.has('bar') || t.has('night_club')) return 'Bar';
+    if (t.has('liquor_store') || t.has('wine_store') || t.has('store')) return 'Wine Shop';
+
+    // Restaurants / Takeaway
+    if (t.has('restaurant') || t.has('meal_takeaway') || t.has('food')) return 'Restaurant';
+
+    // Cheese or specialty food shops
+    if (t.has('grocery_or_supermarket') || t.has('delicatessen')) return 'Cheese Shop';
+
+    // If Google returns something super specific but noisy, don't guess
+    return null; // hide the header instead of being wrong
   };
 
   // Helper: Get price level display
@@ -195,6 +209,8 @@ export default function MerchantDetailPage() {
   const totalRatings = googleMeta?.user_ratings_total;
   const priceLevel = getPriceLevel();
   const location = getLocation();
+  const typeLabel = humanizeType(googleMeta?.types, merchant.type);
+  const hasStreetView = merchant.geo?.lat && merchant.geo?.lng;
 
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#FAF6EF', color: '#222' }}>
@@ -255,23 +271,35 @@ export default function MerchantDetailPage() {
                 Website
               </a>
             )}
+            {merchant.contact?.instagram && (
+              <a
+                href={`https://instagram.com/${merchant.contact.instagram.replace('@', '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
+              >
+                Instagram
+              </a>
+            )}
           </div>
         </div>
       </section>
 
       {/* Main Content - Below the Fold */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-16">
+      <div className="max-w-6xl mx-auto px-6 py-8 md:py-10">
         {/* Two-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
           {/* Left Column - About */}
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl md:text-3xl font-serif mb-6" style={{ 
-                fontFamily: 'Georgia, "Playfair Display", serif',
-                color: '#222'
-              }}>
-                {getMerchantType()}
-              </h2>
+              {typeLabel && (
+                <h2 className="text-3xl md:text-4xl font-serif mb-6 tracking-tight" style={{ 
+                  fontFamily: 'Georgia, "Playfair Display", serif',
+                  color: '#222'
+                }}>
+                  {typeLabel}
+                </h2>
+              )}
               
               {/* Magazine-style Intro Paragraph */}
               <p className="text-lg leading-relaxed mb-6" style={{ 
@@ -290,11 +318,11 @@ export default function MerchantDetailPage() {
           </div>
           
           {/* Right Column - Anchor Image */}
-                    <div>
+          <div>
             {galleryImages.length > 0 && (
               <div className="rounded-2xl overflow-hidden shadow-lg">
                 <img
-                  src={galleryImages[0].url}
+                  src={galleryImages[0]}
                   alt={`${merchant.name} interior`}
                   className="w-full h-auto object-cover"
                   style={{ maxHeight: '500px' }}
@@ -305,41 +333,39 @@ export default function MerchantDetailPage() {
         </div>
 
         {/* Subtle Section Divider */}
-        <div className="border-t mb-16" style={{ borderColor: '#E8E4DE' }}></div>
+        <hr className="border-t my-6" style={{ borderColor: '#E8E4DE' }} />
 
         {/* Photo Mosaic - Google Places Photos */}
-        {galleryImages.length > 1 && (
-          <section className="mb-16">
+        {galleryImages.length > 0 && (
+          <section className="py-6 md:py-8">
             <h2 className="text-2xl md:text-3xl font-serif mb-6" style={{ 
               fontFamily: 'Georgia, "Playfair Display", serif'
             }}>
               Gallery
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-              {galleryImages.slice(1).map((img, i) => {
-                const isStreetView = img.caption === 'Street View';
+              {galleryImages.map((src, i) => {
                 return (
                   <figure
                     key={i}
-                    className="relative overflow-hidden rounded-xl cursor-pointer hover:opacity-90 transition group"
-                    style={{ aspectRatio: '1/1' }}
-                    onClick={() => setLightboxIndex(i + 1)}
+                    className="relative overflow-hidden rounded-xl cursor-pointer hover:opacity-90 transition group aspect-square"
+                    onClick={() => setLightboxIndex(i)}
                   >
                     <img
-                      src={img.url}
-                      alt={img.caption || `${merchant.name} photo ${i + 2}`}
+                      src={src}
+                      alt={`${merchant.name} photo ${i + 1}`}
                       loading="lazy"
-                      className="w-full h-full object-cover"
+                      className="h-full w-full object-cover"
                       onError={(e) => {
-                        if (isStreetView) {
+                        if (hasStreetView && i === 0) {
                           e.currentTarget.parentElement?.remove();
                         }
                       }}
                     />
                     
-                    {/* Street View badge */}
-                    {isStreetView && (
-                      <span className="absolute bottom-3 right-3 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md">
+                    {/* Street View badge - only on first tile */}
+                    {hasStreetView && i === 0 && (
+                      <span className="absolute bottom-2 right-2 rounded bg-black/60 text-white text-xs px-2 py-1">
                         Street View
                       </span>
                     )}
@@ -351,10 +377,10 @@ export default function MerchantDetailPage() {
         )}
 
         {/* Subtle Section Divider */}
-        <div className="border-t mb-16" style={{ borderColor: '#E8E4DE' }}></div>
+        <hr className="border-t my-6" style={{ borderColor: '#E8E4DE' }} />
 
         {/* Two-Column: Hours & Contact/Address */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pb-8 md:pb-10">
           {/* Hours */}
           {googleMeta?.opening_hours?.weekday_text && (
             <section>
@@ -395,16 +421,17 @@ export default function MerchantDetailPage() {
             <address className="not-italic space-y-2 text-sm" style={{ color: '#555', lineHeight: '1.5' }}>
               {/* Address */}
               {(googleMeta?.formatted_address || merchant.address) && (
-                <div>
-                  <p className="mb-1">{googleMeta?.formatted_address || merchant.address}</p>
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${merchant.geo?.lat},${merchant.geo?.lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline text-xs"
-                  >
-                    Get Directions →
-                  </a>
+                <div className="flex gap-3">
+                  <span className="w-20 shrink-0 text-neutral-600">Address</span>
+                  <div>
+                    <p className="mb-1">{googleMeta?.formatted_address || merchant.address}</p>
+                    <button
+                      onClick={() => setMapsOpen(true)}
+                      className="text-blue-600 hover:underline text-xs"
+                    >
+                      Get Directions →
+                    </button>
+                  </div>
                 </div>
               )}
               
@@ -523,7 +550,7 @@ export default function MerchantDetailPage() {
             </svg>
           </button>
           <img
-            src={galleryImages[lightboxIndex].url}
+            src={galleryImages[lightboxIndex]}
             alt={`${merchant.name} - Photo ${lightboxIndex + 1}`}
             className="max-w-full max-h-full object-contain"
             onClick={(e) => e.stopPropagation()}
@@ -549,6 +576,45 @@ export default function MerchantDetailPage() {
             >
               Next →
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Map Choice Modal */}
+      {mapsOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={() => setMapsOpen(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-6 max-w-sm w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-serif mb-4">Choose Maps App</h3>
+            <div className="space-y-3">
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${merchant.geo?.lat},${merchant.geo?.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full px-4 py-3 text-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Google Maps
+              </a>
+              <a
+                href={`https://maps.apple.com/?daddr=${merchant.geo?.lat},${merchant.geo?.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full px-4 py-3 text-center bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition"
+              >
+                Apple Maps
+              </a>
+              <button
+                onClick={() => setMapsOpen(false)}
+                className="block w-full px-4 py-3 text-center border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
