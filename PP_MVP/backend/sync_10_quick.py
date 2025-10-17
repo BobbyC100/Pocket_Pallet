@@ -100,19 +100,17 @@ def main():
                 
                 if place_data:
                     google_meta = map_place_to_meta(place_data)
+                    meta_json = json.dumps(google_meta).replace("'", "''")
                     
-                    update_query = text("""
+                    update_query = text(f"""
                         UPDATE merchants
-                        SET google_meta = CAST(:meta AS jsonb),
+                        SET google_meta = '{meta_json}'::jsonb,
                             google_sync_status = 'synced',
                             last_synced_at = NOW()
-                        WHERE id = :id
+                        WHERE id = '{str(merchant_id)}'
                     """)
                     
-                    db.execute(update_query, {
-                        'id': str(merchant_id),
-                        'meta': json.dumps(google_meta)
-                    })
+                    db.execute(update_query)
                     db.commit()
                     
                     print(f"  ✅ SUCCESS")
