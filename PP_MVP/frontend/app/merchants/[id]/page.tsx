@@ -209,8 +209,8 @@ export default function MerchantDetailPage() {
         {/* Gradient Overlay - 40% opacity */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
         
-        {/* Overlay Content */}
-        <div className="absolute inset-x-0 bottom-0 pb-12 px-6 md:px-12 text-white max-w-7xl mx-auto">
+        {/* Overlay Content - Centered */}
+        <div className="absolute inset-x-0 bottom-0 pb-12 px-6 md:px-12 text-white max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-serif mb-3 animate-fadeIn" style={{ 
             fontFamily: 'Georgia, "Playfair Display", serif',
             textShadow: '0 2px 12px rgba(0,0,0,0.4)'
@@ -219,7 +219,7 @@ export default function MerchantDetailPage() {
           </h1>
           
           {(googleMeta?.formatted_address || merchant.address) && (
-            <p className="text-lg md:text-xl mb-3 opacity-90" style={{ 
+            <p className="text-lg md:text-xl mb-6 opacity-90" style={{ 
               fontFamily: 'Inter, "Work Sans", sans-serif',
               textShadow: '0 1px 8px rgba(0,0,0,0.3)'
             }}>
@@ -227,40 +227,14 @@ export default function MerchantDetailPage() {
             </p>
           )}
           
-          {/* Metadata Row */}
-          <div className="flex items-center gap-2 mb-6 text-sm opacity-90" style={{
-            color: '#E5E5E5',
-            textShadow: '0 1px 6px rgba(0,0,0,0.3)'
-          }}>
-            {rating && (
-              <>
-                <span>⭐ {rating.toFixed(1)}</span>
-                <span>•</span>
-              </>
-            )}
-            <span>{getMerchantType()}</span>
-            {priceLevel && (
-              <>
-                <span>•</span>
-                <span>{priceLevel}</span>
-              </>
-            )}
-            {location && (
-              <>
-                <span>•</span>
-                <span>{location}</span>
-              </>
-            )}
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 mb-4">
+          {/* Action Buttons - Centered */}
+          <div className="flex flex-wrap gap-3 justify-center">
             {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
               <a
                 href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
                 className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
               >
-                📞 Call
+                Call
               </a>
             )}
             <a
@@ -269,7 +243,7 @@ export default function MerchantDetailPage() {
               rel="noopener noreferrer"
               className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
             >
-              🗺️ Directions
+              Directions
             </a>
             {(googleMeta?.website || merchant.contact?.website) && (
               <a
@@ -278,17 +252,10 @@ export default function MerchantDetailPage() {
                 rel="noopener noreferrer"
                 className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
               >
-                🌐 Website
+                Website
               </a>
             )}
           </div>
-          
-          {/* Social Proof */}
-          {totalRatings && totalRatings > 0 && (
-            <p className="text-sm opacity-90">
-              {totalRatings.toLocaleString()} {totalRatings === 1 ? 'person loves' : 'people love'} this place
-            </p>
-          )}
         </div>
       </section>
 
@@ -403,10 +370,9 @@ export default function MerchantDetailPage() {
           {/* Hours */}
           {googleMeta?.opening_hours?.weekday_text && (
             <section>
-              <h2 className="text-xl font-serif mb-4 flex items-center gap-2" style={{ 
+              <h2 className="text-xl font-serif mb-4" style={{ 
                 fontFamily: 'Georgia, "Playfair Display", serif'
               }}>
-                <span>🕒</span>
                 Hours
               </h2>
               <div className="space-y-2 text-sm" style={{ color: '#555' }}>
