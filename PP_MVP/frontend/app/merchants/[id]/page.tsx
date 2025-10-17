@@ -100,21 +100,21 @@ export default function MerchantDetailPage() {
     return '/images/wine-shop-hero.jpg'; // Fallback
   };
 
-  // Helper: Build photo mosaic (skip first photo if used as hero)
-  const buildMosaic = (): Array<{ url: string; caption?: string }> => {
+  // Helper: Build minimal gallery (1-2 contextual images)
+  const buildGallery = (): Array<{ url: string; caption?: string }> => {
     if (!merchant) return [];
     
     const images: Array<{ url: string; caption?: string }> = [];
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-    // Add Google Places photos (skip first if used as hero, show 4-6 photos)
+    // Add 1-2 Google Places photos (skip first if used as hero)
     if (merchant.google_meta?.photos && apiKey) {
-      const startIndex = !merchant.hero_image ? 1 : 0; // Skip first if used as hero
+      const startIndex = !merchant.hero_image ? 1 : 0;
       const photoUrls = merchant.google_meta.photos
-        .slice(startIndex, startIndex + 6)
-        .map((photo, idx) => ({
+        .slice(startIndex, startIndex + 2)
+        .map((photo) => ({
           url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${apiKey}`,
-          caption: undefined // Google doesn't provide captions
+          caption: undefined
         }));
       images.push(...photoUrls);
     }
@@ -130,7 +130,7 @@ export default function MerchantDetailPage() {
     return images;
   };
 
-  const images = buildMosaic();
+  const galleryImages = buildGallery();
 
   // Helper: Format URL for display
   const displayUrl = (url: string) => {
@@ -150,9 +150,25 @@ export default function MerchantDetailPage() {
     return 'Wine Merchant';
   };
 
+  // Helper: Get price level display
+  const getPriceLevel = () => {
+    const level = merchant?.google_meta?.price_level;
+    if (!level) return null;
+    return '$'.repeat(level);
+  };
+
+  // Helper: Get location (city)
+  const getLocation = () => {
+    const address = merchant?.google_meta?.formatted_address || merchant?.address;
+    if (!address) return null;
+    // Extract city from address (simplified - usually second-to-last component)
+    const parts = address.split(',');
+    return parts.length >= 2 ? parts[parts.length - 2].trim() : null;
+  };
+
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#FAF8F4' }}>
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#FAF6EF' }}>
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#D6A55B] border-r-transparent"></div>
           <p className="mt-4" style={{ color: '#222' }}>Loading...</p>
@@ -163,7 +179,7 @@ export default function MerchantDetailPage() {
 
   if (error || !merchant) {
     return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#FAF8F4' }}>
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#FAF6EF' }}>
         <div className="text-center">
           <p className="text-red-600 mb-4">{error || 'Merchant not found'}</p>
           <Link href="/merchants" className="text-[#D6A55B] hover:underline">
@@ -175,34 +191,35 @@ export default function MerchantDetailPage() {
   }
 
   const googleMeta = merchant.google_meta;
-  const openNow = googleMeta?.opening_hours?.open_now;
   const rating = googleMeta?.rating;
   const totalRatings = googleMeta?.user_ratings_total;
+  const priceLevel = getPriceLevel();
+  const location = getLocation();
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#FAF8F4', color: '#222' }}>
+    <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#FAF6EF', color: '#222' }}>
       {/* Hero Section - Above the Fold */}
-      <section className="relative h-[65vh] w-full overflow-hidden">
+      <section className="relative w-full overflow-hidden" style={{ height: '70vh', minHeight: '70vh' }}>
         <img
           src={getHeroImage()}
           alt={merchant.name}
           className="absolute inset-0 w-full h-full object-cover"
         />
         
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent"></div>
+        {/* Gradient Overlay - 40% opacity */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
         
         {/* Overlay Content */}
         <div className="absolute inset-x-0 bottom-0 pb-12 px-6 md:px-12 text-white max-w-7xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-serif mb-3" style={{ 
+          <h1 className="text-4xl md:text-6xl font-serif mb-3 animate-fadeIn" style={{ 
             fontFamily: 'Georgia, "Playfair Display", serif',
-            textShadow: '0 2px 12px rgba(0,0,0,0.3)'
+            textShadow: '0 2px 12px rgba(0,0,0,0.4)'
           }}>
             {merchant.name}
           </h1>
           
           {(googleMeta?.formatted_address || merchant.address) && (
-            <p className="text-lg md:text-xl mb-6 opacity-90" style={{ 
+            <p className="text-lg md:text-xl mb-3 opacity-90" style={{ 
               fontFamily: 'Inter, "Work Sans", sans-serif',
               textShadow: '0 1px 8px rgba(0,0,0,0.3)'
             }}>
@@ -210,12 +227,38 @@ export default function MerchantDetailPage() {
             </p>
           )}
           
+          {/* Metadata Row */}
+          <div className="flex items-center gap-2 mb-6 text-sm opacity-90" style={{
+            color: '#E5E5E5',
+            textShadow: '0 1px 6px rgba(0,0,0,0.3)'
+          }}>
+            {rating && (
+              <>
+                <span>⭐ {rating.toFixed(1)}</span>
+                <span>•</span>
+              </>
+            )}
+            <span>{getMerchantType()}</span>
+            {priceLevel && (
+              <>
+                <span>•</span>
+                <span>{priceLevel}</span>
+              </>
+            )}
+            {location && (
+              <>
+                <span>•</span>
+                <span>{location}</span>
+              </>
+            )}
+          </div>
+          
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-3 mb-4">
             {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
               <a
                 href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
-                className="px-5 py-2.5 rounded-full text-sm font-medium border-2 border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
+                className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
               >
                 📞 Call
               </a>
@@ -224,7 +267,7 @@ export default function MerchantDetailPage() {
               href={`https://www.google.com/maps/dir/?api=1&destination=${merchant.geo?.lat},${merchant.geo?.lng}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-full text-sm font-medium border-2 border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
+              className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
             >
               🗺️ Directions
             </a>
@@ -233,7 +276,7 @@ export default function MerchantDetailPage() {
                 href={googleMeta?.website || merchant.contact?.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-5 py-2.5 rounded-full text-sm font-medium border-2 border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
+                className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
               >
                 🌐 Website
               </a>
@@ -256,52 +299,20 @@ export default function MerchantDetailPage() {
           {/* Left Column - About */}
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl md:text-3xl font-serif mb-4" style={{ 
+              <h2 className="text-2xl md:text-3xl font-serif mb-6" style={{ 
                 fontFamily: 'Georgia, "Playfair Display", serif',
                 color: '#222'
               }}>
                 {getMerchantType()}
               </h2>
               
-              {/* Status Badge */}
-              {googleMeta?.business_status === 'OPERATIONAL' && openNow !== undefined && (
-                <div className="mb-4">
-                  <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
-                    openNow 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    <span className={`w-2 h-2 rounded-full ${openNow ? 'bg-green-600' : 'bg-red-600'}`}></span>
-                    {openNow ? 'Open Now' : 'Closed'}
-                  </span>
-                </div>
-              )}
-              
-              {/* Rating */}
-              {rating && (
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <svg 
-                        key={i} 
-                        className={`w-5 h-5 ${i < Math.round(rating) ? 'text-yellow-400' : 'text-gray-300'}`}
-                        fill="currentColor" 
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <span className="text-sm" style={{ color: '#555' }}>
-                    {rating.toFixed(1)} ({totalRatings?.toLocaleString()} reviews)
-                  </span>
-                </div>
-              )}
-              
-              <p className="text-base leading-relaxed mb-4" style={{ 
-                color: '#555',
-                lineHeight: '1.7',
-                maxWidth: '65ch'
+              {/* Magazine-style Intro Paragraph */}
+              <p className="text-lg leading-relaxed mb-6" style={{ 
+                color: '#333',
+                fontSize: '19px',
+                lineHeight: '1.8',
+                maxWidth: '65ch',
+                fontFamily: 'Inter, "Work Sans", sans-serif'
               }}>
                 {googleMeta?.editorial_summary || merchant.about || 
                   `${merchant.name} is a curated destination for natural wine enthusiasts. Discover unique bottles from small producers and family vineyards, carefully selected for their character and authenticity.`}
@@ -311,7 +322,7 @@ export default function MerchantDetailPage() {
               {merchant.tags && merchant.tags.length > 0 && (
                 <div className="space-y-2">
                   {merchant.tags.slice(0, 3).map((tag, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm" style={{ color: '#555' }}>
+                    <div key={i} className="flex items-center gap-2 text-base" style={{ color: '#555' }}>
                       <span style={{ color: '#D6A55B' }}>•</span>
                       <span>{tag}</span>
                     </div>
@@ -323,10 +334,10 @@ export default function MerchantDetailPage() {
           
           {/* Right Column - Anchor Image */}
           <div>
-            {images.length > 0 && (
+            {galleryImages.length > 0 && (
               <div className="rounded-2xl overflow-hidden shadow-lg">
                 <img
-                  src={images[0].url}
+                  src={galleryImages[0].url}
                   alt={`${merchant.name} interior`}
                   className="w-full h-auto object-cover"
                   style={{ maxHeight: '500px' }}
@@ -336,17 +347,14 @@ export default function MerchantDetailPage() {
           </div>
         </div>
 
-        {/* Photo Mosaic */}
-        {images.length > 1 && (
+        {/* Subtle Section Divider */}
+        <div className="border-t mb-16" style={{ borderColor: '#E8E4DE' }}></div>
+
+        {/* Minimal Gallery (1-2 images + Street View) */}
+        {galleryImages.length > 1 && (
           <section className="mb-16">
-            <h2 className="text-2xl md:text-3xl font-serif mb-6" style={{ 
-              fontFamily: 'Georgia, "Playfair Display", serif'
-            }}>
-              Gallery
-            </h2>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-              {images.slice(1).map((img, i) => {
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {galleryImages.slice(1).map((img, i) => {
                 const isStreetView = img.caption === 'Street View';
                 return (
                   <figure
@@ -369,14 +377,14 @@ export default function MerchantDetailPage() {
                     
                     {/* Street View badge */}
                     {isStreetView && (
-                      <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                      <span className="absolute bottom-3 right-3 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md">
                         Street View
                       </span>
                     )}
                     
-                    {/* Caption */}
+                    {/* Optional Caption */}
                     {img.caption && !isStreetView && (
-                      <figcaption className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-white text-sm italic">
+                      <figcaption className="mt-2 text-sm italic" style={{ color: '#777' }}>
                         {img.caption}
                       </figcaption>
                     )}
@@ -384,23 +392,13 @@ export default function MerchantDetailPage() {
                 );
               })}
             </div>
-            
-            {/* View on Google Link */}
-            <a
-              href={googleMeta?.url || merchant.source_url || '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mt-6"
-            >
-              <svg width="16" height="16" fill="currentColor" className="opacity-70" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
-              View full profile on Google
-            </a>
           </section>
         )}
 
-        {/* Two-Column: Contact & Hours */}
+        {/* Subtle Section Divider */}
+        <div className="border-t mb-16" style={{ borderColor: '#E8E4DE' }}></div>
+
+        {/* Two-Column: Hours & Contact/Address */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
           {/* Hours */}
           {googleMeta?.opening_hours?.weekday_text && (
@@ -418,8 +416,11 @@ export default function MerchantDetailPage() {
                   return (
                     <div 
                       key={i} 
-                      className={`flex justify-between py-1 ${isToday ? 'font-semibold' : ''}`}
-                      style={{ color: isToday ? '#D6A55B' : '#555' }}
+                      className={`flex justify-between py-1.5 px-3 rounded ${isToday ? 'font-semibold' : ''}`}
+                      style={{ 
+                        color: isToday ? '#D6A55B' : '#555',
+                        backgroundColor: isToday ? '#FBF6EE' : 'transparent'
+                      }}
                     >
                       <span>{day}</span>
                       <span>{hours}</span>
@@ -442,7 +443,7 @@ export default function MerchantDetailPage() {
               {/* Address */}
               {(googleMeta?.formatted_address || merchant.address) && (
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 mt-0.5" style={{ color: '#D6A55B' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#D6A55B' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -463,7 +464,7 @@ export default function MerchantDetailPage() {
               {/* Phone */}
               {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 mt-0.5" style={{ color: '#D6A55B' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#D6A55B' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                   <a 
@@ -478,7 +479,7 @@ export default function MerchantDetailPage() {
               {/* Website */}
               {(googleMeta?.website || merchant.contact?.website) && (
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 mt-0.5" style={{ color: '#D6A55B' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#D6A55B' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                   </svg>
                   <a
@@ -495,7 +496,7 @@ export default function MerchantDetailPage() {
               {/* Instagram */}
               {merchant.contact?.instagram && (
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 mt-0.5" style={{ color: '#D6A55B' }} fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#D6A55B' }} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                   </svg>
                   <a
@@ -509,10 +510,26 @@ export default function MerchantDetailPage() {
                 </div>
               )}
             </address>
+            
+            {/* View on Google Link */}
+            <a
+              href={googleMeta?.url || merchant.source_url || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mt-6"
+            >
+              <svg width="16" height="16" fill="currentColor" className="opacity-70" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              View full profile on Google
+            </a>
           </section>
         </div>
 
-        {/* Available Wines Section */}
+        {/* Subtle Section Divider */}
+        <div className="border-t mb-16" style={{ borderColor: '#E8E4DE' }}></div>
+
+        {/* Available Wines Section - Bottom of Page */}
         <section className="mb-16">
           <h2 className="text-2xl md:text-3xl font-serif mb-4" style={{ 
             fontFamily: 'Georgia, "Playfair Display", serif'
@@ -529,7 +546,8 @@ export default function MerchantDetailPage() {
           </div>
           
           <div className="mt-6 p-12 text-center border-2 border-dashed rounded-xl" style={{
-            borderColor: '#E5E5E5',
+            borderColor: '#E8E4DE',
+            backgroundColor: '#FEFDFB',
             color: '#999'
           }}>
             <p className="text-lg">No wines parsed yet. Check back soon!</p>
@@ -538,7 +556,7 @@ export default function MerchantDetailPage() {
         </section>
 
         {/* Back to Merchants */}
-        <div className="text-center pt-8 border-t" style={{ borderColor: '#E5E5E5' }}>
+        <div className="text-center pt-8 border-t" style={{ borderColor: '#E8E4DE' }}>
           <Link 
             href="/merchants"
             className="inline-flex items-center gap-2 text-sm hover:underline"
@@ -567,7 +585,7 @@ export default function MerchantDetailPage() {
             </svg>
           </button>
           <img
-            src={images[lightboxIndex].url}
+            src={galleryImages[lightboxIndex].url}
             alt={`${merchant.name} - Photo ${lightboxIndex + 1}`}
             className="max-w-full max-h-full object-contain"
             onClick={(e) => e.stopPropagation()}
@@ -587,9 +605,9 @@ export default function MerchantDetailPage() {
               className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full disabled:opacity-50"
               onClick={(e) => {
                 e.stopPropagation();
-                setLightboxIndex(Math.min(images.length - 1, lightboxIndex + 1));
+                setLightboxIndex(Math.min(galleryImages.length - 1, lightboxIndex + 1));
               }}
-              disabled={lightboxIndex === images.length - 1}
+              disabled={lightboxIndex === galleryImages.length - 1}
             >
               Next →
             </button>
@@ -598,7 +616,7 @@ export default function MerchantDetailPage() {
       )}
 
       <footer className="border-t py-6 text-center text-sm" style={{ 
-        borderColor: '#E5E5E5',
+        borderColor: '#E8E4DE',
         color: '#999',
         backgroundColor: '#FEFEFE'
       }}>
