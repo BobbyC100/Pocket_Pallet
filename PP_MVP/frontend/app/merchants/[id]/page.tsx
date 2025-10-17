@@ -317,12 +317,12 @@ export default function MerchantDetailPage() {
             </div>
           </div>
           
-          {/* Right Column - Anchor Image */}
+          {/* Right Column - Anchor Image (skip Street View, use first Google photo) */}
           <div>
-            {galleryImages.length > 0 && (
+            {galleryImages.length > 1 && (
               <div className="rounded-2xl overflow-hidden shadow-lg">
                 <img
-                  src={galleryImages[0]}
+                  src={galleryImages[1]}
                   alt={`${merchant.name} interior`}
                   className="w-full h-auto object-cover"
                   style={{ maxHeight: '500px' }}
@@ -491,34 +491,38 @@ export default function MerchantDetailPage() {
           </section>
                     </div>
 
-        {/* Subtle Section Divider */}
-        <div className="border-t mb-16" style={{ borderColor: '#E8E4DE' }}></div>
+        {/* Available Wines Section - Only show for Wine Shops */}
+        {typeLabel === 'Wine Shop' && (
+          <>
+            {/* Subtle Section Divider */}
+            <div className="border-t mb-16" style={{ borderColor: '#E8E4DE' }}></div>
 
-        {/* Available Wines Section - Bottom of Page */}
-        <section className="mb-16">
-          <h2 className="text-2xl md:text-3xl font-serif mb-4" style={{ 
-            fontFamily: 'Georgia, "Playfair Display", serif'
-          }}>
-            Available Wines
-          </h2>
-          
-          <div className="mt-4 text-sm rounded-lg px-4 py-3 border" style={{
-            backgroundColor: '#EFF6FF',
-            borderColor: '#BFDBFE',
-            color: '#1E40AF'
-          }}>
-            Menu rotates — last verified {Math.floor(Math.random() * 30)} days ago.
-                  </div>
-          
-          <div className="mt-6 p-12 text-center border-2 border-dashed rounded-xl" style={{
-            borderColor: '#E8E4DE',
-            backgroundColor: '#FEFDFB',
-            color: '#999'
-          }}>
-            <p className="text-lg">No wines parsed yet. Check back soon!</p>
-            <p className="text-sm mt-2">We&apos;re working on connecting wine inventory to merchant profiles.</p>
-          </div>
-      </section>
+            <section className="mb-16">
+              <h2 className="text-2xl md:text-3xl font-serif mb-4" style={{ 
+                fontFamily: 'Georgia, "Playfair Display", serif'
+              }}>
+                Available Wines
+              </h2>
+              
+              <div className="mt-4 text-sm rounded-lg px-4 py-3 border" style={{
+                backgroundColor: '#EFF6FF',
+                borderColor: '#BFDBFE',
+                color: '#1E40AF'
+              }}>
+                Menu rotates — last verified {Math.floor(Math.random() * 30)} days ago.
+              </div>
+              
+              <div className="mt-6 p-12 text-center border-2 border-dashed rounded-xl" style={{
+                borderColor: '#E8E4DE',
+                backgroundColor: '#FEFDFB',
+                color: '#999'
+              }}>
+                <p className="text-lg">No wines parsed yet. Check back soon!</p>
+                <p className="text-sm mt-2">We&apos;re working on connecting wine inventory to merchant profiles.</p>
+              </div>
+            </section>
+          </>
+        )}
 
         {/* Back to Merchants */}
         <div className="text-center pt-8 border-t" style={{ borderColor: '#E8E4DE' }}>
