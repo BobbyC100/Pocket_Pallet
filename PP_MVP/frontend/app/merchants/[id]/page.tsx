@@ -141,6 +141,23 @@ export default function MerchantDetailPage() {
     }
   };
 
+  // Helper: Check if URL is Instagram
+  const isInstagramUrl = (url?: string) => {
+    if (!url) return false;
+    return url.includes('instagram.com');
+  };
+
+  // Helper: Extract Instagram handle from URL
+  const getInstagramHandle = (url: string) => {
+    try {
+      const u = new URL(url);
+      const handle = u.pathname.split('/').filter(Boolean)[0];
+      return `@${handle}`;
+    } catch {
+      return url;
+    }
+  };
+
   // Helper: Humanize merchant type from Google types
   const humanizeType = (types?: string[], fallback?: string | null) => {
     if (fallback) return fallback;
@@ -259,17 +276,32 @@ export default function MerchantDetailPage() {
             >
               Directions
             </a>
+            {/* Website or Instagram Button */}
             {(googleMeta?.website || merchant.contact?.website) && (
-              <a
-                href={googleMeta?.website || merchant.contact?.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
-              >
-                Website
-              </a>
+              <>
+                {isInstagramUrl(googleMeta?.website || merchant.contact?.website) ? (
+                  <a
+                    href={googleMeta?.website || merchant.contact?.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
+                  >
+                    Instagram
+                  </a>
+                ) : (
+                  <a
+                    href={googleMeta?.website || merchant.contact?.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
+                  >
+                    Website
+                  </a>
+                )}
+              </>
             )}
-            {merchant.contact?.instagram && (
+            {/* Show Instagram button if contact.instagram exists */}
+            {merchant.contact?.instagram && !isInstagramUrl(googleMeta?.website || merchant.contact?.website || '') && (
               <a
                 href={`https://instagram.com/${merchant.contact.instagram.replace('@', '')}`}
                 target="_blank"
@@ -416,75 +448,82 @@ export default function MerchantDetailPage() {
               Contact & Address
             </h2>
             
-            <address className="not-italic space-y-2 text-sm" style={{ color: '#555', lineHeight: '1.5' }}>
+            <div className="space-y-4 text-sm" style={{ color: '#555', lineHeight: '1.5' }}>
               {/* Address */}
               {(googleMeta?.formatted_address || merchant.address) && (
-                <div className="flex gap-3">
-                  <span className="w-20 shrink-0 text-neutral-600">Address</span>
-                  <div>
-                    <p className="mb-1">{googleMeta?.formatted_address || merchant.address}</p>
-                    <button
-                      onClick={() => setMapsOpen(true)}
-                      className="text-blue-600 hover:underline text-xs"
-                    >
-                      Get Directions →
-                    </button>
-                  </div>
+                <div>
+                  <p className="mb-1 text-left">{googleMeta?.formatted_address || merchant.address}</p>
+                  <button
+                    onClick={() => setMapsOpen(true)}
+                    className="text-blue-600 hover:underline text-xs text-left"
+                  >
+                    Get Directions →
+                  </button>
                         </div>
                       )}
 
-              {/* Phone */}
-              {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
-                <div>
-                  <a 
-                    href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    {googleMeta?.formatted_phone_number || merchant.contact?.phone}
-                  </a>
+              {/* Contact Section */}
+              <div>
+                <h3 className="text-xs uppercase tracking-wide text-neutral-500 mb-2">Contact</h3>
+                <div className="space-y-1.5">
+                  {/* Phone */}
+                  {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
+                    <div>
+                      <a 
+                        href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
+                        className="text-blue-600 hover:underline block text-left"
+                      >
+                        {googleMeta?.formatted_phone_number || merchant.contact?.phone}
+                      </a>
                         </div>
                       )}
 
-              {/* Website */}
-              {(googleMeta?.website || merchant.contact?.website) && (
-                <div>
-                  <a
-                    href={googleMeta?.website || merchant.contact?.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline break-all"
-                  >
-                    {displayUrl(googleMeta?.website || merchant.contact?.website || '')}
-                  </a>
+                  {/* Website - only if not Instagram */}
+                  {(googleMeta?.website || merchant.contact?.website) && !isInstagramUrl(googleMeta?.website || merchant.contact?.website) && (
+                    <div>
+                      <a
+                        href={googleMeta?.website || merchant.contact?.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline break-all block text-left"
+                      >
+                        {displayUrl(googleMeta?.website || merchant.contact?.website || '')}
+                      </a>
                         </div>
                       )}
 
-              {/* Instagram */}
-              {merchant.contact?.instagram && (
-                <div>
-                  <a
-                    href={`https://instagram.com/${merchant.contact.instagram.replace('@', '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    {merchant.contact.instagram}
-                  </a>
+                  {/* Instagram - from contact field OR from website if it's Instagram */}
+                  {(merchant.contact?.instagram || isInstagramUrl(googleMeta?.website || merchant.contact?.website)) && (
+                    <div>
+                      <a
+                        href={
+                          merchant.contact?.instagram 
+                            ? `https://instagram.com/${merchant.contact.instagram.replace('@', '')}`
+                            : (googleMeta?.website || merchant.contact?.website || '')
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline block text-left"
+                      >
+                        {merchant.contact?.instagram || getInstagramHandle(googleMeta?.website || merchant.contact?.website || '')}
+                      </a>
                         </div>
                       )}
-            </address>
+                </div>
+              </div>
+            </div>
             
             {/* View on Google Link */}
             <a
               href={googleMeta?.url || merchant.source_url || '#'}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mt-6"
+              className="flex items-center gap-2 text-sm text-blue-600 hover:underline mt-6 text-left"
             >
               <svg width="16" height="16" fill="currentColor" className="opacity-70" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
               </svg>
-              View full profile on Google
+              View Google Profile
             </a>
           </section>
                     </div>
