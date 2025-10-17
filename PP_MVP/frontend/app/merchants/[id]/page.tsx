@@ -199,6 +199,110 @@ export default function MerchantDetailPage() {
     return '$'.repeat(level);
   };
 
+  // Helper: Extract "Vibe" from editorial summary + types + hours
+  const getVibe = (): string | null => {
+    if (!merchant) return null;
+    
+    const summary = (googleMeta?.editorial_summary || merchant.about || '').toLowerCase();
+    const types = new Set(googleMeta?.types || []);
+    
+    // Date night: romantic keywords
+    if (summary.match(/cozy|romantic|date|wine list|intimate|candlelit/i)) {
+      return 'date night';
+    }
+    
+    // Quick lunch: counter service, quick, takeaway
+    if (summary.match(/counter service|quick|grab.*go|takeaway|lunch|fast/i) || types.has('meal_takeaway')) {
+      return 'quick lunch';
+    }
+    
+    // Late night: check closing time
+    const hours = googleMeta?.opening_hours?.weekday_text;
+    if (hours) {
+      const latePattern = /(?:11:00 PM|12:00 AM|1:00 AM|2:00 AM)/i;
+      if (hours.some(h => latePattern.test(h))) {
+        return 'late night';
+      }
+    }
+    if (summary.match(/open (?:till|until) (?:11pm|12am|late)|after hours|late night/i)) {
+      return 'late night';
+    }
+    
+    // Local favorite: mentions of locals, regulars, neighborhood
+    if (summary.match(/locals?|regulars?|neighborhood|staple|hidden gem|local favorite/i)) {
+      return 'local favorite';
+    }
+    
+    // Casual: fallback
+    if (summary.match(/casual|laid-back|no frills|relaxed|unpretentious/i)) {
+      return 'casual';
+    }
+    
+    return null;
+  };
+
+  // Helper: Extract "Known For" from editorial summary
+  const getKnownFor = (): string[] => {
+    if (!merchant) return [];
+    
+    const summary = googleMeta?.editorial_summary || merchant.about || '';
+    const knownFor: string[] = [];
+    
+    // Extract noun phrases related to food/drink
+    const foodPatterns = [
+      /(?:fresh|grilled|crispy|fried|smoked|marinated|house-made|homemade|authentic)\s+(\w+(?:\s+\w+)?)/gi,
+      /(?:their|its|famous|known for|signature)\s+([a-z]+\s+(?:tacos?|fish|shrimp|wine|beer|cocktails?|dishes?|pizza|burgers?|sandwiches?))/gi,
+      /(seafood|fish|tacos?|burritos?|quesadillas?|margaritas?|cerveza|beer|wine|cocktails?)\s+(?:selection|menu|list)/gi
+    ];
+    
+    foodPatterns.forEach(pattern => {
+      const matches = Array.from(summary.matchAll(pattern));
+      for (const match of matches) {
+        const phrase = (match[1] || match[0]).trim().toLowerCase();
+        if (phrase && phrase.length > 3 && phrase.length < 30) {
+          knownFor.push(phrase);
+        }
+      }
+    });
+    
+    // De-dupe and limit to top 3
+    return Array.from(new Set(knownFor)).slice(0, 3);
+  };
+
+  // Helper: Extract "Good to Know" from types + hours + summary
+  const getGoodToKnow = (): string[] => {
+    if (!merchant) return [];
+    
+    const tips: string[] = [];
+    const summary = (googleMeta?.editorial_summary || merchant.about || '').toLowerCase();
+    
+    // Late night hours
+    const hours = googleMeta?.opening_hours?.weekday_text;
+    if (hours) {
+      const latePattern = /(?:11:00 PM|12:00 AM|1:00 AM)/i;
+      if (hours.some(h => latePattern.test(h))) {
+        tips.push('open late');
+      }
+    }
+    
+    // Outdoor seating
+    if (summary.match(/outdoor|patio|terrace|sidewalk|picnic/i)) {
+      tips.push('outdoor seating');
+    }
+    
+    // Cash only
+    if (summary.match(/cash\s*only|no cards|bring cash/i)) {
+      tips.push('cash only');
+    }
+    
+    // Popular/busy
+    if (summary.match(/line|busy|crowded|popular|packed/i)) {
+      tips.push('can get busy');
+    }
+    
+    return tips.slice(0, 4);
+  };
+
   // Helper: Get location (city)
   const getLocation = () => {
     const address = merchant?.google_meta?.formatted_address || merchant?.address;
@@ -347,19 +451,55 @@ export default function MerchantDetailPage() {
               )}
 
               {/* Meta Tags - Compact, Editorial Style */}
-              <div className="flex flex-wrap gap-3 text-sm" style={{ color: '#666' }}>
-                {/* Price Level */}
-                {googleMeta?.price_level && (
-                  <span className="flex items-center gap-1">
-                    {'$'.repeat(googleMeta.price_level)}
-                  </span>
+              <div className="space-y-3">
+                {/* Row 1: Price, Open/Closed, Vibe */}
+                <div className="flex flex-wrap gap-3 text-sm" style={{ color: '#666' }}>
+                  {/* Price Level */}
+                  {googleMeta?.price_level && (
+                    <span className="flex items-center gap-1">
+                      {'$'.repeat(googleMeta.price_level)}
+                    </span>
+                  )}
+                  
+                  {/* Hours Status - Open/Closed */}
+                  {googleMeta?.opening_hours?.open_now !== undefined && (
+                    <span className={googleMeta.opening_hours.open_now ? 'text-green-700' : 'text-red-700'}>
+                      {googleMeta.opening_hours.open_now ? 'Open now' : 'Closed'}
+                    </span>
+                  )}
+
+                  {/* Vibe */}
+                  {getVibe() && (
+                    <span className="flex items-center gap-1 italic">
+                      {getVibe()}
+                    </span>
+                  )}
+                </div>
+
+                {/* Row 2: Known For */}
+                {getKnownFor().length > 0 && (
+                  <div className="text-sm" style={{ color: '#666' }}>
+                    <span className="font-medium">Known for: </span>
+                    {getKnownFor().join(' · ')}
+                  </div>
                 )}
-                
-                {/* Hours Status - Open/Closed */}
-                {googleMeta?.opening_hours?.open_now !== undefined && (
-                  <span className={googleMeta.opening_hours.open_now ? 'text-green-700' : 'text-red-700'}>
-                    {googleMeta.opening_hours.open_now ? 'Open now' : 'Closed'}
-                  </span>
+
+                {/* Row 3: Good to Know */}
+                {getGoodToKnow().length > 0 && (
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    {getGoodToKnow().map((tip, i) => (
+                      <span 
+                        key={i}
+                        className="px-2 py-1 rounded-full"
+                        style={{ 
+                          backgroundColor: '#E8E4DE',
+                          color: '#555'
+                        }}
+                      >
+                        {tip}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
