@@ -17,7 +17,7 @@ def fetch_place_details(place_id: str) -> Dict[str, Any] | None:
     url = "https://maps.googleapis.com/maps/api/place/details/json"
     params = {
         'place_id': place_id,
-        'key': settings.GOOGLE_MAPS_API_KEY,
+        'key': settings.GOOGLE_PLACES_API_KEY,
         'fields': 'place_id,name,formatted_address,formatted_phone_number,website,rating,user_ratings_total,price_level,opening_hours,photos,types,editorial_summary,url,business_status'
     }
     response = requests.get(url, params=params)
