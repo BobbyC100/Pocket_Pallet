@@ -102,14 +102,18 @@ async def sync_test_10_merchants(db: Session = Depends(get_db)):
                     google_meta = map_place_to_meta(place_data)
                     meta_json = json.dumps(google_meta)
                     
-                    # Update database - use json.dumps for safe insertion
+                    # Update database using bindparam with CAST
+                    from sqlalchemy import bindparam
                     update_query = text("""
                         UPDATE merchants
-                        SET google_meta = :meta_json::jsonb,
+                        SET google_meta = CAST(:meta_json AS jsonb),
                             google_sync_status = 'synced',
                             last_synced_at = NOW()
                         WHERE id = :merchant_id
-                    """)
+                    """).bindparams(
+                        bindparam('meta_json', type_=None),
+                        bindparam('merchant_id', type_=None)
+                    )
                     
                     db.execute(update_query, {
                         'meta_json': meta_json,
