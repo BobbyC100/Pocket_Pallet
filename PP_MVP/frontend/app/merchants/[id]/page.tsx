@@ -439,75 +439,109 @@ export default function MerchantDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
           {/* Left Column - Meta → Description → Tips */}
           <div className="relative">
-            {/* Meta Section - Always Visible */}
-            <div className="space-y-4 mb-8 sticky top-0 py-4 z-10">
-              {/* Type Header */}
-              {typeLabel && (
-                <h2 className="text-3xl md:text-4xl font-serif tracking-tight" style={{ 
-                  fontFamily: 'Georgia, "Playfair Display", serif',
-                  color: '#222'
-                }}>
-                  {typeLabel}
-                </h2>
-              )}
-
-              {/* Meta Tags - Vertical Layout */}
-              <div className="space-y-2 text-sm" style={{ color: '#666' }}>
-                {/* Open/Closed Pill */}
-                {googleMeta?.opening_hours?.open_now !== undefined && (
-                  <div>
-                    <span 
-                      className="inline-block px-3 py-1 rounded-full text-xs font-medium"
-                      style={{
-                        backgroundColor: googleMeta.opening_hours.open_now ? '#D4EDDA' : '#F8D7DA',
-                        color: googleMeta.opening_hours.open_now ? '#155724' : '#721C24'
-                      }}
-                    >
-                      {googleMeta.opening_hours.open_now ? 'Open now' : 'Closed'}
-                    </span>
-                  </div>
+            {/* At a Glance Section */}
+            <div className="mb-8 sticky top-0 py-4 z-10">
+              {/* Top Row: Type pill · Cost · Open/Closed status */}
+              <div className="flex flex-wrap items-center gap-3 text-sm mb-6" style={{ color: '#666' }}>
+                {/* Type Pill */}
+                {typeLabel && (
+                  <span 
+                    className="px-3 py-1 rounded-full text-xs border"
+                    style={{ 
+                      borderColor: '#D6D3CD',
+                      color: '#555'
+                    }}
+                  >
+                    {typeLabel}
+                  </span>
                 )}
 
-                {/* Price Level */}
+                {/* Cost */}
                 {googleMeta?.price_level && (
-                  <div>
-                    {'$'.repeat(googleMeta.price_level)}
-                  </div>
+                  <span>
+                    <span className="font-medium" style={{ color: '#444' }}>Cost:</span> {'$'.repeat(googleMeta.price_level)}
+                  </span>
                 )}
 
+                {/* Open/Closed Status Pill */}
+                {googleMeta?.opening_hours?.open_now !== undefined && (
+                  <span 
+                    className="px-3 py-1 rounded-full text-xs font-medium"
+                    style={{
+                      backgroundColor: googleMeta.opening_hours.open_now ? '#D4EDDA' : '#F8D7DA',
+                      color: googleMeta.opening_hours.open_now ? '#155724' : '#721C24'
+                    }}
+                  >
+                    {googleMeta.opening_hours.open_now ? 'Open now' : 'Closed'}
+                  </span>
+                )}
+              </div>
+
+              {/* Labeled Definition List */}
+              <dl className="space-y-3 text-sm">
                 {/* Vibe */}
                 {getVibe() && (
-                  <div className="italic">
-                    {getVibe()}
+                  <div className="flex gap-4">
+                    <dt className="w-24 shrink-0 font-medium" style={{ color: '#888' }}>
+                      Vibe
+                    </dt>
+                    <dd className="italic" style={{ color: '#555' }}>
+                      {getVibe()}
+                    </dd>
                   </div>
                 )}
 
                 {/* Known For */}
                 {getKnownFor().length > 0 && (
-                  <div className="pt-2">
-                    <span className="font-medium">Known for: </span>
-                    {getKnownFor().join(', ')}
+                  <div className="flex gap-4">
+                    <dt className="w-24 shrink-0 font-medium" style={{ color: '#888' }}>
+                      Known for
+                    </dt>
+                    <dd className="flex flex-wrap gap-2">
+                      {getKnownFor().slice(0, 4).map((item, i) => (
+                        <span 
+                          key={i}
+                          className="px-2 py-1 rounded-full text-xs border"
+                          style={{ 
+                            borderColor: '#D6D3CD',
+                            color: '#555'
+                          }}
+                        >
+                          {item}
+                        </span>
+                      ))}
+                      {getKnownFor().length > 4 && (
+                        <span className="text-xs" style={{ color: '#888' }}>
+                          +{getKnownFor().length - 4} more
+                        </span>
+                      )}
+                    </dd>
                   </div>
                 )}
 
-                {/* Good to Know Pills */}
+                {/* Good to Know */}
                 {getGoodToKnow().length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {getGoodToKnow().map((tip, i) => (
-                      <span 
-                        key={i}
-                        className="px-2 py-1 rounded-full text-xs"
-                        style={{ 
-                          backgroundColor: '#E8E4DE',
-                          color: '#555'
-                        }}
-                      >
-                        {tip}
-                      </span>
-                    ))}
+                  <div className="flex gap-4">
+                    <dt className="w-24 shrink-0 font-medium" style={{ color: '#888' }}>
+                      Good to know
+                    </dt>
+                    <dd className="flex flex-wrap gap-2">
+                      {getGoodToKnow().map((tip, i) => (
+                        <span 
+                          key={i}
+                          className="px-2 py-1 rounded-full text-xs"
+                          style={{ 
+                            backgroundColor: '#E8E4DE',
+                            color: '#555'
+                          }}
+                        >
+                          {tip}
+                        </span>
+                      ))}
+                    </dd>
                   </div>
                 )}
-              </div>
+              </dl>
             </div>
 
             {/* Description Section - Line Clamped */}
