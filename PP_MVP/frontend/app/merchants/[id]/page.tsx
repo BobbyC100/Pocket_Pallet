@@ -100,18 +100,18 @@ export default function MerchantDetailPage() {
     return '/images/wine-shop-hero.jpg'; // Fallback
   };
 
-  // Helper: Build minimal gallery (1-2 contextual images)
+  // Helper: Build photo mosaic (6-8 photos + Street View)
   const buildGallery = (): Array<{ url: string; caption?: string }> => {
     if (!merchant) return [];
     
     const images: Array<{ url: string; caption?: string }> = [];
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-    // Add 1-2 Google Places photos (skip first if used as hero)
+    // Add 6-8 Google Places photos (skip first if used as hero)
     if (merchant.google_meta?.photos && apiKey) {
       const startIndex = !merchant.hero_image ? 1 : 0;
       const photoUrls = merchant.google_meta.photos
-        .slice(startIndex, startIndex + 2)
+        .slice(startIndex, startIndex + 8)
         .map((photo) => ({
           url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${apiKey}`,
           caption: undefined
@@ -317,17 +317,22 @@ export default function MerchantDetailPage() {
         {/* Subtle Section Divider */}
         <div className="border-t mb-16" style={{ borderColor: '#E8E4DE' }}></div>
 
-        {/* Minimal Gallery (1-2 images + Street View) */}
+        {/* Photo Mosaic - Google Places Photos */}
         {galleryImages.length > 1 && (
           <section className="mb-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <h2 className="text-2xl md:text-3xl font-serif mb-6" style={{ 
+              fontFamily: 'Georgia, "Playfair Display", serif'
+            }}>
+              Gallery
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
               {galleryImages.slice(1).map((img, i) => {
                 const isStreetView = img.caption === 'Street View';
                 return (
                   <figure
                     key={i}
                     className="relative overflow-hidden rounded-xl cursor-pointer hover:opacity-90 transition group"
-                    style={{ aspectRatio: isStreetView ? '1/1' : 'auto' }}
+                    style={{ aspectRatio: '1/1' }}
                     onClick={() => setLightboxIndex(i + 1)}
                   >
                     <img
@@ -347,13 +352,6 @@ export default function MerchantDetailPage() {
                       <span className="absolute bottom-3 right-3 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md">
                         Street View
                       </span>
-                    )}
-                    
-                    {/* Optional Caption */}
-                    {img.caption && !isStreetView && (
-                      <figcaption className="mt-2 text-sm italic" style={{ color: '#777' }}>
-                        {img.caption}
-                      </figcaption>
                     )}
                   </figure>
                 );
