@@ -117,11 +117,9 @@ export default function MerchantDetailPage() {
       );
     }
 
-    // Then Google Places photos (skip first if used as hero, show up to 6)
+    // Then Google Places photos (all available photos)
     if (merchant.google_meta?.photos) {
-      const startIndex = !merchant.hero_image ? 1 : 0;
       const photoUrls = merchant.google_meta.photos
-        .slice(startIndex, startIndex + 6)
         .map((photo) => 
           `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${apiKey}`
         );
@@ -318,7 +316,7 @@ export default function MerchantDetailPage() {
           </div>
           
           {/* Right Column - Anchor Image (skip Street View, use first Google photo) */}
-          <div>
+                    <div>
             {galleryImages.length > 1 && (
               <div className="rounded-2xl overflow-hidden shadow-lg">
                 <img
@@ -338,7 +336,7 @@ export default function MerchantDetailPage() {
         {/* Photo Mosaic - Google Places Photos */}
         {galleryImages.length > 0 && (
           <section className="py-6 md:py-8">
-            <h2 className="text-2xl md:text-3xl font-serif mb-6" style={{ 
+            <h2 className="text-2xl md:text-3xl font-serif mb-6 text-center" style={{ 
               fontFamily: 'Georgia, "Playfair Display", serif'
             }}>
               Gallery
@@ -384,7 +382,7 @@ export default function MerchantDetailPage() {
           {/* Hours */}
           {googleMeta?.opening_hours?.weekday_text && (
             <section>
-              <h2 className="text-lg font-serif mb-3" style={{ 
+              <h2 className="text-lg font-serif mb-3 text-center" style={{ 
                 fontFamily: 'Georgia, "Playfair Display", serif'
               }}>
                 Hours
@@ -412,7 +410,7 @@ export default function MerchantDetailPage() {
           
           {/* Contact & Address */}
           <section>
-            <h2 className="text-lg font-serif mb-3" style={{ 
+            <h2 className="text-lg font-serif mb-3 text-center" style={{ 
               fontFamily: 'Georgia, "Playfair Display", serif'
             }}>
               Contact & Address
@@ -432,9 +430,9 @@ export default function MerchantDetailPage() {
                       Get Directions →
                     </button>
                   </div>
-                </div>
-              )}
-              
+                        </div>
+                      )}
+
               {/* Phone */}
               {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
                 <div>
@@ -444,9 +442,9 @@ export default function MerchantDetailPage() {
                   >
                     {googleMeta?.formatted_phone_number || merchant.contact?.phone}
                   </a>
-                </div>
-              )}
-              
+                        </div>
+                      )}
+
               {/* Website */}
               {(googleMeta?.website || merchant.contact?.website) && (
                 <div>
@@ -458,9 +456,9 @@ export default function MerchantDetailPage() {
                   >
                     {displayUrl(googleMeta?.website || merchant.contact?.website || '')}
                   </a>
-                </div>
-              )}
-              
+                        </div>
+                      )}
+
               {/* Instagram */}
               {merchant.contact?.instagram && (
                 <div>
@@ -472,8 +470,8 @@ export default function MerchantDetailPage() {
                   >
                     {merchant.contact.instagram}
                   </a>
-                </div>
-              )}
+                        </div>
+                      )}
             </address>
             
             {/* View on Google Link */}
@@ -536,8 +534,8 @@ export default function MerchantDetailPage() {
             </svg>
             Back to All Merchants
           </Link>
-        </div>
-      </div>
+                    </div>
+                  </div>
 
       {/* Lightbox */}
       {lightboxIndex !== null && (
