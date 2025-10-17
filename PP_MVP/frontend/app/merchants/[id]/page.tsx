@@ -440,7 +440,7 @@ export default function MerchantDetailPage() {
           {/* Left Column - Meta → Description → Tips */}
           <div className="relative">
             {/* Meta Section - Always Visible */}
-            <div className="space-y-4 mb-8 sticky top-0 py-4 z-10" style={{ backgroundColor: '#FEFDFB' }}>
+            <div className="space-y-4 mb-8 sticky top-0 py-4 z-10">
               {/* Type Header */}
               {typeLabel && (
                 <h2 className="text-3xl md:text-4xl font-serif tracking-tight" style={{ 
@@ -451,47 +451,52 @@ export default function MerchantDetailPage() {
                 </h2>
               )}
 
-              {/* Meta Tags - Compact, Editorial Style */}
-              <div className="space-y-3">
-                {/* Row 1: Price, Open/Closed, Vibe */}
-                <div className="flex flex-wrap gap-3 text-sm" style={{ color: '#666' }}>
-                  {/* Price Level */}
-                  {googleMeta?.price_level && (
-                    <span className="flex items-center gap-1">
-                      {'$'.repeat(googleMeta.price_level)}
-                    </span>
-                  )}
-                  
-                  {/* Hours Status - Open/Closed */}
-                  {googleMeta?.opening_hours?.open_now !== undefined && (
-                    <span className={googleMeta.opening_hours.open_now ? 'text-green-700' : 'text-red-700'}>
+              {/* Meta Tags - Vertical Layout */}
+              <div className="space-y-2 text-sm" style={{ color: '#666' }}>
+                {/* Open/Closed Pill */}
+                {googleMeta?.opening_hours?.open_now !== undefined && (
+                  <div>
+                    <span 
+                      className="inline-block px-3 py-1 rounded-full text-xs font-medium"
+                      style={{
+                        backgroundColor: googleMeta.opening_hours.open_now ? '#D4EDDA' : '#F8D7DA',
+                        color: googleMeta.opening_hours.open_now ? '#155724' : '#721C24'
+                      }}
+                    >
                       {googleMeta.opening_hours.open_now ? 'Open now' : 'Closed'}
                     </span>
-                  )}
-
-                  {/* Vibe */}
-                  {getVibe() && (
-                    <span className="flex items-center gap-1 italic">
-                      {getVibe()}
-                    </span>
-                  )}
-                </div>
-
-                {/* Row 2: Known For */}
-                {getKnownFor().length > 0 && (
-                  <div className="text-sm" style={{ color: '#666' }}>
-                    <span className="font-medium">Known for: </span>
-                    {getKnownFor().join(' · ')}
                   </div>
                 )}
 
-                {/* Row 3: Good to Know */}
+                {/* Price Level */}
+                {googleMeta?.price_level && (
+                  <div>
+                    {'$'.repeat(googleMeta.price_level)}
+                  </div>
+                )}
+
+                {/* Vibe */}
+                {getVibe() && (
+                  <div className="italic">
+                    {getVibe()}
+                  </div>
+                )}
+
+                {/* Known For */}
+                {getKnownFor().length > 0 && (
+                  <div className="pt-2">
+                    <span className="font-medium">Known for: </span>
+                    {getKnownFor().join(', ')}
+                  </div>
+                )}
+
+                {/* Good to Know Pills */}
                 {getGoodToKnow().length > 0 && (
-                  <div className="flex flex-wrap gap-2 text-xs">
+                  <div className="flex flex-wrap gap-2 pt-2">
                     {getGoodToKnow().map((tip, i) => (
                       <span 
                         key={i}
-                        className="px-2 py-1 rounded-full"
+                        className="px-2 py-1 rounded-full text-xs"
                         style={{ 
                           backgroundColor: '#E8E4DE',
                           color: '#555'
