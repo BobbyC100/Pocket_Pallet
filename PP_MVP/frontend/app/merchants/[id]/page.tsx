@@ -335,7 +335,7 @@ export default function MerchantDetailPage() {
           {/* Left Column - Meta → Description → Tips */}
           <div className="relative">
             {/* Meta Section - Always Visible */}
-            <div className="space-y-4 mb-8 sticky top-0 bg-white/95 backdrop-blur-sm py-4 z-10">
+            <div className="space-y-4 mb-8 sticky top-0 py-4 z-10" style={{ backgroundColor: '#FEFDFB' }}>
               {/* Type Header */}
               {typeLabel && (
                 <h2 className="text-3xl md:text-4xl font-serif tracking-tight" style={{ 
@@ -355,14 +355,7 @@ export default function MerchantDetailPage() {
                   </span>
                 )}
                 
-                {/* Rating */}
-                {googleMeta?.rating && (
-                  <span className="flex items-center gap-1">
-                    ⭐ {googleMeta.rating}
-                  </span>
-                )}
-                
-                {/* Hours Status */}
+                {/* Hours Status - Open/Closed */}
                 {googleMeta?.opening_hours?.open_now !== undefined && (
                   <span className={googleMeta.opening_hours.open_now ? 'text-green-700' : 'text-red-700'}>
                     {googleMeta.opening_hours.open_now ? 'Open now' : 'Closed'}
