@@ -602,9 +602,118 @@ export default function MerchantDetailPage() {
               )}
       </section>
 
+            {/* Hours Section - Below Description */}
+            {googleMeta?.opening_hours?.weekday_text && (
+              <section className="mt-8" aria-label="Hours">
+                <h3 className="mb-3 text-xl font-semibold">Hours</h3>
+                <dl className="divide-y divide-neutral-200">
+                  {googleMeta.opening_hours.weekday_text.map((text, i) => {
+                    const [day, hours] = text.split(': ');
+                    const todayIndex = (new Date().getDay() + 6) % 7; // Adjust: Sunday=0 → 6
+                    const isToday = i === todayIndex;
+                    return (
+                      <div key={i} className="grid grid-cols-[110px_1fr] items-baseline py-1 leading-tight">
+                        <dt className={isToday ? "text-base text-amber-700 font-medium" : "text-base text-neutral-700"}>
+                          {day}
+                        </dt>
+                        <dd className={isToday ? "text-base text-amber-700 font-medium" : "text-base text-neutral-700"}>
+                          {hours}
+                        </dd>
+                      </div>
+                    );
+                  })}
+                </dl>
+              </section>
+            )}
+
+            {/* Contact & Address Section - Below Hours */}
+            <section className="mt-6" aria-label="Contact & Address">
+              <h3 className="mb-3 text-xl font-semibold">Contact & Address</h3>
+              <ul className="space-y-2 leading-tight text-lg">
+                {/* Address */}
+                {(googleMeta?.formatted_address || merchant.address) && (
+                  <li className="text-neutral-700">
+                    <span className="mr-2">📍</span>
+                    {googleMeta?.formatted_address || merchant.address}
+                  </li>
+                )}
+
+                {/* Get Directions */}
+                {merchant.geo?.lat && merchant.geo?.lng && (
+                  <li>
+                    <button
+                      onClick={() => setMapsOpen(true)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      <span className="mr-2">🧭</span>
+                      Get Directions
+                    </button>
+                  </li>
+                )}
+
+                {/* Phone */}
+                {googleMeta?.formatted_phone_number && (
+                  <li>
+                    <a
+                      href={`tel:${googleMeta.formatted_phone_number.replace(/\s/g, '')}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      <span className="mr-2">📞</span>
+                      {googleMeta.formatted_phone_number}
+                    </a>
+                  </li>
+                )}
+
+                {/* Instagram */}
+                {(merchant.contact?.instagram || (googleMeta?.website && googleMeta.website.includes('instagram.com'))) && (
+                  <li>
+                    <a
+                      href={merchant.contact?.instagram || googleMeta?.website || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      <span className="mr-2">📸</span>
+                      {merchant.contact?.instagram 
+                        ? (merchant.contact.instagram.startsWith('@') ? merchant.contact.instagram : `@${merchant.contact.instagram}`)
+                        : 'Instagram'
+                      }
+                    </a>
+                  </li>
+                )}
+
+                {/* Google Profile */}
+                {googleMeta?.url && (
+                  <li>
+                    <a
+                      href={googleMeta.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      <span className="mr-2">🔎</span>
+                      View Google Profile
+                    </a>
+                  </li>
+                )}
+              </ul>
+            </section>
+        </div>
+
+          {/* RIGHT: Hero + Photo Mosaic */}
+          <div className="flex flex-col gap-6">
+            {/* Hero Image */}
+            <div className="flex justify-end items-start">
+              <img
+                src={getHeroImage()}
+                alt={merchant.name}
+                className="aspect-[16/9] w-full max-w-[730px] rounded-2xl object-cover shadow-sm"
+              />
+                    </div>
+
             {/* Photo Mosaic - 5-Up Layout */}
             {galleryImages.length > 0 && (
-              <section className="mt-8">
+              <section>
                 <div className="grid gap-2 grid-cols-2 md:grid-cols-4 md:grid-rows-2">
                   {/* First photo - Large (2x2 on desktop, normal on mobile) */}
                   <button
@@ -675,129 +784,15 @@ export default function MerchantDetailPage() {
                               <span className="rounded-md bg-black/55 px-3 py-1.5 text-lg font-semibold text-white">
                                 +{remaining} More
                               </span>
-                            </div>
+                        </div>
                           </>
                         )}
                       </button>
                     );
                   })}
-                </div>
+                        </div>
               </section>
             )}
-          </div>
-
-          {/* RIGHT: Hero + Details Block */}
-          <div className="flex flex-col gap-6">
-            {/* Hero Image */}
-            <div className="flex justify-end items-start">
-              <img
-                src={getHeroImage()}
-                alt={merchant.name}
-                className="aspect-[16/9] w-full max-w-[730px] rounded-2xl object-cover shadow-sm"
-              />
-            </div>
-
-            {/* Details Block (Hours + Contact) - Tighter spacing with emojis */}
-            <section aria-label="Details" className="rounded-2xl bg-neutral-50 p-6">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Hours - Tighter spacing with dividers */}
-                {googleMeta?.opening_hours?.weekday_text && (
-                  <div>
-                    <h3 className="mb-3 text-xl font-semibold">Hours</h3>
-                    <dl className="divide-y divide-neutral-200">
-                      {googleMeta.opening_hours.weekday_text.map((text, i) => {
-                        const [day, hours] = text.split(': ');
-                        const todayIndex = (new Date().getDay() + 6) % 7; // Adjust: Sunday=0 → 6
-                        const isToday = i === todayIndex;
-                        return (
-                          <div key={i} className="grid grid-cols-[110px_1fr] items-baseline py-1 leading-tight">
-                            <dt className={isToday ? "text-base text-amber-700 font-medium" : "text-base text-neutral-700"}>
-                              {day}
-                            </dt>
-                            <dd className={isToday ? "text-base text-amber-700 font-medium" : "text-base text-neutral-700"}>
-                              {hours}
-                            </dd>
-                          </div>
-                        );
-                      })}
-                    </dl>
-                  </div>
-                )}
-
-                {/* Contact & Address - With emojis */}
-                <div>
-                  <h3 className="mb-3 text-xl font-semibold">Contact & Address</h3>
-                  <ul className="space-y-2 leading-tight text-lg">
-                    {/* Address */}
-                    {(googleMeta?.formatted_address || merchant.address) && (
-                      <li className="text-neutral-700">
-                        <span className="mr-2">📍</span>
-                        {googleMeta?.formatted_address || merchant.address}
-                      </li>
-                    )}
-
-                    {/* Get Directions */}
-                    {merchant.geo?.lat && merchant.geo?.lng && (
-                      <li>
-                        <button
-                          onClick={() => setMapsOpen(true)}
-                          className="text-blue-600 hover:underline"
-                        >
-                          <span className="mr-2">🧭</span>
-                          Get Directions
-                        </button>
-                      </li>
-                    )}
-
-                    {/* Phone */}
-                    {googleMeta?.formatted_phone_number && (
-                      <li>
-                        <a
-                          href={`tel:${googleMeta.formatted_phone_number.replace(/\s/g, '')}`}
-                          className="text-blue-600 hover:underline"
-                        >
-                          <span className="mr-2">📞</span>
-                          {googleMeta.formatted_phone_number}
-                        </a>
-                      </li>
-                    )}
-
-                    {/* Instagram */}
-                    {(merchant.contact?.instagram || (googleMeta?.website && googleMeta.website.includes('instagram.com'))) && (
-                      <li>
-                        <a
-                          href={merchant.contact?.instagram || googleMeta?.website || '#'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          <span className="mr-2">📸</span>
-                          {merchant.contact?.instagram 
-                            ? (merchant.contact.instagram.startsWith('@') ? merchant.contact.instagram : `@${merchant.contact.instagram}`)
-                            : 'Instagram'
-                          }
-                        </a>
-                      </li>
-                    )}
-
-                    {/* Google Profile */}
-                    {googleMeta?.url && (
-                      <li>
-                        <a
-                          href={googleMeta.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          <span className="mr-2">🔎</span>
-                          View Google Profile
-                        </a>
-                      </li>
-                    )}
-                  </ul>
-                </div>
-              </div>
-            </section>
           </div>
         </div>
       </header>
