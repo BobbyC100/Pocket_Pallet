@@ -1,4 +1,5 @@
 'use client';
+// Editorial Notes feature - Phase 1
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
