@@ -25,6 +25,10 @@ class MerchantBase(BaseModel):
     source_url: Optional[str] = None
     google_place_id: Optional[str] = None
     google_sync_status: Optional[str] = None
+    editor_note: Optional[str] = Field(None, max_length=280)
+    editor_name: Optional[str] = None
+    editor_title: Optional[str] = None
+    editor_is_published: bool = True
 
 
 class MerchantCreate(MerchantBase):
@@ -49,6 +53,10 @@ class MerchantUpdate(BaseModel):
     source_url: Optional[str] = None
     google_place_id: Optional[str] = None
     google_sync_status: Optional[str] = None
+    editor_note: Optional[str] = Field(None, max_length=280)
+    editor_name: Optional[str] = None
+    editor_title: Optional[str] = None
+    editor_is_published: Optional[bool] = None
 
 
 class MerchantResponse(MerchantBase):
@@ -57,6 +65,8 @@ class MerchantResponse(MerchantBase):
     last_synced_at: Optional[datetime] = None
     google_meta: Optional[Dict[str, Any]] = None
     google_last_synced: Optional[datetime] = None
+    editor_updated_at: Optional[datetime] = None
+    editor_updated_by: Optional[str] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
 
@@ -64,6 +74,11 @@ class MerchantResponse(MerchantBase):
     def serialize_id(self, value: Union[str, UUID]) -> str:
         """Convert UUID to string for JSON serialization."""
         return str(value)
+    
+    @field_serializer('editor_updated_by')
+    def serialize_editor_updated_by(self, value: Union[str, UUID, None]) -> Optional[str]:
+        """Convert UUID to string for JSON serialization."""
+        return str(value) if value else None
 
     class Config:
         from_attributes = True

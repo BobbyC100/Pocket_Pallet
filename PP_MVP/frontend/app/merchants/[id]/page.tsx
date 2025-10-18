@@ -52,6 +52,10 @@ type Merchant = {
   source_url: string | null;
   google_meta?: GoogleMeta | null;
   google_place_id?: string | null;
+  editor_note?: string | null;
+  editor_name?: string | null;
+  editor_title?: string | null;
+  editor_is_published?: boolean;
   created_at: string;
 };
 
@@ -578,13 +582,13 @@ export default function MerchantDetailPage() {
                   ) : (
                     <a
                       href={googleMeta?.website || merchant.contact?.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                target="_blank"
+                rel="noopener noreferrer"
                       className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-400"
-                    >
+              >
                       Website
-                    </a>
-                  )}
+              </a>
+            )}
                 </>
               )}
               {merchant.contact?.instagram && !isInstagramUrl(googleMeta?.website || merchant.contact?.website || '') && (
@@ -597,7 +601,7 @@ export default function MerchantDetailPage() {
                   Instagram
                 </a>
               )}
-            </div>
+          </div>
 
             {/* Container 1: At a glance + Description */}
             <section className="mt-5 w-full rounded-lg border border-neutral-200 p-4" aria-labelledby="at-a-glance" style={{ backgroundColor: 'transparent' }}>
@@ -754,7 +758,29 @@ export default function MerchantDetailPage() {
                   </button>
                 )}
               </div>
-            </section>
+
+              {/* Editor's Note - Manual Editorial Content */}
+              {merchant.editor_is_published && merchant.editor_note && (
+                <section className="mt-4 border-t border-neutral-200 pt-3">
+                  <div className="text-xs uppercase tracking-wide text-neutral-500 font-semibold">
+                    {merchant.editor_name ? (
+                      <>
+                        Editor's Note from {merchant.editor_name}
+                        {merchant.editor_title && (
+                          <span className="text-neutral-400"> ({merchant.editor_title})</span>
+                        )}
+                        :
+                      </>
+                    ) : (
+                      <>Editor's Note:</>
+          )}
+        </div>
+                  <p className="mt-1 text-sm md:text-base italic text-neutral-700">
+                    {merchant.editor_note}
+                  </p>
+                </section>
+              )}
+      </section>
 
             {/* Container 2: Business Details */}
             <section className="mt-3 w-full rounded-lg border border-neutral-200 p-4 space-y-4" aria-label="Business Details" style={{ backgroundColor: 'transparent' }}>
@@ -779,9 +805,9 @@ export default function MerchantDetailPage() {
                         ) : (
                           <span className="text-neutral-700">{getStatusMessage()}</span>
                         )}
-                      </p>
-                    </div>
-                    
+          </p>
+        </div>
+
                     {/* Time Until Change */}
                     {getTimeUntilChange() && (
                       <p className="ml-7 text-sm text-neutral-600">
