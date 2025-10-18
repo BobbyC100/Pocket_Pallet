@@ -66,6 +66,7 @@ export default function MerchantDetailPage() {
   const [mapsOpen, setMapsOpen] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [shouldShowToggle, setShouldShowToggle] = useState(false);
+  const [hoursExpanded, setHoursExpanded] = useState(false);
   const descriptionRef = useRef<HTMLDivElement>(null);
 
   // Check if description is long enough to need truncation
@@ -345,6 +346,106 @@ export default function MerchantDetailPage() {
   const typeLabel = humanizeType(googleMeta?.types, merchant.type);
   const hasStreetView = merchant.geo?.lat && merchant.geo?.lng;
 
+  // Helper: Get status message with next state change
+  const getStatusMessage = () => {
+    const openingHours = googleMeta?.opening_hours;
+    if (!openingHours) return null;
+    
+    const isOpen = openingHours.open_now;
+    const periods = openingHours.periods;
+    
+    if (!periods || periods.length === 0) {
+      return isOpen ? 'Open' : 'Closed';
+    }
+    
+    // Get current day/time
+    const now = new Date();
+    const currentDay = (now.getDay() + 6) % 7; // Convert Sunday=0 to Monday=0
+    const currentTime = now.getHours() * 100 + now.getMinutes(); // e.g., 14:30 = 1430
+    
+    // Find today's periods
+    const todayPeriods = periods.filter(p => p.open.day === currentDay);
+    
+    if (todayPeriods.length === 0) {
+      // No periods today, find next opening
+      const futurePeriods = periods.filter(p => p.open.day > currentDay);
+      if (futurePeriods.length > 0) {
+        const nextPeriod = futurePeriods[0];
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const nextDay = days[nextPeriod.open.day];
+        const openTime = formatTime(nextPeriod.open.time);
+        return `Closed · Opens ${nextDay} ${openTime}`;
+      }
+      return 'Closed';
+    }
+    
+    // Check if currently within any period
+    for (const period of todayPeriods) {
+      const openTime = parseInt(period.open.time);
+      const closeTime = period.close ? parseInt(period.close.time) : 2400;
+      
+      if (currentTime >= openTime && currentTime < closeTime) {
+        // Currently open
+        const closeFormatted = formatTime(period.close?.time || '2400');
+        return `Open · Closes ${closeFormatted}`;
+      }
+    }
+    
+    // Closed, find next opening today or tomorrow
+    const futurePeriodsToday = todayPeriods.filter(p => parseInt(p.open.time) > currentTime);
+    if (futurePeriodsToday.length > 0) {
+      const nextPeriod = futurePeriodsToday[0];
+      const openFormatted = formatTime(nextPeriod.open.time);
+      return `Closed · Opens ${openFormatted}`;
+    }
+    
+    // Find tomorrow's opening
+    const tomorrowDay = (currentDay + 1) % 7;
+    const tomorrowPeriods = periods.filter(p => p.open.day === tomorrowDay);
+    if (tomorrowPeriods.length > 0) {
+      const openFormatted = formatTime(tomorrowPeriods[0].open.time);
+      return `Closed · Opens ${openFormatted}`;
+    }
+    
+    return isOpen ? 'Open' : 'Closed';
+  };
+  
+  // Helper: Format time string (e.g., "1430" -> "2:30 PM")
+  const formatTime = (time: string) => {
+    const hours = parseInt(time.slice(0, -2));
+    const minutes = time.slice(-2);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${minutes} ${period}`;
+  };
+  
+  // Helper: Get price range display
+  const getPriceRange = () => {
+    if (!googleMeta?.price_level) return null;
+    const level = googleMeta.price_level;
+    if (level === 1) return '$10–20 per person';
+    if (level === 2) return '$20–40 per person';
+    if (level === 3) return '$40–70 per person';
+    if (level === 4) return '$70+ per person';
+    return null;
+  };
+  
+  // Helper: Get last updated message
+  const getLastUpdated = () => {
+    if (!merchant.created_at) return null;
+    const created = new Date(merchant.created_at);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - created.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Updated today';
+    if (diffDays === 1) return 'Updated yesterday';
+    if (diffDays < 7) return `Updated ${diffDays} days ago`;
+    if (diffDays < 30) return `Updated ${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `Updated ${Math.floor(diffDays / 30)} months ago`;
+    return 'Verified by admin';
+  };
+
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#FAF6EF', color: '#222' }}>
       {/* Header Layout: Left Title / Right Hero */}
@@ -602,101 +703,137 @@ export default function MerchantDetailPage() {
               )}
       </section>
 
-            {/* Hours Section - Below Description */}
-            {googleMeta?.opening_hours?.weekday_text && (
-              <section className="mt-8 w-full" aria-label="Hours">
-                <h3 className="mb-3 w-full text-left text-xl font-semibold">Hours</h3>
-                <dl className="w-full divide-y divide-neutral-200">
-                  {googleMeta.opening_hours.weekday_text.map((text, i) => {
-                    const [day, hours] = text.split(': ');
-                    const todayIndex = (new Date().getDay() + 6) % 7; // Adjust: Sunday=0 → 6
-                    const isToday = i === todayIndex;
-                    return (
-                      <div key={i} className="grid grid-cols-[110px_1fr] items-baseline py-1 leading-tight">
-                        <dt className={isToday ? "text-base text-amber-700 font-medium" : "text-base text-neutral-700"}>
-                          {day}
-                        </dt>
-                        <dd className={isToday ? "text-base text-amber-700 font-medium" : "text-base text-neutral-700"}>
-                          {hours}
-                        </dd>
-                      </div>
-                    );
-                  })}
-                </dl>
-              </section>
-            )}
-
-            {/* Contact & Address Section - Below Hours */}
-            <section className="mt-6 w-full" aria-label="Contact & Address">
-              <h3 className="mb-3 w-full text-left text-xl font-semibold">Contact & Address</h3>
-              <ul className="w-full space-y-2 leading-tight text-left text-lg">
-                {/* Address */}
-                {(googleMeta?.formatted_address || merchant.address) && (
-                  <li className="text-neutral-700">
-                    <span className="mr-2">📍</span>
+            {/* Business Info Section - Below Description */}
+            <section className="mt-8 w-full rounded-xl border border-neutral-200 bg-white p-5" aria-label="Business Info">
+              {/* Address */}
+              {(googleMeta?.formatted_address || merchant.address) && (
+                <div className="mb-3 flex items-start gap-3">
+                  <span className="text-xl mt-0.5">📍</span>
+                  <p className="text-base leading-relaxed text-neutral-800">
                     {googleMeta?.formatted_address || merchant.address}
-                  </li>
-                )}
+          </p>
+        </div>
+              )}
+              
+              {/* Status Line */}
+              {getStatusMessage() && (
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="text-xl">🕐</span>
+                  <p className="text-base">
+                    {getStatusMessage()!.startsWith('Open') ? (
+                      <>
+                        <span className="font-semibold text-green-700">Open</span>
+                        <span className="text-neutral-600"> {getStatusMessage()!.replace('Open', '').trim()}</span>
+                      </>
+                    ) : getStatusMessage()!.startsWith('Closed') ? (
+                      <>
+                        <span className="font-semibold text-red-700">Closed</span>
+                        <span className="text-neutral-600"> {getStatusMessage()!.replace('Closed', '').trim()}</span>
+                      </>
+                    ) : (
+                      <span className="text-neutral-600">{getStatusMessage()}</span>
+                    )}
+                  </p>
+                        </div>
+                      )}
+                      
+              {/* Last Updated */}
+              {getLastUpdated() && (
+                <p className="mb-3 ml-9 text-sm text-neutral-500">
+                  {getLastUpdated()}
+                </p>
+              )}
+              
+              {/* See More Hours Button */}
+              {googleMeta?.opening_hours?.weekday_text && (
+                <button
+                  type="button"
+                  onClick={() => setHoursExpanded(!hoursExpanded)}
+                  className="ml-9 text-sm font-medium text-blue-600 hover:underline"
+                >
+                  {hoursExpanded ? 'Hide hours' : 'See more hours'}
+                </button>
+              )}
+              
+              {/* Expandable Hours Table */}
+              {hoursExpanded && googleMeta?.opening_hours?.weekday_text && (
+                <div className="mt-4 ml-9 border-t border-neutral-200 pt-4">
+                  <dl className="divide-y divide-neutral-100">
+                    {googleMeta.opening_hours.weekday_text.map((text, i) => {
+                      const [day, hours] = text.split(': ');
+                      const todayIndex = (new Date().getDay() + 6) % 7;
+                      const isToday = i === todayIndex;
+                      return (
+                        <div key={i} className="grid grid-cols-[100px_1fr] items-baseline py-2">
+                          <dt className={isToday ? "text-sm font-semibold text-amber-700" : "text-sm text-neutral-700"}>
+                            {day}
+                          </dt>
+                          <dd className={isToday ? "text-sm font-semibold text-amber-700" : "text-sm text-neutral-700"}>
+                            {hours}
+                          </dd>
+                        </div>
+                      );
+                    })}
+                  </dl>
+                        </div>
+                      )}
 
-                {/* Get Directions */}
-                {merchant.geo?.lat && merchant.geo?.lng && (
-                  <li>
-                    <button
-                      onClick={() => setMapsOpen(true)}
-                      className="text-blue-600 hover:underline"
-                    >
-                      <span className="mr-2">🧭</span>
-                      Get Directions
-                    </button>
-                  </li>
-                )}
+              {/* Price Range */}
+              {getPriceRange() && (
+                <div className="mt-4 border-t border-neutral-200 pt-4">
+                        <div className="flex items-center gap-2">
+                    <span className="text-xl">💵</span>
+                    <p className="text-sm text-neutral-600">{getPriceRange()}</p>
+                  </div>
+                        </div>
+                      )}
 
+              {/* Contact Actions */}
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-neutral-200 pt-4">
                 {/* Phone */}
                 {googleMeta?.formatted_phone_number && (
-                  <li>
-                    <a
-                      href={`tel:${googleMeta.formatted_phone_number.replace(/\s/g, '')}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      <span className="mr-2">📞</span>
-                      {googleMeta.formatted_phone_number}
-                    </a>
-                  </li>
+                  <a
+                    href={`tel:${googleMeta.formatted_phone_number.replace(/\s/g, '')}`}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm font-medium text-neutral-800 hover:bg-neutral-100"
+                  >
+                    <span>📞</span> Call
+                  </a>
                 )}
-
+                
+                {/* Directions */}
+                {merchant.geo?.lat && merchant.geo?.lng && (
+                  <button
+                    onClick={() => setMapsOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm font-medium text-neutral-800 hover:bg-neutral-100"
+                  >
+                    <span>🧭</span> Directions
+                  </button>
+                )}
+                
                 {/* Instagram */}
                 {(merchant.contact?.instagram || (googleMeta?.website && googleMeta.website.includes('instagram.com'))) && (
-                  <li>
-                    <a
-                      href={merchant.contact?.instagram || googleMeta?.website || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      <span className="mr-2">📸</span>
-                      {merchant.contact?.instagram 
-                        ? (merchant.contact.instagram.startsWith('@') ? merchant.contact.instagram : `@${merchant.contact.instagram}`)
-                        : 'Instagram'
-                      }
-                    </a>
-                  </li>
+                  <a
+                    href={merchant.contact?.instagram || googleMeta?.website || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm font-medium text-neutral-800 hover:bg-neutral-100"
+                  >
+                    <span>📸</span> Instagram
+                  </a>
                 )}
-
+                
                 {/* Google Profile */}
                 {googleMeta?.url && (
-                  <li>
-                    <a
-                      href={googleMeta.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      <span className="mr-2">🔎</span>
-                      View Google Profile
-                    </a>
-                  </li>
+                  <a
+                    href={googleMeta.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm font-medium text-neutral-800 hover:bg-neutral-100"
+                  >
+                    <span>🔎</span> Google
+                  </a>
                 )}
-              </ul>
+              </div>
             </section>
         </div>
 
@@ -783,7 +920,7 @@ export default function MerchantDetailPage() {
                             <div className="absolute inset-0 flex items-center justify-center">
                               <span className="rounded-md bg-black/55 px-3 py-1.5 text-lg font-semibold text-white">
                                 +{remaining} More
-                              </span>
+                          </span>
                         </div>
                           </>
                         )}
@@ -818,8 +955,8 @@ export default function MerchantDetailPage() {
                 color: '#1E40AF'
               }}>
                 Menu rotates — last verified {Math.floor(Math.random() * 30)} days ago.
-                        </div>
-              
+                    </div>
+
               <div className="mt-6 p-12 text-center border-2 border-dashed rounded-xl" style={{
                 borderColor: '#E8E4DE',
                 backgroundColor: '#FEFDFB',
