@@ -439,7 +439,7 @@ export default function MerchantDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
           {/* Left Column - Meta → Description → Tips */}
           <div className="relative">
-            {/* At a Glance Section - Pill Grid */}
+            {/* At a Glance Section - Horizontal Pill Row */}
             <section className="mb-6 pt-2" aria-labelledby="at-a-glance">
               <h2 
                 id="at-a-glance" 
@@ -449,17 +449,18 @@ export default function MerchantDetailPage() {
                 At a glance
               </h2>
 
-              {/* Responsive pill grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+              {/* Horizontal pill row with wrap */}
+              <div className="flex flex-wrap gap-2">
                 {/* Type */}
                 {typeLabel && (
                   <span 
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm border whitespace-nowrap"
                     style={{
                       borderColor: '#e5e7eb',
                       backgroundColor: '#fafafa',
                       color: '#374151'
                     }}
+                    title={`Type: ${typeLabel}`}
                   >
                     {typeLabel}
                   </span>
@@ -468,26 +469,28 @@ export default function MerchantDetailPage() {
                 {/* Cost */}
                 {googleMeta?.price_level && (
                   <span 
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm border whitespace-nowrap"
                     style={{
                       borderColor: '#e5e7eb',
                       backgroundColor: '#fafafa',
                       color: '#374151'
                     }}
+                    title={`Price level: ${'$'.repeat(googleMeta.price_level)}`}
                   >
                     {'$'.repeat(googleMeta.price_level)}
                   </span>
                 )}
 
-                {/* Status */}
+                {/* Status - GREEN for Open, RED for Closed */}
                 {googleMeta?.opening_hours?.open_now !== undefined && (
                   <span 
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-medium border whitespace-nowrap"
                     style={{
                       borderColor: googleMeta.opening_hours.open_now ? '#86efac' : '#fecaca',
                       backgroundColor: googleMeta.opening_hours.open_now ? '#dcfce7' : '#fef2f2',
                       color: googleMeta.opening_hours.open_now ? '#15803d' : '#b91c1c'
                     }}
+                    title={googleMeta.opening_hours.open_now ? 'Currently open' : 'Currently closed'}
                   >
                     {googleMeta.opening_hours.open_now ? 'Open' : 'Closed'}
                   </span>
@@ -496,12 +499,13 @@ export default function MerchantDetailPage() {
                 {/* Vibe */}
                 {getVibe() && (
                   <span 
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm border whitespace-nowrap"
                     style={{
                       borderColor: '#e5e7eb',
                       backgroundColor: '#fafafa',
                       color: '#374151'
                     }}
+                    title={`Vibe: ${getVibe()}`}
                   >
                     {getVibe()}
                   </span>
@@ -511,12 +515,13 @@ export default function MerchantDetailPage() {
                 {getKnownFor().slice(0, 4).map((item, i) => (
                   <span 
                     key={`known-${i}`}
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm border whitespace-nowrap"
                     style={{
                       borderColor: '#e5e7eb',
                       backgroundColor: '#fafafa',
                       color: '#374151'
                     }}
+                    title={`Known for: ${item}`}
                   >
                     {item}
                   </span>
@@ -526,12 +531,13 @@ export default function MerchantDetailPage() {
                 {getGoodToKnow().map((tip, i) => (
                   <span 
                     key={`tip-${i}`}
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium border whitespace-nowrap"
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm border whitespace-nowrap"
                     style={{
                       borderColor: '#e5e7eb',
                       backgroundColor: '#fafafa',
                       color: '#374151'
                     }}
+                    title={`Good to know: ${tip}`}
                   >
                     {tip}
                   </span>
