@@ -599,11 +599,11 @@ export default function MerchantDetailPage() {
               )}
             </div>
 
-            {/* At-a-Glance Pills - Below Action Pills */}
-            <section className="w-full pt-2.5" aria-labelledby="at-a-glance">
+            {/* Container 1: At a glance + Description */}
+            <section className="mt-5 w-full rounded-lg border border-neutral-200 p-4" aria-labelledby="at-a-glance" style={{ backgroundColor: 'transparent' }}>
               <h2 
                 id="at-a-glance" 
-                className="mb-2 w-full text-left text-sm font-semibold text-neutral-500"
+                className="mb-2.5 w-full text-left text-sm font-semibold text-neutral-600"
               >
                 At a glance
               </h2>
@@ -737,53 +737,52 @@ export default function MerchantDetailPage() {
                 </span>
               ))}
             </div>
+
+              {/* Description - Within Container 1 */}
+              <div className="mt-4 w-full">
+                <div className="relative w-full">
+                  <p
+                    ref={descriptionRef}
+                    id="merchant-description"
+                    className={descriptionExpanded ? 'w-full text-left text-neutral-800' : 'w-full text-left text-neutral-800 line-clamp-4'}
+                    style={{ 
+                      fontSize: '1.05rem',
+                      lineHeight: '1.75'
+                    }}
+                  >
+                    {googleMeta?.editorial_summary || merchant.about || 
+                      `${merchant.name} is a curated destination for natural wine enthusiasts. Discover unique bottles from small producers and family vineyards, carefully selected for their character and authenticity.`}
+                  </p>
+                  
+                  {/* Gradient Fade - Only when clamped */}
+                  {!descriptionExpanded && shouldShowToggle && (
+                    <div 
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-x-0 bottom-0 h-10"
+                      style={{
+                        background: 'linear-gradient(to bottom, transparent, rgba(250,246,239,0.92))'
+                      }}
+                    />
+                  )}
+                </div>
+
+                {/* View More/Less Toggle */}
+                {shouldShowToggle && (
+                  <button
+                    type="button"
+                    onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+                    aria-expanded={descriptionExpanded}
+                    aria-controls="merchant-description"
+                    className="mt-2 text-sm font-medium underline underline-offset-4 text-neutral-700 hover:text-neutral-900 motion-reduce:transition-none"
+                  >
+                    {descriptionExpanded ? 'View less' : 'View more'}
+                  </button>
+                )}
+              </div>
             </section>
 
-            {/* Description Section - Below At-a-Glance */}
-            <section className="mt-3 w-full" aria-labelledby="description-heading">
-              <h3 id="description-heading" className="sr-only">Description</h3>
-              <div className="relative w-full">
-                <p
-                  ref={descriptionRef}
-                  id="merchant-description"
-                  className={descriptionExpanded ? 'w-full text-left text-neutral-800' : 'w-full text-left text-neutral-800 line-clamp-4'}
-                  style={{ 
-                    fontSize: '1.05rem',
-                    lineHeight: '1.75'
-                  }}
-                >
-                  {googleMeta?.editorial_summary || merchant.about || 
-                    `${merchant.name} is a curated destination for natural wine enthusiasts. Discover unique bottles from small producers and family vineyards, carefully selected for their character and authenticity.`}
-                </p>
-                
-                {/* Gradient Fade - Only when clamped */}
-                {!descriptionExpanded && shouldShowToggle && (
-                  <div 
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 bottom-0 h-10"
-                    style={{
-                      background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.92))'
-                    }}
-                  />
-          )}
-        </div>
-
-              {/* View More/Less Toggle */}
-              {shouldShowToggle && (
-                <button
-                  type="button"
-                  onClick={() => setDescriptionExpanded(!descriptionExpanded)}
-                  aria-expanded={descriptionExpanded}
-                  aria-controls="merchant-description"
-                  className="mt-2 text-sm font-medium underline underline-offset-4 text-neutral-700 hover:text-neutral-900 motion-reduce:transition-none"
-                >
-                  {descriptionExpanded ? 'View less' : 'View more'}
-                </button>
-              )}
-      </section>
-
-            {/* Business Info Section - Below Description */}
-            <section className="mt-8 w-full space-y-4" aria-label="Business Info">
+            {/* Container 2: Business Details */}
+            <section className="mt-3 w-full rounded-lg border border-neutral-200 p-4 space-y-4" aria-label="Business Details" style={{ backgroundColor: 'transparent' }}>
               {/* Group 1: Status + Price (what matters first) */}
               <div className="space-y-1.5">
                 {/* Status Line */}
