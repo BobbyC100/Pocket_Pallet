@@ -774,14 +774,14 @@ export default function MerchantDetailPage() {
                       </>
                     ) : (
                       <>Editor's Note:</>
-          )}
-        </div>
+                    )}
+                  </div>
                   <p className="mt-1 text-sm md:text-base italic text-neutral-700">
                     {merchant.editor_note}
                   </p>
                 </section>
               )}
-      </section>
+            </section>
 
             {/* Container 2: Business Details */}
             <section className="mt-3 w-full rounded-lg border border-neutral-200 p-4 space-y-4" aria-label="Business Details" style={{ backgroundColor: 'transparent' }}>
