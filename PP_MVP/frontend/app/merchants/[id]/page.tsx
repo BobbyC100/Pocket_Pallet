@@ -349,7 +349,7 @@ export default function MerchantDetailPage() {
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#FAF6EF', color: '#222' }}>
       {/* Header Layout: Left Title / Right Hero */}
       <header className="mx-auto max-w-6xl px-4 pt-6">
-        <div className="grid items-start gap-6 md:grid-cols-[minmax(260px,360px)_1fr]">
+        <div className="grid items-start gap-6 md:grid-cols-[minmax(260px,360px)_0.9fr]">
           {/* LEFT: Title + Address + Action Pills */}
           <div>
             <h1 className="text-4xl font-semibold tracking-tight text-neutral-900 md:text-5xl">
