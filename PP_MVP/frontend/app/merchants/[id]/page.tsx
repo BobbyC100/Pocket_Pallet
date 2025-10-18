@@ -456,13 +456,8 @@ export default function MerchantDetailPage() {
             <h1 className="w-full text-left text-4xl font-semibold tracking-tight text-neutral-900 md:text-5xl">
               {merchant.name.replace(/\s*\([^)]*\)/g, '').trim()}
             </h1>
-            {(googleMeta?.formatted_address || merchant.address) && (
-              <p className="mt-2 w-full text-left text-lg text-neutral-600">
-                {googleMeta?.formatted_address || merchant.address}
-              </p>
-            )}
 
-            {/* Action Pills - Below Address */}
+            {/* Action Pills - Below Title */}
             <div className="mt-4 flex w-full flex-wrap gap-2">
               {/* Directions - FIRST */}
               {merchant.geo?.lat && merchant.geo?.lng && (
