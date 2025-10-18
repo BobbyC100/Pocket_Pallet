@@ -259,3 +259,53 @@ async def add_tacos_fenix(db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@router.post("/seed-editor-note-tacos-fenix")
+async def seed_editor_note_tacos_fenix(db: Session = Depends(get_db)):
+    """
+    Seed editorial note for Tacos Fenix (test data)
+    
+    POST: https://pocket-pallet.onrender.com/api/v1/sync/seed-editor-note-tacos-fenix
+    """
+    try:
+        # Update Tacos Fenix with editorial note
+        from datetime import datetime
+        update_query = text("""
+            UPDATE merchants
+            SET 
+              editor_note = :note,
+              editor_name = :name,
+              editor_title = :title,
+              editor_is_published = true,
+              editor_updated_at = NOW()
+            WHERE slug = 'tacos-fenix'
+            RETURNING id, name, slug
+        """)
+        
+        result = db.execute(update_query, {
+            'note': 'Go early before the lunch rush — the shrimp tacos sell out fast. Best enjoyed with a cold Tecate and their house-made hot sauce.',
+            'name': 'Franny',
+            'title': 'Local Guide'
+        })
+        
+        merchant = result.fetchone()
+        db.commit()
+        
+        if merchant:
+            return {
+                "message": "Successfully seeded editorial note",
+                "merchant_id": str(merchant[0]),
+                "merchant_name": merchant[1],
+                "merchant_slug": merchant[2],
+                "url": f"https://pocket-pallet.vercel.app/merchants/{merchant[2]}"
+            }
+        else:
+            return {
+                "message": "Tacos Fenix not found",
+                "note": "Run the add-tacos-fenix endpoint first"
+            }
+            
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
