@@ -915,6 +915,18 @@ export default function MerchantDetailPage() {
                   </a>
                 )}
                 
+                {/* Website (only if it's not Instagram) */}
+                {googleMeta?.website && !googleMeta.website.includes('instagram.com') && (
+                  <a
+                    href={googleMeta.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-white px-3 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                  >
+                    <span className="text-base">🌐</span> Website
+                  </a>
+                )}
+                
                 {/* Google Profile */}
                 {googleMeta?.url && (
                   <a
