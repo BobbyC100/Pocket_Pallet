@@ -693,9 +693,9 @@ export default function MerchantDetailPage() {
               <img
                 src={getHeroImage()}
                 alt={merchant.name}
-                className="aspect-[16/9] w-full max-w-[860px] rounded-2xl object-cover shadow-sm"
+                className="aspect-[16/9] w-full max-w-[730px] rounded-2xl object-cover shadow-sm"
               />
-        </div>
+            </div>
 
             {/* Details Block (Hours + Contact) - Tighter spacing with emojis */}
             <section aria-label="Details" className="rounded-2xl bg-neutral-50 p-6">
