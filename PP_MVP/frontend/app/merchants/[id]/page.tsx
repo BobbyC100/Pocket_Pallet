@@ -351,18 +351,18 @@ export default function MerchantDetailPage() {
       <header className="mx-auto max-w-6xl px-4 pt-6">
         <div className="grid items-start gap-6 md:grid-cols-[minmax(260px,360px)_0.9fr]">
           {/* LEFT: Title + Address + Action Pills */}
-          <div>
-            <h1 className="text-4xl font-semibold tracking-tight text-neutral-900 md:text-5xl">
+          <div className="flex w-full flex-col items-start">
+            <h1 className="w-full text-left text-4xl font-semibold tracking-tight text-neutral-900 md:text-5xl">
               {merchant.name.replace(/\s*\([^)]*\)/g, '').trim()}
             </h1>
             {(googleMeta?.formatted_address || merchant.address) && (
-              <p className="mt-2 text-lg text-neutral-600">
+              <p className="mt-2 w-full text-left text-lg text-neutral-600">
                 {googleMeta?.formatted_address || merchant.address}
               </p>
             )}
 
             {/* Action Pills - Below Address */}
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-4 flex w-full flex-wrap gap-2">
               {/* Directions - FIRST */}
               {merchant.geo?.lat && merchant.geo?.lng && (
                 <button
@@ -420,16 +420,16 @@ export default function MerchantDetailPage() {
           </div>
 
             {/* At-a-Glance Pills - Below Action Pills */}
-            <section className="pt-4" aria-labelledby="at-a-glance">
+            <section className="w-full pt-4" aria-labelledby="at-a-glance">
               <h2 
                 id="at-a-glance" 
-                className="mb-2 text-sm font-medium text-neutral-500"
+                className="mb-2 w-full text-left text-sm font-medium text-neutral-500"
               >
                 At a glance
               </h2>
 
               {/* Horizontal pill row with wrap */}
-              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2">
+              <div className="flex w-full flex-wrap items-center gap-x-2.5 gap-y-2">
                 {/* Status - GREEN for Open, RED for Closed - ALWAYS FIRST */}
                 {googleMeta?.opening_hours?.open_now !== undefined && (
                   <span 
@@ -560,13 +560,13 @@ export default function MerchantDetailPage() {
             </section>
 
             {/* Description Section - Below At-a-Glance */}
-            <section className="mt-3" aria-labelledby="description-heading">
+            <section className="mt-3 w-full" aria-labelledby="description-heading">
               <h3 id="description-heading" className="sr-only">Description</h3>
-              <div className="relative">
+              <div className="relative w-full">
                 <p
                   ref={descriptionRef}
                   id="merchant-description"
-                  className={descriptionExpanded ? 'text-neutral-800 max-w-prose' : 'text-neutral-800 line-clamp-4 max-w-prose'}
+                  className={descriptionExpanded ? 'w-full text-left text-neutral-800' : 'w-full text-left text-neutral-800 line-clamp-4'}
                   style={{ 
                     fontSize: '1.05rem',
                     lineHeight: '1.75'
@@ -604,9 +604,9 @@ export default function MerchantDetailPage() {
 
             {/* Hours Section - Below Description */}
             {googleMeta?.opening_hours?.weekday_text && (
-              <section className="mt-8" aria-label="Hours">
-                <h3 className="mb-3 text-xl font-semibold">Hours</h3>
-                <dl className="divide-y divide-neutral-200">
+              <section className="mt-8 w-full" aria-label="Hours">
+                <h3 className="mb-3 w-full text-left text-xl font-semibold">Hours</h3>
+                <dl className="w-full divide-y divide-neutral-200">
                   {googleMeta.opening_hours.weekday_text.map((text, i) => {
                     const [day, hours] = text.split(': ');
                     const todayIndex = (new Date().getDay() + 6) % 7; // Adjust: Sunday=0 → 6
@@ -627,9 +627,9 @@ export default function MerchantDetailPage() {
             )}
 
             {/* Contact & Address Section - Below Hours */}
-            <section className="mt-6" aria-label="Contact & Address">
-              <h3 className="mb-3 text-xl font-semibold">Contact & Address</h3>
-              <ul className="space-y-2 leading-tight text-lg">
+            <section className="mt-6 w-full" aria-label="Contact & Address">
+              <h3 className="mb-3 w-full text-left text-xl font-semibold">Contact & Address</h3>
+              <ul className="w-full space-y-2 leading-tight text-left text-lg">
                 {/* Address */}
                 {(googleMeta?.formatted_address || merchant.address) && (
                   <li className="text-neutral-700">
