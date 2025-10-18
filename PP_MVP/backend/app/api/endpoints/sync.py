@@ -161,3 +161,101 @@ async def sync_test_10_merchants(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@router.post("/add-tacos-fenix")
+async def add_tacos_fenix(db: Session = Depends(get_db)):
+    """
+    Add Tacos Fenix merchant to database with Google Places data
+    
+    POST: https://pocket-pallet.onrender.com/api/v1/sync/add-tacos-fenix
+    """
+    PLACE_ID = "ChIJYblmQ3qS2IARnjZgt4i08d0"
+    
+    try:
+        # Check if merchant already exists
+        check_query = text("SELECT id, name FROM merchants WHERE slug = 'tacos-fenix'")
+        result = db.execute(check_query).fetchone()
+        
+        if result:
+            return {
+                "message": "Merchant already exists",
+                "merchant_id": str(result[0]),
+                "name": result[1],
+                "url": "https://pocket-pallet.vercel.app/merchants/tacos-fenix"
+            }
+        
+        # Fetch Google Places data
+        place_data = fetch_place_details(PLACE_ID)
+        
+        if not place_data:
+            raise HTTPException(status_code=500, detail="Failed to fetch Google Places data")
+        
+        # Get additional fields
+        params = {
+            'place_id': PLACE_ID,
+            'key': settings.GOOGLE_PLACES_API_KEY,
+            'fields': 'geometry,opening_hours'
+        }
+        response = requests.get("https://maps.googleapis.com/maps/api/place/details/json", params=params)
+        full_place_data = response.json().get('result', {})
+        
+        # Map to google_meta with periods
+        google_meta = map_place_to_meta(place_data)
+        
+        # Add periods to opening_hours if available
+        if 'opening_hours' in full_place_data and 'periods' in full_place_data['opening_hours']:
+            if 'opening_hours' not in google_meta:
+                google_meta['opening_hours'] = {}
+            google_meta['opening_hours']['periods'] = full_place_data['opening_hours']['periods']
+        
+        # Get geometry
+        geo = None
+        if 'geometry' in full_place_data and 'location' in full_place_data['geometry']:
+            location = full_place_data['geometry']['location']
+            geo = {'lat': location['lat'], 'lng': location['lng']}
+        
+        # Insert merchant
+        import uuid
+        merchant_id = str(uuid.uuid4())
+        
+        insert_query = text("""
+            INSERT INTO merchants (
+                id, name, slug, type, address, google_place_id, country_code,
+                geo, google_meta, google_sync_status, last_synced_at, created_at
+            )
+            VALUES (
+                :id, :name, :slug, :type, :address, :google_place_id, :country_code,
+                CAST(:geo AS jsonb), CAST(:google_meta AS jsonb), 'synced', NOW(), NOW()
+            )
+        """)
+        
+        db.execute(insert_query, {
+            'id': merchant_id,
+            'name': 'Tacos Fenix',
+            'slug': 'tacos-fenix',
+            'type': 'restaurant',
+            'address': 'Av. Espinoza 451, Obrera, 22830 Ensenada, B.C., Mexico',
+            'google_place_id': PLACE_ID,
+            'country_code': 'MX',
+            'geo': json.dumps(geo) if geo else None,
+            'google_meta': json.dumps(google_meta)
+        })
+        
+        db.commit()
+        
+        return {
+            "message": "Successfully created Tacos Fenix",
+            "merchant_id": merchant_id,
+            "name": "Tacos Fenix",
+            "slug": "tacos-fenix",
+            "rating": google_meta.get('rating'),
+            "photos": len(google_meta.get('photos', [])),
+            "has_hours": 'opening_hours' in google_meta,
+            "open_now": google_meta.get('opening_hours', {}).get('open_now'),
+            "url": "https://pocket-pallet.vercel.app/merchants/tacos-fenix"
+        }
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
