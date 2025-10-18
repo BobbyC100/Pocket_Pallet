@@ -451,6 +451,21 @@ export default function MerchantDetailPage() {
 
               {/* Horizontal pill row with wrap */}
               <div className="flex flex-wrap gap-2">
+                {/* Status - GREEN for Open, RED for Closed - ALWAYS FIRST */}
+                {googleMeta?.opening_hours?.open_now !== undefined && (
+                  <span 
+                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-medium border whitespace-nowrap"
+                    style={{
+                      borderColor: googleMeta.opening_hours.open_now ? '#86efac' : '#fecaca',
+                      backgroundColor: googleMeta.opening_hours.open_now ? '#dcfce7' : '#fef2f2',
+                      color: googleMeta.opening_hours.open_now ? '#15803d' : '#b91c1c'
+                    }}
+                    title={googleMeta.opening_hours.open_now ? 'Currently open' : 'Currently closed'}
+                  >
+                    {googleMeta.opening_hours.open_now ? 'Open' : 'Closed'}
+                  </span>
+                )}
+
                 {/* Type */}
                 {typeLabel && (
                   <span 
@@ -478,21 +493,6 @@ export default function MerchantDetailPage() {
                     title={`Price level: ${'$'.repeat(googleMeta.price_level)}`}
                   >
                     {'$'.repeat(googleMeta.price_level)}
-                  </span>
-                )}
-
-                {/* Status - GREEN for Open, RED for Closed */}
-                {googleMeta?.opening_hours?.open_now !== undefined && (
-                  <span 
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-medium border whitespace-nowrap"
-                    style={{
-                      borderColor: googleMeta.opening_hours.open_now ? '#86efac' : '#fecaca',
-                      backgroundColor: googleMeta.opening_hours.open_now ? '#dcfce7' : '#fef2f2',
-                      color: googleMeta.opening_hours.open_now ? '#15803d' : '#b91c1c'
-                    }}
-                    title={googleMeta.opening_hours.open_now ? 'Currently open' : 'Currently closed'}
-                  >
-                    {googleMeta.opening_hours.open_now ? 'Open' : 'Closed'}
                   </span>
                 )}
 
