@@ -366,8 +366,39 @@ export default function MerchantDetailPage() {
     // Find today's periods
     const todayPeriods = periods.filter(p => p.open.day === currentDay);
     
-    if (todayPeriods.length === 0) {
-      // No periods today, find next opening
+    // Trust Google's open_now field, but add context from periods
+    if (isOpen) {
+      // Currently open - find when it closes
+      for (const period of todayPeriods) {
+        const openTime = parseInt(period.open.time);
+        const closeTime = period.close ? parseInt(period.close.time) : 2400;
+        
+        if (currentTime >= openTime && currentTime < closeTime) {
+          const closeFormatted = formatTime(period.close?.time || '2400');
+          return `Open · Closes ${closeFormatted}`;
+        }
+      }
+      return 'Open'; // Fallback if we can't find the closing time
+    } else {
+      // Currently closed - find when it opens
+      
+      // Check for later today
+      const futurePeriodsToday = todayPeriods.filter(p => parseInt(p.open.time) > currentTime);
+      if (futurePeriodsToday.length > 0) {
+        const nextPeriod = futurePeriodsToday[0];
+        const openFormatted = formatTime(nextPeriod.open.time);
+        return `Closed · Opens ${openFormatted}`;
+      }
+      
+      // Find tomorrow's opening
+      const tomorrowDay = (currentDay + 1) % 7;
+      const tomorrowPeriods = periods.filter(p => p.open.day === tomorrowDay);
+      if (tomorrowPeriods.length > 0) {
+        const openFormatted = formatTime(tomorrowPeriods[0].open.time);
+        return `Closed · Opens ${openFormatted}`;
+      }
+      
+      // Find next available day
       const futurePeriods = periods.filter(p => p.open.day > currentDay);
       if (futurePeriods.length > 0) {
         const nextPeriod = futurePeriods[0];
@@ -376,38 +407,9 @@ export default function MerchantDetailPage() {
         const openTime = formatTime(nextPeriod.open.time);
         return `Closed · Opens ${nextDay} ${openTime}`;
       }
-      return 'Closed';
-    }
-    
-    // Check if currently within any period
-    for (const period of todayPeriods) {
-      const openTime = parseInt(period.open.time);
-      const closeTime = period.close ? parseInt(period.close.time) : 2400;
       
-      if (currentTime >= openTime && currentTime < closeTime) {
-        // Currently open
-        const closeFormatted = formatTime(period.close?.time || '2400');
-        return `Open · Closes ${closeFormatted}`;
-      }
+      return 'Closed'; // Fallback
     }
-    
-    // Closed, find next opening today or tomorrow
-    const futurePeriodsToday = todayPeriods.filter(p => parseInt(p.open.time) > currentTime);
-    if (futurePeriodsToday.length > 0) {
-      const nextPeriod = futurePeriodsToday[0];
-      const openFormatted = formatTime(nextPeriod.open.time);
-      return `Closed · Opens ${openFormatted}`;
-    }
-    
-    // Find tomorrow's opening
-    const tomorrowDay = (currentDay + 1) % 7;
-    const tomorrowPeriods = periods.filter(p => p.open.day === tomorrowDay);
-    if (tomorrowPeriods.length > 0) {
-      const openFormatted = formatTime(tomorrowPeriods[0].open.time);
-      return `Closed · Opens ${openFormatted}`;
-    }
-    
-    return isOpen ? 'Open' : 'Closed';
   };
   
   // Helper: Format time string (e.g., "1430" -> "2:30 PM")
