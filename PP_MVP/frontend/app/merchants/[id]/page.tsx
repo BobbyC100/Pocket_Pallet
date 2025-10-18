@@ -781,106 +781,110 @@ export default function MerchantDetailPage() {
       </section>
 
             {/* Business Info Section - Below Description */}
-            <section className="mt-8 w-full rounded-xl border border-neutral-200 bg-white p-5" aria-label="Business Info">
-              {/* Address */}
-              {(googleMeta?.formatted_address || merchant.address) && (
-                <div className="mb-3 flex items-start gap-3">
-                  <span className="text-xl mt-0.5">📍</span>
-                  <p className="text-base leading-relaxed text-neutral-800">
-                    {googleMeta?.formatted_address || merchant.address}
+            <section className="mt-8 w-full space-y-4" aria-label="Business Info">
+              {/* Group 1: Status + Price (what matters first) */}
+              <div className="space-y-1.5">
+                {/* Status Line */}
+                {getStatusMessage() && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg text-neutral-400">🕐</span>
+                    <p className="text-base">
+                      {getStatusMessage()!.startsWith('Open') ? (
+                        <>
+                          <span className="font-semibold text-green-700">Open</span>
+                          <span className="text-neutral-700"> {getStatusMessage()!.replace('Open', '').trim()}</span>
+                        </>
+                      ) : getStatusMessage()!.startsWith('Closed') ? (
+                        <>
+                          <span className="font-semibold text-red-600">Closed</span>
+                          <span className="text-neutral-700"> {getStatusMessage()!.replace('Closed', '').trim()}</span>
+                        </>
+                      ) : (
+                        <span className="text-neutral-700">{getStatusMessage()}</span>
+                      )}
           </p>
         </div>
-              )}
-              
-              {/* Status Line */}
-              {getStatusMessage() && (
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="text-xl">🕐</span>
-                  <p className="text-base">
-                    {getStatusMessage()!.startsWith('Open') ? (
-                      <>
-                        <span className="font-semibold text-green-700">Open</span>
-                        <span className="text-neutral-600"> {getStatusMessage()!.replace('Open', '').trim()}</span>
-                      </>
-                    ) : getStatusMessage()!.startsWith('Closed') ? (
-                      <>
-                        <span className="font-semibold text-red-700">Closed</span>
-                        <span className="text-neutral-600"> {getStatusMessage()!.replace('Closed', '').trim()}</span>
-                      </>
-                    ) : (
-                      <span className="text-neutral-600">{getStatusMessage()}</span>
-                    )}
+                )}
+                
+                {/* Time Until Change */}
+                {getTimeUntilChange() && (
+                  <p className="ml-7 text-sm text-neutral-600">
+                    {getTimeUntilChange()}
                   </p>
+                )}
+                
+                {/* Price Range */}
+                {getPriceRange() && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg text-neutral-400">💵</span>
+                    <p className="text-base text-neutral-700">{getPriceRange()}</p>
+                  </div>
+                      )}
+                    </div>
+
+              {/* Group 2: Address + Last Updated */}
+              <div className="space-y-1.5">
+                {/* Address */}
+                {(googleMeta?.formatted_address || merchant.address) && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg text-neutral-400 mt-0.5">📍</span>
+                    <p className="text-base leading-relaxed text-neutral-700">
+                      {googleMeta?.formatted_address || merchant.address}
+                    </p>
                         </div>
                       )}
-              
-              {/* Time Until Change (e.g., "Opens in 3 hours") */}
-              {getTimeUntilChange() && (
-                <p className="mb-2 ml-9 text-sm text-neutral-600">
-                  {getTimeUntilChange()}
-                </p>
-              )}
                       
-              {/* Last Updated */}
-              {getLastUpdated() && (
-                <p className="mb-3 ml-9 text-sm text-neutral-500">
-                  {getLastUpdated()}
-                </p>
-              )}
-              
-              {/* See More Hours Button */}
-              {googleMeta?.opening_hours?.weekday_text && (
-                <button
-                  type="button"
-                  onClick={() => setHoursExpanded(!hoursExpanded)}
-                  className="ml-9 text-sm font-medium text-blue-600 hover:underline"
-                >
-                  {hoursExpanded ? 'Hide hours' : 'See more hours'}
-                </button>
-              )}
+                {/* Last Updated */}
+                {getLastUpdated() && (
+                  <p className="ml-7 text-sm text-neutral-500">
+                    {getLastUpdated()}
+                  </p>
+                )}
+                
+                {/* See More Hours Button */}
+                {googleMeta?.opening_hours?.weekday_text && (
+                  <button
+                    type="button"
+                    onClick={() => setHoursExpanded(!hoursExpanded)}
+                    className="ml-7 text-sm font-medium text-blue-600 hover:underline"
+                  >
+                    {hoursExpanded ? 'Hide hours' : 'See more hours'}
+                  </button>
+                )}
+              </div>
               
               {/* Expandable Hours Table */}
               {hoursExpanded && googleMeta?.opening_hours?.weekday_text && (
-                <div className="mt-4 ml-9 border-t border-neutral-200 pt-4">
+                <div className="ml-7 pt-2">
                   <dl className="divide-y divide-neutral-100">
                     {googleMeta.opening_hours.weekday_text.map((text, i) => {
                       const [day, hours] = text.split(': ');
                       const todayIndex = (new Date().getDay() + 6) % 7;
                       const isToday = i === todayIndex;
                       return (
-                        <div key={i} className="grid grid-cols-[100px_1fr] items-baseline py-2">
-                          <dt className={isToday ? "text-sm font-semibold text-amber-700" : "text-sm text-neutral-700"}>
+                        <div key={i} className="grid grid-cols-[100px_1fr] items-baseline py-1.5">
+                          <dt className={isToday ? "text-sm font-semibold text-amber-700" : "text-sm text-neutral-600"}>
                             {day}
                           </dt>
-                          <dd className={isToday ? "text-sm font-semibold text-amber-700" : "text-sm text-neutral-700"}>
+                          <dd className={isToday ? "text-sm font-semibold text-amber-700" : "text-sm text-neutral-600"}>
                             {hours}
                           </dd>
                         </div>
                       );
                     })}
                   </dl>
-                        </div>
-                      )}
-
-              {/* Price Range */}
-              {getPriceRange() && (
-                <div className="mt-4 border-t border-neutral-200 pt-4">
-                        <div className="flex items-center gap-2">
-                    <span className="text-xl">💵</span>
-                    <p className="text-sm text-neutral-600">{getPriceRange()}</p>
-                  </div>
-                        </div>
-                      )}
-
-              {/* Contact Actions */}
-              <div className="mt-4 flex flex-wrap gap-2 border-t border-neutral-200 pt-4">
+                </div>
+              )}
+              
+              {/* Group 3: Action Buttons */}
+              <div className="flex flex-wrap gap-1.5 pt-2">
                 {/* Phone */}
                 {googleMeta?.formatted_phone_number && (
                   <a
                     href={`tel:${googleMeta.formatted_phone_number.replace(/\s/g, '')}`}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm font-medium text-neutral-800 hover:bg-neutral-100"
+                    className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-white px-3 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
                   >
-                    <span>📞</span> Call
+                    <span className="text-base">📞</span> Call
                   </a>
                 )}
                 
@@ -888,9 +892,9 @@ export default function MerchantDetailPage() {
                 {merchant.geo?.lat && merchant.geo?.lng && (
                   <button
                     onClick={() => setMapsOpen(true)}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm font-medium text-neutral-800 hover:bg-neutral-100"
+                    className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-white px-3 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
                   >
-                    <span>🧭</span> Directions
+                    <span className="text-base">🧭</span> Directions
                   </button>
                 )}
                 
@@ -900,9 +904,9 @@ export default function MerchantDetailPage() {
                     href={merchant.contact?.instagram || googleMeta?.website || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm font-medium text-neutral-800 hover:bg-neutral-100"
+                    className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-white px-3 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
                   >
-                    <span>📸</span> Instagram
+                    <span className="text-base">📸</span> Instagram
                   </a>
                 )}
                 
@@ -912,9 +916,9 @@ export default function MerchantDetailPage() {
                     href={googleMeta.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm font-medium text-neutral-800 hover:bg-neutral-100"
+                    className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-white px-3 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
                   >
-                    <span>🔎</span> Google
+                    <span className="text-base">🔎</span> Google
                   </a>
                 )}
               </div>
