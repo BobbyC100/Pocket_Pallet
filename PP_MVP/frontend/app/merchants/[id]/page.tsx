@@ -398,13 +398,13 @@ export default function MerchantDetailPage() {
                   ) : (
                     <a
                       href={googleMeta?.website || merchant.contact?.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                target="_blank"
+                rel="noopener noreferrer"
                       className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
-                    >
+              >
                       Website
-                    </a>
-                  )}
+              </a>
+            )}
                 </>
               )}
               {merchant.contact?.instagram && !isInstagramUrl(googleMeta?.website || merchant.contact?.website || '') && (
@@ -417,7 +417,7 @@ export default function MerchantDetailPage() {
                   Instagram
                 </a>
               )}
-            </div>
+          </div>
 
             {/* At-a-Glance Pills - Below Action Pills */}
             <section className="pt-4" aria-labelledby="at-a-glance">
@@ -554,9 +554,9 @@ export default function MerchantDetailPage() {
                       aria-hidden="true"
                       className="pointer-events-none absolute -bottom-2 left-1/2 z-10 h-2 w-2 -translate-x-1/2 rotate-45 bg-neutral-900 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
                     />
-                  </span>
-                ))}
-              </div>
+                </span>
+              ))}
+            </div>
             </section>
 
             {/* Description Section - Below At-a-Glance */}
@@ -585,8 +585,8 @@ export default function MerchantDetailPage() {
                       background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.92))'
                     }}
                   />
-                )}
-              </div>
+          )}
+        </div>
 
               {/* View More/Less Toggle */}
               {shouldShowToggle && (
@@ -600,27 +600,57 @@ export default function MerchantDetailPage() {
                   {descriptionExpanded ? 'View less' : 'View more'}
                 </button>
               )}
-            </section>
+      </section>
+
+            {/* Photo Mosaic - Below Description */}
+            {galleryImages.length > 0 && (
+              <section className="mt-8">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-1">
+                  {galleryImages.map((src, i) => {
+                    return (
+                      <figure
+                        key={i}
+                        className="relative overflow-hidden rounded-xl cursor-pointer hover:opacity-90 transition group aspect-square"
+                        onClick={() => setLightboxIndex(i)}
+                      >
+                        <img
+                          src={src}
+                          alt={`${merchant.name} photo ${i + 1}`}
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            if (hasStreetView && i === 0) {
+                              e.currentTarget.parentElement?.remove();
+                            }
+                          }}
+                        />
+                        
+                        {/* Street View badge - only on first tile */}
+                        {hasStreetView && i === 0 && (
+                          <span className="absolute bottom-2 right-2 rounded bg-black/60 text-white text-xs px-2 py-1">
+                            Street View
+                          </span>
+                        )}
+                      </figure>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
           </div>
 
-          {/* RIGHT: Right-justified hero */}
-          <div className="flex justify-end items-start">
-            <img
-              src={getHeroImage()}
-              alt={merchant.name}
-              className="aspect-[16/9] w-full max-w-[860px] rounded-2xl object-cover shadow-sm"
-            />
-          </div>
+          {/* RIGHT: Hero + Details Block */}
+          <div className="flex flex-col gap-6">
+            {/* Hero Image */}
+            <div className="flex justify-end items-start">
+              <img
+                src={getHeroImage()}
+                alt={merchant.name}
+                className="aspect-[16/9] w-full max-w-[860px] rounded-2xl object-cover shadow-sm"
+              />
         </div>
-      </header>
 
-      {/* Main Content - Below Header */}
-      <div className="max-w-6xl mx-auto px-6 py-8 md:py-10">
-        {/* Details Block (was in two-column grid, now full width) */}
-        <div>
-          
-          {/* Right Column - Details Block (Hours + Contact) */}
-          <div>
+            {/* Details Block (Hours + Contact) */}
             <section aria-label="Details" className="rounded-2xl bg-neutral-50 p-6">
               <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 {/* Hours */}
@@ -653,7 +683,7 @@ export default function MerchantDetailPage() {
                   <div className="space-y-3 text-base text-neutral-700">
                     {/* Address */}
                     {merchant.address && (
-                      <div>
+                    <div>
                         <p className="leading-relaxed">{merchant.address}</p>
                         {merchant.geo?.lat && merchant.geo?.lng && (
                           <button
@@ -662,25 +692,31 @@ export default function MerchantDetailPage() {
                           >
                             Get Directions
                           </button>
-                        )}
-                      </div>
+                      )}
+                    </div>
                     )}
 
                     {/* Phone */}
                     {googleMeta?.formatted_phone_number && (
-                      <div>
+                        <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
                         <a
                           href={`tel:${googleMeta.formatted_phone_number.replace(/\s/g, '')}`}
                           className="text-blue-600 hover:underline"
                         >
                           {googleMeta.formatted_phone_number}
                         </a>
-                      </div>
-                    )}
-
+                        </div>
+                      )}
+                      
                     {/* Instagram */}
                     {(merchant.contact?.instagram || (googleMeta?.website && googleMeta.website.includes('instagram.com'))) && (
-                      <div>
+                        <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-neutral-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                        </svg>
                         <a
                           href={merchant.contact?.instagram || googleMeta?.website || '#'}
                           target="_blank"
@@ -689,12 +725,18 @@ export default function MerchantDetailPage() {
                         >
                           Instagram
                         </a>
-                      </div>
-                    )}
+                        </div>
+                      )}
 
                     {/* Google Profile */}
                     {googleMeta?.url && (
-                      <div>
+                        <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-neutral-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
                         <a
                           href={googleMeta.url}
                           target="_blank"
@@ -703,175 +745,18 @@ export default function MerchantDetailPage() {
                         >
                           View Google Profile
                         </a>
-                      </div>
-                    )}
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
             </section>
           </div>
         </div>
+      </header>
 
-        {/* Subtle Section Divider */}
-        <hr className="border-t my-6" style={{ borderColor: '#E8E4DE' }} />
-
-        {/* Photo Mosaic - Google Places Photos */}
-        {galleryImages.length > 0 && (
-          <section className="py-6 md:py-8">
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-1">
-              {galleryImages.map((src, i) => {
-                return (
-                  <figure
-                    key={i}
-                    className="relative overflow-hidden rounded-xl cursor-pointer hover:opacity-90 transition group aspect-square"
-                    onClick={() => setLightboxIndex(i)}
-                  >
-                    <img
-                      src={src}
-                      alt={`${merchant.name} photo ${i + 1}`}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                      onError={(e) => {
-                        if (hasStreetView && i === 0) {
-                          e.currentTarget.parentElement?.remove();
-                        }
-                      }}
-                    />
-                    
-                    {/* Street View badge - only on first tile */}
-                    {hasStreetView && i === 0 && (
-                      <span className="absolute bottom-2 right-2 rounded bg-black/60 text-white text-xs px-2 py-1">
-                        Street View
-                      </span>
-                    )}
-                  </figure>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* Subtle Section Divider */}
-        <hr className="border-t my-6" style={{ borderColor: '#E8E4DE' }} />
-
-        {/* Two-Column: Hours & Contact/Address */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pb-8 md:pb-10">
-          {/* Hours */}
-          {googleMeta?.opening_hours?.weekday_text && (
-            <section>
-              <h2 className="text-lg font-serif mb-3 text-center" style={{ 
-                fontFamily: 'Georgia, "Playfair Display", serif'
-              }}>
-                Hours
-              </h2>
-              <div className="space-y-0.5 text-sm" style={{ color: '#555', lineHeight: '1.5' }}>
-                {googleMeta.opening_hours.weekday_text.map((text, i) => {
-                  const [day, hours] = text.split(': ');
-                  const isToday = new Date().getDay() === i;
-                  return (
-                    <div 
-                      key={i} 
-                      className={`flex justify-between py-0.5 ${isToday ? 'font-semibold' : ''}`}
-                      style={{ 
-                        color: isToday ? '#D6A55B' : '#555',
-                      }}
-                    >
-                      <span>{day}</span>
-                      <span>{hours}</span>
-                    </div>
-                  );
-                })}
-                        </div>
-            </section>
-          )}
-          
-          {/* Contact & Address */}
-          <section>
-            <h2 className="text-lg font-serif mb-3 text-center" style={{ 
-              fontFamily: 'Georgia, "Playfair Display", serif'
-            }}>
-              Contact & Address
-            </h2>
-            
-            <div className="space-y-4 text-sm" style={{ color: '#555', lineHeight: '1.5' }}>
-              {/* Address */}
-              {(googleMeta?.formatted_address || merchant.address) && (
-                <div>
-                  <p className="mb-1 text-left">{googleMeta?.formatted_address || merchant.address}</p>
-                  <button
-                    onClick={() => setMapsOpen(true)}
-                    className="text-blue-600 hover:underline text-xs text-left"
-                  >
-                    Get Directions →
-                  </button>
-                        </div>
-                      )}
-
-              {/* Contact Section */}
-              <div>
-                <h3 className="text-xs uppercase tracking-wide text-neutral-500 mb-2">Contact</h3>
-                <div className="space-y-1.5">
-                  {/* Phone */}
-                  {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
-                    <div>
-                      <a 
-                        href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
-                        className="text-blue-600 hover:underline block text-left"
-                      >
-                        {googleMeta?.formatted_phone_number || merchant.contact?.phone}
-                      </a>
-                        </div>
-                      )}
-
-                  {/* Website - only if not Instagram */}
-                  {(googleMeta?.website || merchant.contact?.website) && !isInstagramUrl(googleMeta?.website || merchant.contact?.website) && (
-                    <div>
-                      <a
-                        href={googleMeta?.website || merchant.contact?.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline break-all block text-left"
-                      >
-                        {displayUrl(googleMeta?.website || merchant.contact?.website || '')}
-                      </a>
-                        </div>
-                      )}
-
-                  {/* Instagram - from contact field OR from website if it's Instagram */}
-                  {(merchant.contact?.instagram || isInstagramUrl(googleMeta?.website || merchant.contact?.website)) && (
-                    <div>
-                      <a
-                        href={
-                          merchant.contact?.instagram 
-                            ? `https://instagram.com/${merchant.contact.instagram.replace('@', '')}`
-                            : (googleMeta?.website || merchant.contact?.website || '')
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline block text-left"
-                      >
-                        {merchant.contact?.instagram || getInstagramHandle(googleMeta?.website || merchant.contact?.website || '')}
-                      </a>
-                        </div>
-                      )}
-                </div>
-              </div>
-            </div>
-            
-            {/* View on Google Link */}
-            <div className="mt-2">
-              <a
-                href={googleMeta?.url || merchant.source_url || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline block text-left text-sm"
-              >
-                View Google Profile
-              </a>
-            </div>
-          </section>
-                    </div>
-
+      {/* Main Content - Below Header */}
+      <div className="max-w-6xl mx-auto px-6 py-8 md:py-10">
         {/* Available Wines Section - Only show for Wine Shops */}
         {typeLabel === 'Wine Shop' && (
           <>
@@ -891,7 +776,7 @@ export default function MerchantDetailPage() {
                 color: '#1E40AF'
               }}>
                 Menu rotates — last verified {Math.floor(Math.random() * 30)} days ago.
-              </div>
+                        </div>
               
               <div className="mt-6 p-12 text-center border-2 border-dashed rounded-xl" style={{
                 borderColor: '#E8E4DE',
@@ -900,7 +785,7 @@ export default function MerchantDetailPage() {
               }}>
                 <p className="text-lg">No wines parsed yet. Check back soon!</p>
                 <p className="text-sm mt-2">We&apos;re working on connecting wine inventory to merchant profiles.</p>
-              </div>
+                        </div>
             </section>
           </>
         )}
