@@ -418,24 +418,9 @@ export default function MerchantDetailPage() {
                 </a>
               )}
             </div>
-          </div>
 
-          {/* RIGHT: Right-justified hero */}
-          <div className="flex justify-end">
-            <img
-              src={getHeroImage()}
-              alt={merchant.name}
-              className="aspect-[16/9] w-full max-w-[860px] rounded-2xl object-cover shadow-sm"
-            />
-          </div>
-
-          {/* At‑a‑glance below hero, right column */}
-          <div className="md:col-start-2">
-
-            {/* At-a-Glance Pills under hero */}
-            <div className="mt-3 flex justify-end">
-              <div className="max-w-[860px] flex-1">
-                <section className="pt-4" aria-labelledby="at-a-glance">
+            {/* At-a-Glance Pills - Below Action Pills */}
+            <section className="pt-4" aria-labelledby="at-a-glance">
               <h2 
                 id="at-a-glance" 
                 className="mb-2 text-sm font-medium text-neutral-500"
@@ -573,20 +558,9 @@ export default function MerchantDetailPage() {
                 ))}
               </div>
             </section>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
 
-      {/* Main Content - Below Header */}
-      <div className="max-w-6xl mx-auto px-6 py-8 md:py-10">
-        {/* Two-Column Grid: Description left, Details right */}
-        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,480px)] gap-6">
-          {/* Left Column - Description */}
-          <div>
-            {/* Description Section - Line Clamped with View More/Less */}
-            <section className="mt-1" aria-labelledby="description-heading">
+            {/* Description Section - Below At-a-Glance */}
+            <section className="mt-3" aria-labelledby="description-heading">
               <h3 id="description-heading" className="sr-only">Description</h3>
               <div className="relative">
                 <p
@@ -628,6 +602,22 @@ export default function MerchantDetailPage() {
               )}
             </section>
           </div>
+
+          {/* RIGHT: Right-justified hero */}
+          <div className="flex justify-end items-start">
+            <img
+              src={getHeroImage()}
+              alt={merchant.name}
+              className="aspect-[16/9] w-full max-w-[860px] rounded-2xl object-cover shadow-sm"
+            />
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content - Below Header */}
+      <div className="max-w-6xl mx-auto px-6 py-8 md:py-10">
+        {/* Details Block (was in two-column grid, now full width) */}
+        <div>
           
           {/* Right Column - Details Block (Hours + Contact) */}
           <div>
