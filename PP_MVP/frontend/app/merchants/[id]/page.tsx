@@ -350,7 +350,7 @@ export default function MerchantDetailPage() {
       {/* Header Layout: Left Title / Right Hero */}
       <header className="mx-auto max-w-6xl px-4 pt-6">
         <div className="grid items-start gap-6 md:grid-cols-[minmax(260px,360px)_1fr]">
-          {/* LEFT: Title + Address */}
+          {/* LEFT: Title + Address + Action Pills */}
           <div>
             <h1 className="text-4xl font-semibold tracking-tight text-neutral-900 md:text-5xl">
               {merchant.name}
@@ -360,29 +360,10 @@ export default function MerchantDetailPage() {
                 {googleMeta?.formatted_address || merchant.address}
               </p>
             )}
-          </div>
 
-          {/* RIGHT: Right-justified hero */}
-          <div className="flex justify-end">
-            <img
-              src={getHeroImage()}
-              alt={merchant.name}
-              className="aspect-[16/9] w-full max-w-[860px] rounded-2xl object-cover shadow-sm"
-            />
-          </div>
-
-          {/* Actions + At‑a‑glance live UNDER the hero, same right column */}
-          <div className="md:col-start-2">
-            {/* Action Pills */}
-            <div className="flex flex-wrap justify-end gap-2">
-              {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
-                <a
-                  href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
-                  className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
-                >
-                  Call
-                </a>
-              )}
+            {/* Action Pills - Below Address */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {/* Directions - FIRST */}
               {merchant.geo?.lat && merchant.geo?.lng && (
                 <button
                   onClick={() => setMapsOpen(true)}
@@ -391,7 +372,18 @@ export default function MerchantDetailPage() {
                   Directions
                 </button>
               )}
-              {/* Website or Instagram Button */}
+
+              {/* Call - SECOND */}
+              {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
+                <a
+                  href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
+                  className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+                >
+                  Call
+                </a>
+              )}
+
+              {/* Instagram / Website - THIRD */}
               {(googleMeta?.website || merchant.contact?.website) && (
                 <>
                   {isInstagramUrl(googleMeta?.website || merchant.contact?.website) ? (
@@ -415,7 +407,6 @@ export default function MerchantDetailPage() {
                   )}
                 </>
               )}
-              {/* Show Instagram button if contact.instagram exists */}
               {merchant.contact?.instagram && !isInstagramUrl(googleMeta?.website || merchant.contact?.website || '') && (
                 <a
                   href={`https://instagram.com/${merchant.contact.instagram.replace('@', '')}`}
@@ -427,6 +418,19 @@ export default function MerchantDetailPage() {
                 </a>
               )}
             </div>
+          </div>
+
+          {/* RIGHT: Right-justified hero */}
+          <div className="flex justify-end">
+            <img
+              src={getHeroImage()}
+              alt={merchant.name}
+              className="aspect-[16/9] w-full max-w-[860px] rounded-2xl object-cover shadow-sm"
+            />
+          </div>
+
+          {/* At‑a‑glance below hero, right column */}
+          <div className="md:col-start-2">
 
             {/* At-a-Glance Pills under hero */}
             <div className="mt-3 flex justify-end">
