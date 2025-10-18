@@ -439,75 +439,99 @@ export default function MerchantDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
           {/* Left Column - Meta → Description → Tips */}
           <div className="relative">
-            {/* At a Glance Section - Horizontal Pill Row */}
-            <section className="mb-6 pt-2" aria-labelledby="at-a-glance">
+            {/* At a Glance Section - Horizontal Pills with Tooltips */}
+            <section className="mb-6 pt-4" aria-labelledby="at-a-glance">
               <h2 
                 id="at-a-glance" 
-                className="mb-3 text-sm font-medium"
-                style={{ color: '#6b7280' }}
+                className="mb-2 text-sm font-medium text-neutral-500"
               >
                 At a glance
               </h2>
 
               {/* Horizontal pill row with wrap */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2">
                 {/* Status - GREEN for Open, RED for Closed - ALWAYS FIRST */}
                 {googleMeta?.opening_hours?.open_now !== undefined && (
                   <span 
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-medium border whitespace-nowrap"
+                    className="group relative inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium leading-none shadow-[0_1px_0_rgba(0,0,0,0.03)]"
                     style={{
                       borderColor: googleMeta.opening_hours.open_now ? '#86efac' : '#fecaca',
                       backgroundColor: googleMeta.opening_hours.open_now ? '#dcfce7' : '#fef2f2',
                       color: googleMeta.opening_hours.open_now ? '#15803d' : '#b91c1c'
                     }}
-                    title={googleMeta.opening_hours.open_now ? 'Currently open' : 'Currently closed'}
+                    aria-label={googleMeta.opening_hours.open_now ? 'Currently open' : 'Currently closed'}
                   >
                     {googleMeta.opening_hours.open_now ? 'Open' : 'Closed'}
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute -bottom-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    >
+                      Status
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -bottom-2 left-1/2 z-10 h-2 w-2 -translate-x-1/2 rotate-45 bg-neutral-900 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    />
                   </span>
                 )}
 
                 {/* Type */}
                 {typeLabel && (
                   <span 
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm border whitespace-nowrap"
-                    style={{
-                      borderColor: '#e5e7eb',
-                      backgroundColor: '#fafafa',
-                      color: '#374151'
-                    }}
-                    title={`Type: ${typeLabel}`}
+                    className="group relative inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-sm font-medium leading-none text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.03)]"
+                    aria-label={`Type: ${typeLabel}`}
                   >
                     {typeLabel}
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute -bottom-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    >
+                      Type
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -bottom-2 left-1/2 z-10 h-2 w-2 -translate-x-1/2 rotate-45 bg-neutral-900 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    />
                   </span>
                 )}
 
                 {/* Cost */}
                 {googleMeta?.price_level && (
                   <span 
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm border whitespace-nowrap"
-                    style={{
-                      borderColor: '#e5e7eb',
-                      backgroundColor: '#fafafa',
-                      color: '#374151'
-                    }}
-                    title={`Price level: ${'$'.repeat(googleMeta.price_level)}`}
+                    className="group relative inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-sm font-medium leading-none text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.03)]"
+                    aria-label={`Cost: ${'$'.repeat(googleMeta.price_level)}`}
                   >
                     {'$'.repeat(googleMeta.price_level)}
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute -bottom-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    >
+                      Cost
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -bottom-2 left-1/2 z-10 h-2 w-2 -translate-x-1/2 rotate-45 bg-neutral-900 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    />
                   </span>
                 )}
 
                 {/* Vibe */}
                 {getVibe() && (
                   <span 
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm border whitespace-nowrap"
-                    style={{
-                      borderColor: '#e5e7eb',
-                      backgroundColor: '#fafafa',
-                      color: '#374151'
-                    }}
-                    title={`Vibe: ${getVibe()}`}
+                    className="group relative inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-sm font-medium leading-none text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.03)]"
+                    aria-label={`Vibe: ${getVibe()}`}
                   >
                     {getVibe()}
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute -bottom-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    >
+                      Vibe
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -bottom-2 left-1/2 z-10 h-2 w-2 -translate-x-1/2 rotate-45 bg-neutral-900 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    />
                   </span>
                 )}
 
@@ -515,15 +539,20 @@ export default function MerchantDetailPage() {
                 {getKnownFor().slice(0, 4).map((item, i) => (
                   <span 
                     key={`known-${i}`}
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm border whitespace-nowrap"
-                    style={{
-                      borderColor: '#e5e7eb',
-                      backgroundColor: '#fafafa',
-                      color: '#374151'
-                    }}
-                    title={`Known for: ${item}`}
+                    className="group relative inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-sm font-medium leading-none text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.03)]"
+                    aria-label={`Known for: ${item}`}
                   >
                     {item}
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute -bottom-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    >
+                      Known for
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -bottom-2 left-1/2 z-10 h-2 w-2 -translate-x-1/2 rotate-45 bg-neutral-900 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    />
                   </span>
                 ))}
 
@@ -531,46 +560,49 @@ export default function MerchantDetailPage() {
                 {getGoodToKnow().map((tip, i) => (
                   <span 
                     key={`tip-${i}`}
-                    className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm border whitespace-nowrap"
-                    style={{
-                      borderColor: '#e5e7eb',
-                      backgroundColor: '#fafafa',
-                      color: '#374151'
-                    }}
-                    title={`Good to know: ${tip}`}
+                    className="group relative inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-sm font-medium leading-none text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.03)]"
+                    aria-label={`Good to know: ${tip}`}
                   >
                     {tip}
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute -bottom-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    >
+                      Good to know
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -bottom-2 left-1/2 z-10 h-2 w-2 -translate-x-1/2 rotate-45 bg-neutral-900 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                    />
                   </span>
                 ))}
               </div>
             </section>
 
-            {/* Description Section - Line Clamped */}
-            <div className="mb-8">
+            {/* Description Section - Line Clamped with View More/Less */}
+            <section className="mb-8 mt-3" aria-labelledby="description-heading">
+              <h3 id="description-heading" className="sr-only">Description</h3>
               <div className="relative">
-                <div
+                <p
                   ref={descriptionRef}
                   id="merchant-description"
-                  className={`text-lg leading-relaxed ${
-                    descriptionExpanded ? '' : 'line-clamp-5 lg:line-clamp-5 md:line-clamp-6 sm:line-clamp-8'
-                  }`}
+                  className={descriptionExpanded ? 'text-neutral-800 max-w-prose' : 'text-neutral-800 line-clamp-4 max-w-prose'}
                   style={{ 
-                    color: '#333',
-                    fontSize: '19px',
-                    lineHeight: '1.8',
-                    fontFamily: 'Inter, "Work Sans", sans-serif'
+                    fontSize: '1.05rem',
+                    lineHeight: '1.75'
                   }}
                 >
                   {googleMeta?.editorial_summary || merchant.about || 
                     `${merchant.name} is a curated destination for natural wine enthusiasts. Discover unique bottles from small producers and family vineyards, carefully selected for their character and authenticity.`}
-                </div>
+                </p>
                 
                 {/* Gradient Fade - Only when clamped */}
                 {!descriptionExpanded && shouldShowToggle && (
                   <div 
-                    className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-x-0 bottom-0 h-10"
                     style={{
-                      background: 'linear-gradient(to bottom, transparent, #FEFDFB)'
+                      background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.92))'
                     }}
                   />
                 )}
@@ -579,29 +611,108 @@ export default function MerchantDetailPage() {
               {/* View More/Less Toggle */}
               {shouldShowToggle && (
                 <button
+                  type="button"
                   onClick={() => setDescriptionExpanded(!descriptionExpanded)}
                   aria-expanded={descriptionExpanded}
                   aria-controls="merchant-description"
-                  className="mt-3 text-sm text-blue-600 hover:underline font-medium transition-colors motion-reduce:transition-none"
+                  className="mt-2 text-sm font-medium underline underline-offset-4 text-neutral-700 hover:text-neutral-900 motion-reduce:transition-none"
                 >
-                  {descriptionExpanded ? 'View less ↑' : 'View more ↓'}
+                  {descriptionExpanded ? 'View less' : 'View more'}
                 </button>
               )}
-            </div>
+            </section>
           </div>
           
-          {/* Right Column - Anchor Image (skip Street View, use first Google photo) */}
-                    <div>
-            {galleryImages.length > 1 && (
-              <div className="rounded-2xl overflow-hidden shadow-lg">
-                <img
-                  src={galleryImages[1]}
-                  alt={`${merchant.name} interior`}
-                  className="w-full h-auto object-cover"
-                  style={{ maxHeight: '500px' }}
-                />
+          {/* Right Column - Details Block (Hours + Contact) */}
+          <div>
+            <section aria-label="Details" className="rounded-2xl bg-neutral-50 p-6">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                {/* Hours */}
+                {googleMeta?.opening_hours?.weekday_text && (
+                  <div>
+                    <h3 className="mb-4 text-xl font-semibold">Hours</h3>
+                    <dl className="space-y-3">
+                      {googleMeta.opening_hours.weekday_text.map((text, i) => {
+                        const [day, hours] = text.split(': ');
+                        const todayIndex = (new Date().getDay() + 6) % 7; // Adjust: Sunday=0 → 6
+                        const isToday = i === todayIndex;
+                        return (
+                          <div key={i} className="grid grid-cols-[120px_1fr] items-baseline">
+                            <dt className={isToday ? "text-lg text-amber-700 font-medium" : "text-lg text-neutral-700"}>
+                              {day}
+                            </dt>
+                            <dd className={isToday ? "text-base text-amber-700" : "text-base text-neutral-600"}>
+                              {hours}
+                            </dd>
+                          </div>
+                        );
+                      })}
+                    </dl>
+                  </div>
+                )}
+
+                {/* Contact & Address */}
+                <div>
+                  <h3 className="mb-4 text-xl font-semibold">Contact & Address</h3>
+                  <div className="space-y-3 text-base text-neutral-700">
+                    {/* Address */}
+                    {merchant.address && (
+                      <div>
+                        <p className="leading-relaxed">{merchant.address}</p>
+                        {merchant.geo?.lat && merchant.geo?.lng && (
+                          <button
+                            onClick={() => setMapsOpen(true)}
+                            className="mt-2 text-sm text-blue-600 hover:underline"
+                          >
+                            Get Directions
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Phone */}
+                    {googleMeta?.formatted_phone_number && (
+                      <div>
+                        <a
+                          href={`tel:${googleMeta.formatted_phone_number.replace(/\s/g, '')}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {googleMeta.formatted_phone_number}
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Instagram */}
+                    {(merchant.contact?.instagram || (googleMeta?.website && googleMeta.website.includes('instagram.com'))) && (
+                      <div>
+                        <a
+                          href={merchant.contact?.instagram || googleMeta?.website || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          Instagram
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Google Profile */}
+                    {googleMeta?.url && (
+                      <div>
+                        <a
+                          href={googleMeta.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-neutral-600 hover:text-neutral-900"
+                        >
+                          View Google Profile
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
+            </section>
           </div>
         </div>
 
@@ -611,12 +722,7 @@ export default function MerchantDetailPage() {
         {/* Photo Mosaic - Google Places Photos */}
         {galleryImages.length > 0 && (
           <section className="py-6 md:py-8">
-            <h2 className="text-2xl md:text-3xl font-serif mb-6 text-center" style={{ 
-              fontFamily: 'Georgia, "Playfair Display", serif'
-            }}>
-              Gallery
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-1">
               {galleryImages.map((src, i) => {
                 return (
                   <figure
