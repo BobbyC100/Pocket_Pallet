@@ -20,7 +20,7 @@ if not DATABASE_URL:
 # Tacos Fenix data
 PLACE_ID = "ChIJYblmQ3qS2IARnjZgt4i08d0"
 MERCHANT_DATA = {
-    'name': 'Tacos Fenix (Fish & Shrimp)',
+    'name': 'Tacos Fenix',  # Cleaned name (removed parenthetical)
     'slug': 'tacos-fenix',
     'type': 'restaurant',
     'address': 'Av. Espinoza 451, Obrera, 22830 Ensenada, B.C., Mexico',
