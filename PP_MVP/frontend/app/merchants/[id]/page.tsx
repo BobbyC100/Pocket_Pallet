@@ -610,31 +610,6 @@ export default function MerchantDetailPage() {
 
               {/* Horizontal pill row with wrap */}
               <div className="flex w-full flex-wrap items-center gap-x-2.5 gap-y-2">
-                {/* Status - GREEN for Open, RED for Closed - ALWAYS FIRST */}
-                {googleMeta?.opening_hours?.open_now !== undefined && (
-                  <span 
-                    className="group relative inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium leading-none shadow-[0_1px_0_rgba(0,0,0,0.03)]"
-                    style={{
-                      borderColor: googleMeta.opening_hours.open_now ? '#86efac' : '#fecaca',
-                      backgroundColor: googleMeta.opening_hours.open_now ? '#dcfce7' : '#fef2f2',
-                      color: googleMeta.opening_hours.open_now ? '#15803d' : '#b91c1c'
-                    }}
-                    aria-label={googleMeta.opening_hours.open_now ? 'Currently open' : 'Currently closed'}
-                  >
-                    {googleMeta.opening_hours.open_now ? 'Open' : 'Closed'}
-                    <span
-                      role="tooltip"
-                      className="pointer-events-none absolute -bottom-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
-                    >
-                      Status
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute -bottom-2 left-1/2 z-10 h-2 w-2 -translate-x-1/2 rotate-45 bg-neutral-900 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
-                    />
-                  </span>
-                )}
-
                 {/* Type */}
                 {typeLabel && (
                   <span 
@@ -785,33 +760,35 @@ export default function MerchantDetailPage() {
             <section className="mt-3 w-full rounded-lg border border-neutral-200 p-4 space-y-4" aria-label="Business Details" style={{ backgroundColor: 'transparent' }}>
               {/* Group 1: Status + Price (what matters first) */}
               <div className="space-y-1.5">
-                {/* Status Line */}
+                {/* Status Line + Countdown */}
                 {getStatusMessage() && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg text-neutral-400">🕐</span>
-                    <p className="text-base">
-                      {getStatusMessage()!.startsWith('Open') ? (
-                        <>
-                          <span className="font-semibold text-green-700">Open</span>
-                          <span className="text-neutral-700"> {getStatusMessage()!.replace('Open', '').trim()}</span>
-                        </>
-                      ) : getStatusMessage()!.startsWith('Closed') ? (
-                        <>
-                          <span className="font-semibold text-red-600">Closed</span>
-                          <span className="text-neutral-700"> {getStatusMessage()!.replace('Closed', '').trim()}</span>
-                        </>
-                      ) : (
-                        <span className="text-neutral-700">{getStatusMessage()}</span>
-                      )}
-          </p>
-        </div>
-                )}
-                
-                {/* Time Until Change */}
-                {getTimeUntilChange() && (
-                  <p className="ml-7 text-sm text-neutral-600">
-                    {getTimeUntilChange()}
-                  </p>
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg text-neutral-400">🕐</span>
+                      <p className="text-base">
+                        {getStatusMessage()!.startsWith('Open') ? (
+                          <>
+                            <span className="font-semibold text-green-700">Open</span>
+                            <span className="text-neutral-700"> {getStatusMessage()!.replace('Open', '').trim()}</span>
+                          </>
+                        ) : getStatusMessage()!.startsWith('Closed') ? (
+                          <>
+                            <span className="font-semibold text-red-600">Closed</span>
+                            <span className="text-neutral-700"> {getStatusMessage()!.replace('Closed', '').trim()}</span>
+                          </>
+                        ) : (
+                          <span className="text-neutral-700">{getStatusMessage()}</span>
+                        )}
+                      </p>
+                    </div>
+                    
+                    {/* Time Until Change */}
+                    {getTimeUntilChange() && (
+                      <p className="ml-7 text-sm text-neutral-600">
+                        {getTimeUntilChange()}
+                      </p>
+                    )}
+                  </div>
                 )}
                 
                 {/* Price Range */}
