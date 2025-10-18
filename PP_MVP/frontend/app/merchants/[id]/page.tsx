@@ -347,100 +347,91 @@ export default function MerchantDetailPage() {
 
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#FAF6EF', color: '#222' }}>
-      {/* Hero Section - Above the Fold */}
-      <section className="relative w-full overflow-hidden" style={{ height: '60vh', minHeight: '60vh' }}>
-        <img
-          src={getHeroImage()}
-          alt={merchant.name}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        
-        {/* Gradient Overlay - 40% opacity */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-        
-        {/* Overlay Content - Centered */}
-        <div className="absolute inset-x-0 bottom-0 pb-12 px-6 md:px-12 text-white max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-serif mb-3 animate-fadeIn" style={{ 
-            fontFamily: 'Georgia, "Playfair Display", serif',
-            textShadow: '0 2px 12px rgba(0,0,0,0.4)'
-          }}>
-            {merchant.name}
-          </h1>
-          
-          {(googleMeta?.formatted_address || merchant.address) && (
-            <p className="text-lg md:text-xl mb-6 opacity-90" style={{ 
-              fontFamily: 'Inter, "Work Sans", sans-serif',
-              textShadow: '0 1px 8px rgba(0,0,0,0.3)'
-            }}>
-              {googleMeta?.formatted_address || merchant.address}
-            </p>
-          )}
-          
-          {/* Action Buttons - Centered */}
-          <div className="flex flex-wrap gap-3 justify-center">
-            {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
-              <a
-                href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
-                className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
-              >
-                Call
-              </a>
-            )}
-            <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${merchant.geo?.lat},${merchant.geo?.lng}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
-            >
-              Directions
-            </a>
-            {/* Website or Instagram Button */}
-            {(googleMeta?.website || merchant.contact?.website) && (
-              <>
-                {isInstagramUrl(googleMeta?.website || merchant.contact?.website) ? (
-                  <a
-                    href={googleMeta?.website || merchant.contact?.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
-                  >
-                    Instagram
-                  </a>
-                ) : (
-                  <a
-                    href={googleMeta?.website || merchant.contact?.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
-                  >
-                    Website
-                  </a>
-                )}
-              </>
-            )}
-            {/* Show Instagram button if contact.instagram exists */}
-            {merchant.contact?.instagram && !isInstagramUrl(googleMeta?.website || merchant.contact?.website || '') && (
-              <a
-                href={`https://instagram.com/${merchant.contact.instagram.replace('@', '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 rounded-full text-sm font-medium border border-white/70 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition"
-              >
-                Instagram
-              </a>
+      {/* Header Layout: Left Title / Right Hero */}
+      <header className="mx-auto max-w-6xl px-4 pt-6">
+        <div className="grid items-start gap-6 md:grid-cols-[minmax(260px,360px)_1fr]">
+          {/* LEFT: Title + Address */}
+          <div>
+            <h1 className="text-4xl font-semibold tracking-tight text-neutral-900 md:text-5xl">
+              {merchant.name}
+            </h1>
+            {(googleMeta?.formatted_address || merchant.address) && (
+              <p className="mt-2 text-lg text-neutral-600">
+                {googleMeta?.formatted_address || merchant.address}
+              </p>
             )}
           </div>
-        </div>
-      </section>
 
-      {/* Main Content - Below the Fold */}
-      <div className="max-w-6xl mx-auto px-6 py-8 md:py-10">
-        {/* Two-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-          {/* Left Column - Meta → Description → Tips */}
-          <div className="relative">
-            {/* At a Glance Section - Horizontal Pills with Tooltips */}
-            <section className="mb-6 pt-4" aria-labelledby="at-a-glance">
+          {/* RIGHT: Right-justified hero */}
+          <div className="flex justify-end">
+            <img
+              src={getHeroImage()}
+              alt={merchant.name}
+              className="aspect-[16/9] w-full max-w-[860px] rounded-2xl object-cover shadow-sm"
+            />
+          </div>
+
+          {/* Actions + At‑a‑glance live UNDER the hero, same right column */}
+          <div className="md:col-start-2">
+            {/* Action Pills */}
+            <div className="flex flex-wrap justify-end gap-2">
+              {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
+                <a
+                  href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
+                  className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+                >
+                  Call
+                </a>
+              )}
+              {merchant.geo?.lat && merchant.geo?.lng && (
+                <button
+                  onClick={() => setMapsOpen(true)}
+                  className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+                >
+                  Directions
+                </button>
+              )}
+              {/* Website or Instagram Button */}
+              {(googleMeta?.website || merchant.contact?.website) && (
+                <>
+                  {isInstagramUrl(googleMeta?.website || merchant.contact?.website) ? (
+                    <a
+                      href={googleMeta?.website || merchant.contact?.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+                    >
+                      Instagram
+                    </a>
+                  ) : (
+                    <a
+                      href={googleMeta?.website || merchant.contact?.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+                    >
+                      Website
+                    </a>
+                  )}
+                </>
+              )}
+              {/* Show Instagram button if contact.instagram exists */}
+              {merchant.contact?.instagram && !isInstagramUrl(googleMeta?.website || merchant.contact?.website || '') && (
+                <a
+                  href={`https://instagram.com/${merchant.contact.instagram.replace('@', '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+                >
+                  Instagram
+                </a>
+              )}
+            </div>
+
+            {/* At-a-Glance Pills under hero */}
+            <div className="mt-3 flex justify-end">
+              <div className="max-w-[860px] flex-1">
+                <section className="pt-4" aria-labelledby="at-a-glance">
               <h2 
                 id="at-a-glance" 
                 className="mb-2 text-sm font-medium text-neutral-500"
@@ -578,9 +569,20 @@ export default function MerchantDetailPage() {
                 ))}
               </div>
             </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
 
+      {/* Main Content - Below Header */}
+      <div className="max-w-6xl mx-auto px-6 py-8 md:py-10">
+        {/* Two-Column Grid: Description left, Details right */}
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,480px)] gap-6">
+          {/* Left Column - Description */}
+          <div>
             {/* Description Section - Line Clamped with View More/Less */}
-            <section className="mb-8 mt-3" aria-labelledby="description-heading">
+            <section className="mt-1" aria-labelledby="description-heading">
               <h3 id="description-heading" className="sr-only">Description</h3>
               <div className="relative">
                 <p
@@ -722,7 +724,7 @@ export default function MerchantDetailPage() {
         {/* Photo Mosaic - Google Places Photos */}
         {galleryImages.length > 0 && (
           <section className="py-6 md:py-8">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-1">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-1">
               {galleryImages.map((src, i) => {
                 return (
                   <figure
