@@ -353,7 +353,7 @@ export default function MerchantDetailPage() {
           {/* LEFT: Title + Address + Action Pills */}
           <div>
             <h1 className="text-4xl font-semibold tracking-tight text-neutral-900 md:text-5xl">
-              {merchant.name}
+              {merchant.name.replace(/\s*\([^)]*\)/g, '').trim()}
             </h1>
             {(googleMeta?.formatted_address || merchant.address) && (
               <p className="mt-2 text-lg text-neutral-600">
