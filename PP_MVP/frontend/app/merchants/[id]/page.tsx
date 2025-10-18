@@ -545,7 +545,7 @@ export default function MerchantDetailPage() {
               {merchant.geo?.lat && merchant.geo?.lng && (
                 <button
                   onClick={() => setMapsOpen(true)}
-                  className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+                  className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-400"
                 >
                   Directions
                 </button>
@@ -555,7 +555,7 @@ export default function MerchantDetailPage() {
               {(googleMeta?.formatted_phone_number || merchant.contact?.phone) && (
                 <a
                   href={`tel:${googleMeta?.formatted_phone_number || merchant.contact?.phone}`}
-                  className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+                  className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-400"
                 >
                   Call
                 </a>
@@ -569,20 +569,20 @@ export default function MerchantDetailPage() {
                       href={googleMeta?.website || merchant.contact?.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+                      className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-400"
                     >
                       Instagram
                     </a>
                   ) : (
                     <a
                       href={googleMeta?.website || merchant.contact?.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                      className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
-              >
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-400"
+                    >
                       Website
-              </a>
-            )}
+                    </a>
+                  )}
                 </>
               )}
               {merchant.contact?.instagram && !isInstagramUrl(googleMeta?.website || merchant.contact?.website || '') && (
@@ -590,18 +590,18 @@ export default function MerchantDetailPage() {
                   href={`https://instagram.com/${merchant.contact.instagram.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-4 py-2 text-base font-medium text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+                  className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-600 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-400"
                 >
                   Instagram
                 </a>
               )}
-          </div>
+            </div>
 
             {/* At-a-Glance Pills - Below Action Pills */}
-            <section className="w-full pt-4" aria-labelledby="at-a-glance">
+            <section className="w-full pt-2.5" aria-labelledby="at-a-glance">
               <h2 
                 id="at-a-glance" 
-                className="mb-2 w-full text-left text-sm font-medium text-neutral-500"
+                className="mb-2 w-full text-left text-sm font-semibold text-neutral-500"
               >
                 At a glance
               </h2>
