@@ -814,7 +814,7 @@ export default function MerchantDetailPage() {
                         </div>
                       )}
               
-              {/* Time Until Change */}
+              {/* Time Until Change (e.g., "Opens in 3 hours") */}
               {getTimeUntilChange() && (
                 <p className="mb-2 ml-9 text-sm text-neutral-600">
                   {getTimeUntilChange()}
