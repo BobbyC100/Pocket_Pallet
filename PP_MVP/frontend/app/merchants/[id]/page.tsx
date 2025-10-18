@@ -446,6 +446,88 @@ export default function MerchantDetailPage() {
     return 'Verified by admin';
   };
 
+  // Helper: Get time until next state change (e.g., "Opens in 3 hours")
+  const getTimeUntilChange = () => {
+    const openingHours = googleMeta?.opening_hours;
+    if (!openingHours || !openingHours.periods || openingHours.periods.length === 0) return null;
+    
+    const isOpen = openingHours.open_now;
+    const periods = openingHours.periods;
+    const now = new Date();
+    const currentDay = (now.getDay() + 6) % 7;
+    const currentTime = now.getHours() * 100 + now.getMinutes();
+    
+    // Find today's periods
+    const todayPeriods = periods.filter(p => p.open.day === currentDay);
+    
+    if (isOpen) {
+      // Currently open, find closing time
+      for (const period of todayPeriods) {
+        const openTime = parseInt(period.open.time);
+        const closeTime = period.close ? parseInt(period.close.time) : 2400;
+        
+        if (currentTime >= openTime && currentTime < closeTime) {
+          const closeHour = Math.floor(closeTime / 100);
+          const closeMinute = closeTime % 100;
+          const closeDate = new Date(now);
+          closeDate.setHours(closeHour, closeMinute, 0, 0);
+          
+          const diffMs = closeDate.getTime() - now.getTime();
+          const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+          const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+          
+          if (diffHours > 0) {
+            return `Closes in ${diffHours} hour${diffHours > 1 ? 's' : ''}`;
+          } else if (diffMinutes > 0) {
+            return `Closes in ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
+          }
+        }
+      }
+    } else {
+      // Currently closed, find next opening time
+      // Check for later today
+      const futurePeriodsToday = todayPeriods.filter(p => parseInt(p.open.time) > currentTime);
+      if (futurePeriodsToday.length > 0) {
+        const nextPeriod = futurePeriodsToday[0];
+        const openTime = parseInt(nextPeriod.open.time);
+        const openHour = Math.floor(openTime / 100);
+        const openMinute = openTime % 100;
+        const openDate = new Date(now);
+        openDate.setHours(openHour, openMinute, 0, 0);
+        
+        const diffMs = openDate.getTime() - now.getTime();
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        
+        if (diffHours > 0) {
+          return `Opens in ${diffHours} hour${diffHours > 1 ? 's' : ''}`;
+        } else if (diffMinutes > 0) {
+          return `Opens in ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
+        }
+      }
+      
+      // Check for tomorrow
+      const tomorrowDay = (currentDay + 1) % 7;
+      const tomorrowPeriods = periods.filter(p => p.open.day === tomorrowDay);
+      if (tomorrowPeriods.length > 0) {
+        const nextPeriod = tomorrowPeriods[0];
+        const openTime = parseInt(nextPeriod.open.time);
+        const openHour = Math.floor(openTime / 100);
+        const openMinute = openTime % 100;
+        const openDate = new Date(now);
+        openDate.setDate(openDate.getDate() + 1);
+        openDate.setHours(openHour, openMinute, 0, 0);
+        
+        const diffMs = openDate.getTime() - now.getTime();
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        
+        return `Opens in ${diffHours} hour${diffHours > 1 ? 's' : ''}`;
+      }
+    }
+    
+    return null;
+  };
+
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#FAF6EF', color: '#222' }}>
       {/* Header Layout: Left Title / Right Hero */}
@@ -731,6 +813,13 @@ export default function MerchantDetailPage() {
                   </p>
                         </div>
                       )}
+              
+              {/* Time Until Change */}
+              {getTimeUntilChange() && (
+                <p className="mb-2 ml-9 text-sm text-neutral-600">
+                  {getTimeUntilChange()}
+                </p>
+              )}
                       
               {/* Last Updated */}
               {getLastUpdated() && (
